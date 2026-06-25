@@ -11,7 +11,7 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-gallery-white">
       {/* Simplified top bar */}
-      <header className="h-14 flex items-center justify-between px-4 border-b border-gallery-border bg-gallery-white flex-shrink-0">
+      <header className="h-14 flex items-center justify-between px-4 bg-gallery-white flex-shrink-0">
         <Link
           href="/"
           className="flex items-center gap-2.5 group"

@@ -62,9 +62,9 @@ export default function VariableTracker({
   }, [currentStep, steps]);
 
   return (
-    <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden border border-code-surface">
+    <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-code-surface border-b border-gallery-border/10 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-code-surface flex-shrink-0">
         <span className="text-sm font-medium text-code-text">变量状态</span>
         <span className="text-xs text-gallery-gray font-mono">
           Step {currentStep + 1}/{steps.length}

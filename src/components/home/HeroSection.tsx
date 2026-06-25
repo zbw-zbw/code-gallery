@@ -12,7 +12,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gallery-border bg-gallery-white/80 backdrop-blur-sm mb-8"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gallery-bg backdrop-blur-sm mb-8"
         >
           <span className="text-xs md:text-sm text-gallery-gray">
             TRAE AI 创造力大赛 · 学习工作赛道
@@ -83,7 +83,7 @@ export default function HeroSection() {
           </Link>
           <a
             href="#features"
-            className="px-8 py-3.5 border border-gallery-border hover:border-gallery-gray text-gallery-black font-medium rounded-xl transition-colors duration-200 text-base"
+            className="px-8 py-3.5 bg-gallery-bg hover:bg-gallery-border/50 text-gallery-black font-medium rounded-xl transition-colors duration-200 text-base"
           >
             了解更多
           </a>
@@ -106,7 +106,7 @@ function HeroDecoration() {
         delay: 0.6,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="relative max-w-3xl mx-auto w-full h-[200px] rounded-2xl bg-code-bg border border-code-surface overflow-hidden"
+      className="relative max-w-3xl mx-auto w-full h-[200px] rounded-2xl bg-code-bg shadow-sm overflow-hidden"
     >
       <div className="absolute inset-0 flex items-center justify-center gap-8 md:gap-16 px-8">
         {/* Left: Code blocks */}

@@ -23,6 +23,29 @@ const LOADING_STAGES = [
   "生成可视化数据...",
 ];
 
+// Tab icons as SVG components
+const ExecutionIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </svg>
+);
+
+const ArchitectureIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1" />
+    <rect x="14" y="3" width="7" height="7" rx="1" />
+    <rect x="3" y="14" width="7" height="7" rx="1" />
+    <rect x="14" y="14" width="7" height="7" rx="1" />
+  </svg>
+);
+
+const DataFlowIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    <path d="M14.5 6.5L17.5 9.5" />
+  </svg>
+);
+
 export default function ResultPanel({
   result,
   isAnalyzing,
@@ -84,7 +107,7 @@ export default function ResultPanel({
     return (
       <div className="h-full flex flex-col items-center justify-center bg-gallery-white px-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-xl bg-code-bg border border-code-surface flex items-center justify-center">
+          <div className="w-16 h-16 rounded-xl bg-code-bg flex items-center justify-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="16 18 22 12 16 6" />
               <polyline points="8 6 2 12 8 18" />
@@ -93,7 +116,7 @@ export default function ResultPanel({
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
-          <div className="w-16 h-16 rounded-xl bg-gallery-bg border border-gallery-border flex items-center justify-center">
+          <div className="w-16 h-16 rounded-xl bg-gallery-bg flex items-center justify-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2">
               <rect x="3" y="3" width="7" height="7" rx="1" />
               <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -112,7 +135,7 @@ export default function ResultPanel({
   return (
     <div className="h-full flex flex-col bg-gallery-white overflow-hidden">
       {/* Summary */}
-      <div className="px-5 py-3 border-b border-gallery-border bg-gallery-bg/50 flex items-start justify-between gap-4">
+      <div className="px-5 py-3 bg-gallery-bg/50 flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm text-gallery-gray mb-0.5">代码概述</p>
           <p className="text-base font-medium text-gallery-black truncate">{result.summary}</p>
@@ -133,11 +156,11 @@ export default function ResultPanel({
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gallery-border relative">
+      <div className="flex relative bg-gallery-bg/30">
         {[
-          { key: "execution" as const, label: "执行流程", icon: "▶️" },
-          { key: "architecture" as const, label: "架构图", icon: "🏗️" },
-          { key: "dataflow" as const, label: "数据流", icon: "🔀" },
+          { key: "execution" as const, label: "执行流程", Icon: ExecutionIcon },
+          { key: "architecture" as const, label: "架构图", Icon: ArchitectureIcon },
+          { key: "dataflow" as const, label: "数据流", Icon: DataFlowIcon },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -148,7 +171,7 @@ export default function ResultPanel({
                 : "text-gallery-gray hover:text-gallery-black"
             }`}
           >
-            <span className="text-xs">{tab.icon}</span>
+            <tab.Icon />
             <span>{tab.label}</span>
             {activeTab === tab.key && (
               <motion.div

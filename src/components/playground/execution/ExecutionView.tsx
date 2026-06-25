@@ -84,8 +84,14 @@ export default function ExecutionView({
   );
 
   const handlePlayPause = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
+    setIsPlaying((prev) => {
+      if (!prev && currentStep >= totalSteps - 1) {
+        setCurrentStep(0);
+        return true;
+      }
+      return !prev;
+    });
+  }, [currentStep, totalSteps]);
 
   const handleSpeedChange = useCallback((speed: number) => {
     setPlaySpeed(speed);

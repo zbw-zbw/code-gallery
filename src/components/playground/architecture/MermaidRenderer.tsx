@@ -124,7 +124,7 @@ export default function MermaidRenderer({
           <summary className="text-xs text-code-purple cursor-pointer text-center">
             查看 Mermaid 原始代码
           </summary>
-          <pre className="mt-2 text-xs font-mono text-gallery-black bg-white rounded-lg p-3 overflow-auto max-h-32 border border-gallery-border">
+          <pre className="mt-2 text-xs font-mono text-gallery-black bg-white rounded-lg p-3 overflow-auto max-h-32 shadow-sm">
             {code}
           </pre>
         </details>

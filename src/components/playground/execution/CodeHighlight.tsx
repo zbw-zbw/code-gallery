@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ExecutionStep } from "@/types";
+import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
 
 interface CodeHighlightProps {
   code: string;
@@ -43,10 +44,26 @@ export default function CodeHighlight({
     }
   }, [activeLine]);
 
+  // Detect language from fileName or code
+  const detectLang = (fname?: string): string => {
+    if (!fname) return "javascript";
+    if (fname.endsWith(".py")) return "python";
+    if (fname.endsWith(".ts")) return "typescript";
+    if (fname.endsWith(".java")) return "java";
+    if (fname.endsWith(".go")) return "go";
+    if (fname.endsWith(".rs")) return "rust";
+    if (fname.endsWith(".cpp") || fname.endsWith(".cc")) return "cpp";
+    return "javascript";
+  };
+
+  const language = detectLang(fileName);
+  const highlightedHtml = getHighlightedHtml(code, language);
+  const highlightedLines = highlightedHtml.split("\n");
+
   return (
-    <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden border border-code-surface">
+    <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden">
       {/* Title bar */}
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-code-surface border-b border-gallery-border/10 flex-shrink-0">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-code-surface flex-shrink-0">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-400" />
           <div className="w-3 h-3 rounded-full bg-yellow-400" />
@@ -107,19 +124,23 @@ export default function CodeHighlight({
                 >
                   {isActive && (
                     <span className="inline-block mr-1 text-code-purple">
-                      ▶
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     </span>
                   )}
                   {lineNum}
                 </div>
 
-                {/* Code content */}
+                {/* Code content with syntax highlighting */}
                 <div
                   className={`relative flex-1 py-0.5 pr-4 text-sm font-mono whitespace-pre ${
                     isActive ? "text-code-text" : "text-gallery-gray/70"
                   }`}
                 >
-                  {line || " "}
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: highlightedLines[index] || " ",
+                    }}
+                  />
                 </div>
               </div>
             );

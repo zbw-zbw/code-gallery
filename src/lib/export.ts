@@ -25,7 +25,7 @@ export function exportAsSvg(svgString: string): void {
 }
 
 export function generateEmbedCode(): string {
-  return `<iframe src="https://code-gallery.vercel.app/embed/demo" width="800" height="500" frameborder="0" style="border-radius:12px;border:1px solid #e5e7eb;"></iframe>`;
+  return `<iframe src="https://kyriewen.cn/embed/demo" width="800" height="500" frameborder="0" style="border-radius:12px;border:1px solid #e5e7eb;"></iframe>`;
 }
 
 export function generateMarkdown(
@@ -50,5 +50,5 @@ ${code}
 ${mermaidCode}
 \`\`\`
 
-> 由 [代码画廊](https://code-gallery.vercel.app) 生成`;
+> 由 [代码画廊](https://kyriewen.cn) 生成`;
 }

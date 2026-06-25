@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gallery-bg border-t border-gallery-border">
+    <footer className="bg-gallery-bg">
       <div className="max-w-6xl mx-auto px-6 py-12 md:py-16">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Left: Logo + tagline */}
@@ -50,7 +50,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-8 pt-8 border-t border-gallery-border text-center">
+        <div className="mt-8 pt-8 text-center">
           <p className="text-sm text-gallery-gray">
             © 2026 代码画廊 · TRAE AI 创造力大赛
           </p>

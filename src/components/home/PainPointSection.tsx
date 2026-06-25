@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import SectionTitle from "@/components/shared/SectionTitle";
 import { PAIN_POINTS } from "@/lib/constants";
+import Icon from "@/components/shared/Icon";
 
 export default function PainPointSection() {
   return (
@@ -25,9 +26,11 @@ export default function PainPointSection() {
                 delay: index * 0.1,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
-              className="group bg-gallery-white rounded-2xl border border-gallery-border p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="group bg-gallery-bg rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
             >
-              <div className="text-5xl mb-5">{point.emoji}</div>
+              <div className="text-code-purple mb-5">
+                <Icon name={point.icon} size={40} />
+              </div>
               <h3 className="text-xl font-bold text-gallery-black mb-3">
                 {point.title}
               </h3>

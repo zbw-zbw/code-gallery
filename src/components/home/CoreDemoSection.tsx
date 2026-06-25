@@ -43,11 +43,11 @@ export default function CoreDemoSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-          className="rounded-2xl border border-gallery-border overflow-hidden bg-gallery-white"
+          className="rounded-2xl overflow-hidden bg-gallery-white shadow-sm"
         >
           <div className="grid grid-cols-1 md:grid-cols-2">
             {/* Left: Code */}
-            <div className="border-b md:border-b-0 md:border-r border-gallery-border">
+            <div>
               <CodeBlock code={BUBBLE_SORT_CODE} filename="bubbleSort.js" />
             </div>
 

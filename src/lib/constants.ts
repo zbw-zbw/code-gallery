@@ -2,19 +2,19 @@ import { Language } from "@/types";
 
 export const PAIN_POINTS = [
   {
-    emoji: "🧠",
+    icon: "brain",
     title: "脑中编译太慢",
     description:
       "面对陌生代码，要在脑中模拟执行：变量怎么变、循环几次——平均花15分钟才能理清",
   },
   {
-    emoji: "📝",
+    icon: "write",
     title: "图解做不动",
     description:
       "想给博客配代码动画，手动画图30分钟起步，还不一定画得准",
   },
   {
-    emoji: "🔄",
+    icon: "refresh",
     title: "Review 太痛苦",
     description: "200行代码逐行读，不知道整体结构，2小时后：这啥？",
   },
@@ -22,19 +22,19 @@ export const PAIN_POINTS = [
 
 export const FEATURES = [
   {
-    icon: "🎬",
+    icon: "play",
     title: "执行流程动画",
     description:
       "粘贴代码，AI 逐步还原执行过程。变量变化、数据流动、循环过程一目了然",
   },
   {
-    icon: "🏗️",
+    icon: "structure",
     title: "架构图生成",
     description:
       "自动分析函数调用关系和模块依赖，生成可交互的架构图",
   },
   {
-    icon: "📎",
+    icon: "embed",
     title: "可嵌入图解",
     description: "导出为图片或 iframe 嵌入代码，直接插入技术博客",
   },

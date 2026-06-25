@@ -36,6 +36,26 @@ body {
   background: rgba(99, 102, 241, 0.2);
 }
 
+/* Global cursor pointer for interactive elements */
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="range"],
+select,
+label,
+textarea,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  cursor: text;
+}
+
 /* Hero decoration animation */
 @keyframes flowDash {
   to {

@@ -16,9 +16,13 @@ export default function HowItWorksSection() {
         <div className="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-4">
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <div key={step.number} className="flex-1 flex flex-col items-center text-center relative">
-              {/* Connector line */}
+              {/* Connector line - removed border, using SVG instead */}
               {index < HOW_IT_WORKS_STEPS.length - 1 && (
-                <div className="hidden md:block absolute top-10 left-[60%] w-[80%] border-t-2 border-dashed border-gallery-border" />
+                <div className="hidden md:block absolute top-10 left-[60%] w-[80%]">
+                  <svg width="100%" height="2" viewBox="0 0 100 2" preserveAspectRatio="none">
+                    <line x1="0" y1="1" x2="100" y2="1" stroke="#e5e7eb" strokeWidth="2" strokeDasharray="6 4" />
+                  </svg>
+                </div>
               )}
 
               <motion.div

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import SectionTitle from "@/components/shared/SectionTitle";
 import { FEATURES } from "@/lib/constants";
+import Icon from "@/components/shared/Icon";
 
 export default function FeaturesSection() {
   return (
@@ -25,10 +26,10 @@ export default function FeaturesSection() {
                 delay: index * 0.1,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
-              className="group bg-gallery-white rounded-2xl border border-gallery-border overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="group bg-gallery-bg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
             >
               {/* Diagram area */}
-              <div className="h-[200px] bg-gallery-bg flex items-center justify-center p-6">
+              <div className="h-[200px] bg-gallery-white flex items-center justify-center p-6">
                 {index === 0 && <FlowAnimationDiagram />}
                 {index === 1 && <ArchitectureDiagram />}
                 {index === 2 && <EmbedDiagram />}
@@ -36,7 +37,9 @@ export default function FeaturesSection() {
 
               {/* Content */}
               <div className="p-6 md:p-8">
-                <div className="text-3xl mb-3">{feature.icon}</div>
+                <div className="text-code-purple mb-3">
+                  <Icon name={feature.icon} size={32} />
+                </div>
                 <h3 className="text-xl font-bold text-gallery-black mb-3">
                   {feature.title}
                 </h3>
@@ -164,7 +167,7 @@ function ArchitectureDiagram() {
 
 function EmbedDiagram() {
   return (
-    <div className="w-[200px] h-[120px] rounded-xl border-2 border-dashed border-gallery-border bg-gallery-white flex flex-col items-center justify-center gap-2">
+    <div className="w-[200px] h-[120px] rounded-xl bg-gallery-bg flex flex-col items-center justify-center gap-2">
       <svg
         width="32"
         height="32"

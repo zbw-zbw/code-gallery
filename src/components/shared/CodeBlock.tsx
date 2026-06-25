@@ -46,10 +46,10 @@ export default function CodeBlock({ code, filename }: CodeBlockProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-      className="rounded-2xl overflow-hidden bg-code-bg border border-code-surface"
+      className="rounded-2xl overflow-hidden bg-code-bg shadow-sm"
     >
       {filename && (
-        <div className="flex items-center gap-2 px-4 py-3 bg-code-surface border-b border-gallery-border/10">
+        <div className="flex items-center gap-2 px-4 py-3 bg-code-surface">
           <div className="flex gap-1.5">
             <div className="w-3 h-3 rounded-full bg-red-400" />
             <div className="w-3 h-3 rounded-full bg-yellow-400" />

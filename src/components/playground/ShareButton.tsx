@@ -66,7 +66,7 @@ export default function ShareButton({ result }: ShareButtonProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gallery-border z-50 overflow-hidden"
+              className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl z-50 overflow-hidden"
             >
               <button
                 onClick={handleCopyLink}
@@ -80,7 +80,7 @@ export default function ShareButton({ result }: ShareButtonProps) {
               </button>
               <button
                 onClick={handleCopyMarkdown}
-                className="w-full text-left px-4 py-3 text-sm text-gallery-black hover:bg-gallery-bg transition-colors duration-150 flex items-center gap-2 border-t border-gallery-border"
+                className="w-full text-left px-4 py-3 text-sm text-gallery-black hover:bg-gallery-bg transition-colors duration-150 flex items-center gap-2"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />

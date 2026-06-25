@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { FlowNode } from "@/types";
+import { motion, AnimatePresence } from "framer-motion";
 import MermaidRenderer from "../architecture/MermaidRenderer";
 
 interface DataFlowViewProps {
@@ -19,6 +20,8 @@ export default function DataFlowView({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
+  const [hoveredNode, setHoveredNode] = useState<FlowNode | null>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
 
   const zoomIn = useCallback(() => {
@@ -73,7 +76,6 @@ export default function DataFlowView({
       const svg = container.querySelector("svg");
       if (!svg) return;
 
-      // Add flow animation styles to the SVG
       const styleEl = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "style"
@@ -92,13 +94,11 @@ export default function DataFlowView({
         }
       `;
 
-      // Only inject once
       if (!svg.querySelector("#flow-anim-style")) {
         styleEl.id = "flow-anim-style";
         svg.prepend(styleEl);
       }
 
-      // Apply flow class to edge paths
       const edgePaths = svg.querySelectorAll(".edgePaths path");
       edgePaths.forEach((p) => p.classList.add("flow-path"));
 
@@ -110,10 +110,64 @@ export default function DataFlowView({
     return () => observer.disconnect();
   }, [mermaidCode]);
 
+  // Node interaction
+  useEffect(() => {
+    const container = svgContainerRef.current;
+    if (!container || !nodes.length) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const nodeEl = target.closest(".node") as HTMLElement | null;
+      if (nodeEl) {
+        const labelEl = nodeEl.querySelector(".label") as HTMLElement | null;
+        const label = labelEl?.textContent?.trim() || "";
+        const found = nodes.find((n) => n.label === label);
+        if (found) {
+          setSelectedNode(found);
+        }
+      } else {
+        setSelectedNode(null);
+      }
+    };
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const nodeEl = target.closest(".node") as HTMLElement | null;
+      if (nodeEl) {
+        const labelEl = nodeEl.querySelector(".label") as HTMLElement | null;
+        const label = labelEl?.textContent?.trim() || "";
+        const found = nodes.find((n) => n.label === label);
+        if (found) setHoveredNode(found);
+      }
+    };
+
+    const handleMouseOut = () => setHoveredNode(null);
+
+    container.addEventListener("click", handleClick);
+    container.addEventListener("mouseover", handleMouseOver);
+    container.addEventListener("mouseout", handleMouseOut);
+    return () => {
+      container.removeEventListener("click", handleClick);
+      container.removeEventListener("mouseover", handleMouseOver);
+      container.removeEventListener("mouseout", handleMouseOut);
+    };
+  }, [nodes]);
+
+  const nodeConnections = nodes.map((node) => {
+    const outgoing = edges.filter((e) => e.from === node.id);
+    const incoming = edges.filter((e) => e.to === node.id);
+    return { ...node, outgoing, incoming };
+  });
+
+  const activeNode = selectedNode || hoveredNode;
+  const activeNodeData = activeNode
+    ? nodeConnections.find((n) => n.id === activeNode.id)
+    : null;
+
   return (
     <div className="h-full flex flex-col bg-gallery-white overflow-hidden">
       {/* Top toolbar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-gallery-border bg-gallery-bg/50 flex-shrink-0">
+      <div className="flex items-center justify-between px-5 py-3 bg-gallery-bg/50 flex-shrink-0">
         <h3 className="text-sm font-medium text-gallery-black">数据流图</h3>
         <div className="flex items-center gap-1.5">
           <button
@@ -121,7 +175,7 @@ export default function DataFlowView({
             className="w-8 h-8 rounded-lg flex items-center justify-center text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
             title="缩小"
           >
-            −
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
           <span className="text-xs font-mono text-gallery-gray w-8 text-center">
             {Math.round(scale * 100)}%
@@ -131,14 +185,14 @@ export default function DataFlowView({
             className="w-8 h-8 rounded-lg flex items-center justify-center text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
             title="放大"
           >
-            +
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
           <button
             onClick={resetView}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-xs text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200 ml-1"
             title="重置"
           >
-            ↺
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
         </div>
       </div>
@@ -161,6 +215,61 @@ export default function DataFlowView({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* Node info panel */}
+        <AnimatePresence>
+          {activeNodeData && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="absolute top-4 right-4 z-10 bg-white rounded-xl shadow-lg p-4 max-w-[260px]"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gallery-black">
+                  {activeNodeData.label}
+                </span>
+                {selectedNode && (
+                  <button
+                    onClick={() => setSelectedNode(null)}
+                    className="text-gallery-gray hover:text-gallery-black"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1 mb-2">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-gallery-bg text-gallery-gray">
+                  {activeNodeData.type}
+                </span>
+              </div>
+              {activeNodeData.incoming.length > 0 && (
+                <div className="mb-1">
+                  <span className="text-[10px] text-gallery-gray">输入来源:</span>
+                  <div className="flex flex-wrap gap-1 mt-0.5">
+                    {activeNodeData.incoming.map((e, i) => (
+                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-flow-blue/10 text-flow-blue">
+                        {e.from}{e.label ? ` (${e.label})` : ""}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {activeNodeData.outgoing.length > 0 && (
+                <div>
+                  <span className="text-[10px] text-gallery-gray">输出目标:</span>
+                  <div className="flex flex-wrap gap-1 mt-0.5">
+                    {activeNodeData.outgoing.map((e, i) => (
+                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-code-purple/10 text-code-purple">
+                        {e.to}{e.label ? ` (${e.label})` : ""}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div
           className="w-full h-full flex items-center justify-center"
           style={{
@@ -178,13 +287,13 @@ export default function DataFlowView({
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex items-center justify-center gap-4 md:gap-6 px-5 py-3 border-t border-gallery-border bg-gallery-bg/50 flex-shrink-0 flex-wrap">
-        <DataFlowLegendItem color="#38bdf8" icon="📥" label="输入" />
-        <DataFlowLegendItem color="#6366f1" icon="⚙️" label="处理" />
-        <DataFlowLegendItem color="#34d399" icon="📤" label="输出" />
-        <DataFlowLegendItem color="#f59e0b" icon="❓" label="判断" />
-        <DataFlowLegendItem color="#9ca3af" icon="💾" label="存储" />
+      {/* Legend - SVG icons instead of emojis */}
+      <div className="flex items-center justify-center gap-4 md:gap-6 px-5 py-3 bg-gallery-bg/50 flex-shrink-0 flex-wrap">
+        <DataFlowLegendItem color="#38bdf8" label="输入" />
+        <DataFlowLegendItem color="#6366f1" label="处理" />
+        <DataFlowLegendItem color="#34d399" label="输出" />
+        <DataFlowLegendItem color="#f59e0b" label="判断" />
+        <DataFlowLegendItem color="#9ca3af" label="存储" />
       </div>
     </div>
   );
@@ -192,11 +301,9 @@ export default function DataFlowView({
 
 function DataFlowLegendItem({
   color,
-  icon,
   label,
 }: {
   color: string;
-  icon: string;
   label: string;
 }) {
   return (
@@ -205,7 +312,6 @@ function DataFlowLegendItem({
         className="w-3 h-3 rounded-sm"
         style={{ backgroundColor: color }}
       />
-      <span className="text-xs text-gallery-gray">{icon}</span>
       <span className="text-xs text-gallery-gray">{label}</span>
     </div>
   );

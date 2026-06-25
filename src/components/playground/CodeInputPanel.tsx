@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, ReactNode } from "react";
 import { Language } from "@/types";
 import { detectLanguage, SUPPORTED_LANGUAGES } from "@/lib/constants";
 import LanguageSelector from "./LanguageSelector";
+import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
 
 interface CodeInputPanelProps {
   code: string;
@@ -25,24 +26,31 @@ export default function CodeInputPanel({
   extraToolbar,
 }: CodeInputPanelProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(1);
 
-  // Auto-detect language when code changes
+  // Auto-detect language on first meaningful code paste only
+  const hasAutoDetected = useRef(false);
   useEffect(() => {
-    if (code.trim().length > 0) {
+    setLineCount(code.split("\n").length || 1);
+    if (code.trim().length > 10 && !hasAutoDetected.current) {
       const detected = detectLanguage(code);
       if (detected !== language) {
         onLanguageChange(detected);
       }
+      hasAutoDetected.current = true;
     }
-    setLineCount(code.split("\n").length || 1);
   }, [code, language, onLanguageChange]);
 
-  // Sync scroll between textarea and line numbers
+  // Sync scroll between textarea and highlight layer + line numbers
   const handleScroll = useCallback(() => {
     if (textareaRef.current && lineNumbersRef.current) {
       lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+    if (textareaRef.current && highlightRef.current) {
+      highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+      highlightRef.current.scrollLeft = textareaRef.current.scrollLeft;
     }
   }, []);
 
@@ -63,16 +71,20 @@ export default function CodeInputPanel({
 
   const handleClear = () => {
     onCodeChange("");
+    hasAutoDetected.current = false;
     textareaRef.current?.focus();
   };
 
   const lines = Array.from({ length: lineCount }, (_, i) => i + 1);
   const isEmpty = code.trim().length === 0;
 
+  // Syntax highlighted HTML for overlay
+  const highlightedHtml = getHighlightedHtml(code, language);
+
   return (
     <div className="flex flex-col h-full bg-code-bg">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-code-surface">
+      <div className="flex items-center justify-between px-4 py-3 bg-code-surface flex-shrink-0">
         <div className="flex items-center gap-3">
           <LanguageSelector value={language} onChange={onLanguageChange} />
           {extraToolbar}
@@ -81,7 +93,7 @@ export default function CodeInputPanel({
         <div className="flex items-center gap-2">
           <button
             onClick={handleClear}
-            className="px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-code-text hover:bg-code-surface transition-colors duration-200"
+            className="px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-code-text hover:bg-gallery-border/20 transition-colors duration-200"
           >
             清空
           </button>
@@ -109,33 +121,56 @@ export default function CodeInputPanel({
         </div>
       </div>
 
-      {/* Code editor */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Code editor with syntax highlighting overlay */}
+      <div className="flex-1 flex overflow-hidden relative">
         {/* Line numbers */}
         <div
           ref={lineNumbersRef}
-          className="w-12 flex-shrink-0 py-4 text-right pr-3 text-sm font-mono text-gallery-gray select-none overflow-hidden bg-code-bg"
+          className="w-12 flex-shrink-0 py-4 text-right pr-3 text-sm font-mono text-gallery-gray select-none overflow-hidden bg-code-bg z-10"
         >
           {lines.map((n) => (
             <div key={n} className="leading-6">{n}</div>
           ))}
         </div>
 
-        {/* Textarea */}
-        <textarea
-          ref={textareaRef}
-          value={code}
-          onChange={(e) => onCodeChange(e.target.value)}
-          onScroll={handleScroll}
-          onKeyDown={handleKeyDown}
-          placeholder="粘贴你的代码到这里...（或选择右上角的示例）"
-          spellCheck={false}
-          className="flex-1 py-4 pl-2 pr-4 bg-code-bg text-code-text text-sm font-mono leading-6 resize-none outline-none border-none placeholder:text-gallery-gray/50"
-        />
+        {/* Editor container */}
+        <div className="flex-1 relative">
+          {/* Syntax highlighted background layer */}
+          <div
+            ref={highlightRef}
+            className="absolute inset-0 py-4 pl-2 pr-4 text-sm font-mono leading-6 overflow-hidden pointer-events-none whitespace-pre bg-code-bg"
+            aria-hidden="true"
+          >
+            <div
+              dangerouslySetInnerHTML={{
+                __html: highlightedHtml + "\n ",
+              }}
+              className="hljs"
+              style={{ color: "#abb2bf" }}
+            />
+          </div>
+
+          {/* Textarea on top */}
+          <textarea
+            ref={textareaRef}
+            value={code}
+            onChange={(e) => onCodeChange(e.target.value)}
+            onScroll={handleScroll}
+            onKeyDown={handleKeyDown}
+            placeholder="粘贴你的代码到这里...（或点击右上角示例库）"
+            spellCheck={false}
+            className="absolute inset-0 py-4 pl-2 pr-4 bg-transparent text-code-text text-sm font-mono leading-6 resize-none outline-none border-none placeholder:text-gallery-gray/50"
+            style={{
+              color: "transparent",
+              caretColor: "#f8f8f2",
+              zIndex: 1,
+            }}
+          />
+        </div>
       </div>
 
       {/* Bottom info bar */}
-      <div className="px-4 py-2 border-t border-code-surface text-xs text-gallery-gray flex items-center justify-between">
+      <div className="px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between">
         <span>
           共 {lineCount} 行 · 语言:{" "}
           {SUPPORTED_LANGUAGES.find((l) => l.value === language)?.label}

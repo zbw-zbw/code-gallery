@@ -16,7 +16,7 @@ export default function ExampleCard({ example }: ExampleCardProps) {
   return (
     <Link
       href={`/playground?example=${example.id}`}
-      className="group block rounded-2xl border border-gallery-border overflow-hidden bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+      className="group block rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
     >
       {/* Code preview */}
       <div className="h-28 bg-code-bg relative overflow-hidden px-4 py-3">

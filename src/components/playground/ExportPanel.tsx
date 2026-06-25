@@ -71,7 +71,7 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gallery-border z-50 overflow-hidden"
+              className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl z-50 overflow-hidden"
             >
               <div className="p-4">
                 <h4 className="text-sm font-medium text-gallery-black mb-3">导出可视化</h4>
@@ -84,7 +84,7 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
                       <button
                         key={f}
                         onClick={() => setFormat(f)}
-                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-200 ${
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors duration-200 whitespace-nowrap ${
                           format === f
                             ? "bg-code-purple text-white"
                             : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"

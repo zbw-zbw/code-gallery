@@ -36,7 +36,7 @@ export default function PlayerControls({
   const speeds = [0.5, 1, 2];
 
   return (
-    <div className="bg-gallery-bg border-t border-gallery-border px-4 py-3 flex-shrink-0">
+    <div className="bg-gallery-bg px-4 py-3 flex-shrink-0">
       <div className="flex items-center justify-center gap-3 md:gap-4">
         {/* Desktop controls */}
         <div className="hidden md:flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function PlayerControls({
               onClick={() => onSpeedChange(speed)}
               className={`px-2 py-1 rounded text-xs font-medium transition-colors duration-200 ${
                 playSpeed === speed
-                  ? "text-code-purple border-b-2 border-code-purple"
+                  ? "text-code-purple bg-code-purple/10"
                   : "text-gallery-gray hover:text-gallery-black"
               }`}
             >
