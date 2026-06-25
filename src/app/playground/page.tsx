@@ -69,9 +69,9 @@ function PlaygroundContent() {
 
   return (
     <PlaygroundLayout>
-      <div className="h-full grid grid-cols-1 md:grid-cols-2 grid-rows-[1fr_1fr] md:grid-rows-1 overflow-y-auto md:overflow-y-hidden">
-        {/* Left: Code input */}
-        <div className="min-h-0 flex flex-col">
+      <div className="h-full flex flex-col md:flex-row overflow-hidden">
+        {/* Left: Code input - fills full height */}
+        <div className="flex-1 min-h-0 flex flex-col">
           <CodeInputPanel
             code={code}
             language={language}
@@ -83,8 +83,8 @@ function PlaygroundContent() {
           />
         </div>
 
-        {/* Right: Result */}
-        <div className="min-h-0 flex flex-col">
+        {/* Right: Result - fills full height */}
+        <div className="flex-1 min-h-0 flex flex-col">
           <ResultPanel
             result={result}
             isAnalyzing={isAnalyzing}

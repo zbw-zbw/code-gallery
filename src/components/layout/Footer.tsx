@@ -33,7 +33,9 @@ export default function Footer() {
           {/* Right: GitHub placeholder */}
           <div className="flex items-center gap-4">
             <a
-              href="#"
+              href="https://github.com/zbw-zbw/code-gallery"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-gallery-gray hover:text-gallery-black transition-colors duration-200 flex items-center gap-1.5 text-sm"
             >
               <svg

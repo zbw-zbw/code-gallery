@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Example } from "@/lib/examples";
 import { SUPPORTED_LANGUAGES } from "@/lib/constants";
 import { CATEGORY_LABELS } from "@/lib/examples";
+import Image from "next/image";
 
 interface ExampleCardProps {
   example: Example;
@@ -11,25 +12,22 @@ interface ExampleCardProps {
 
 export default function ExampleCard({ example }: ExampleCardProps) {
   const lang = SUPPORTED_LANGUAGES.find((l) => l.value === example.language);
-  const codeLines = example.code.split("\n").slice(0, 3);
 
   return (
     <Link
       href={`/playground?example=${example.id}`}
       className="group block rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
     >
-      {/* Code preview */}
-      <div className="h-28 bg-code-bg relative overflow-hidden px-4 py-3">
-        <div className="space-y-1.5">
-          {codeLines.map((line, i) => (
-            <div
-              key={i}
-              className="h-3 rounded bg-gallery-gray/30"
-              style={{ width: `${[85, 60, 72][i % 3]}%` }}
-            />
-          ))}
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-code-bg" />
+      {/* Code preview image */}
+      <div className="h-32 bg-code-bg relative overflow-hidden">
+        <Image
+          src={`/examples/${example.id}.svg`}
+          alt={example.title}
+          fill
+          className="object-cover object-top"
+          sizes="(max-width: 768px) 100vw, 33vw"
+          unoptimized
+        />
       </div>
 
       {/* Content */}
@@ -52,7 +50,7 @@ export default function ExampleCard({ example }: ExampleCardProps) {
           {example.description}
         </p>
         <span className="text-xs text-code-purple font-medium group-hover:underline">
-          在 Playground 中打开 →
+          在 Playground 中打开
         </span>
       </div>
     </Link>

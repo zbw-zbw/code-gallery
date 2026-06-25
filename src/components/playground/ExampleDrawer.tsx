@@ -58,7 +58,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             >
-              <div className="w-full max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto hidden md:flex overflow-hidden">
+              <div className="w-full max-w-2xl h-[70vh] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto hidden md:flex overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
                   <h3 className="text-base font-bold text-gallery-black">示例库</h3>
