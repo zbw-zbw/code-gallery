@@ -1,0 +1,222 @@
+"use client";
+
+import { useState, useCallback, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArchNode } from "@/types";
+import MermaidRenderer from "./MermaidRenderer";
+
+interface ArchitectureViewProps {
+  nodes: ArchNode[];
+  edges: { from: string; to: string; label?: string }[];
+  mermaidCode: string;
+}
+
+export default function ArchitectureView({
+  nodes,
+  edges,
+  mermaidCode,
+}: ArchitectureViewProps) {
+  const [scale, setScale] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [selectedNode, setSelectedNode] = useState<ArchNode | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const zoomIn = useCallback(() => {
+    setScale((prev) => Math.min(3, +(prev + 0.2).toFixed(1)));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setScale((prev) => Math.max(0.5, +(prev - 0.2).toFixed(1)));
+  }, []);
+
+  const resetView = useCallback(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setScale((prev) => Math.min(3, Math.max(0.5, +(prev + delta).toFixed(1))));
+  }, []);
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.button !== 0) return;
+      setIsDragging(true);
+      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+    },
+    [position]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging) return;
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y,
+      });
+    },
+    [isDragging, dragStart]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Listen for clicks on mermaid SVG nodes to show info panel
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !nodes.length) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const nodeEl = target.closest(".node") as HTMLElement | null;
+      if (nodeEl) {
+        const labelEl = nodeEl.querySelector(".label") as HTMLElement | null;
+        const label = labelEl?.textContent?.trim() || "";
+        const found = nodes.find(
+          (n) => n.label === label && n.description
+        );
+        if (found) {
+          setSelectedNode(found);
+        }
+      }
+    };
+
+    container.addEventListener("click", handleClick);
+    return () => container.removeEventListener("click", handleClick);
+  }, [nodes]);
+
+  const hasDescription = nodes.some((n) => n.description);
+
+  return (
+    <div className="h-full flex flex-col bg-gallery-white overflow-hidden">
+      {/* Top toolbar */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-gallery-border bg-gallery-bg/50 flex-shrink-0">
+        <h3 className="text-sm font-medium text-gallery-black">架构图</h3>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={zoomOut}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
+            title="缩小"
+          >
+            −
+          </button>
+          <span className="text-xs font-mono text-gallery-gray w-8 text-center">
+            {Math.round(scale * 100)}%
+          </span>
+          <button
+            onClick={zoomIn}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
+            title="放大"
+          >
+            +
+          </button>
+          <button
+            onClick={resetView}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-xs text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200 ml-1"
+            title="重置"
+          >
+            ↺
+          </button>
+        </div>
+      </div>
+
+      {/* Chart area */}
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-hidden relative bg-[#fcfcff]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(229, 231, 235, 0.4) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(229, 231, 235, 0.4) 1px, transparent 1px)
+          `,
+          backgroundSize: "24px 24px",
+          cursor: isDragging ? "grabbing" : "grab",
+        }}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        {/* Node info panel */}
+        <AnimatePresence>
+          {selectedNode && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="absolute top-4 right-4 z-10 bg-white rounded-xl shadow-lg border border-gallery-border p-4 max-w-[220px]"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gallery-black">
+                  {selectedNode.label}
+                </span>
+                <button
+                  onClick={() => setSelectedNode(null)}
+                  className="text-gallery-gray hover:text-gallery-black"
+                >
+                  ✕
+                </button>
+              </div>
+              {selectedNode.description && (
+                <p className="text-xs text-gallery-gray leading-relaxed">
+                  {selectedNode.description}
+                </p>
+              )}
+              <span className="inline-block mt-2 text-[10px] px-1.5 py-0.5 rounded bg-gallery-bg text-gallery-gray">
+                {selectedNode.type}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Zoomable/pannable chart container */}
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{
+            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+            transformOrigin: "center center",
+            transition: isDragging ? "none" : "transform 0.1s ease-out",
+            userSelect: "none",
+          }}
+        >
+          <MermaidRenderer
+            code={mermaidCode}
+            id="architecture"
+            className="pointer-events-auto"
+          />
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-6 px-5 py-3 border-t border-gallery-border bg-gallery-bg/50 flex-shrink-0">
+        <LegendItem color="#6366f1" label="函数" />
+        <LegendItem color="#38bdf8" label="类/模块" />
+        <LegendItem color="#34d399" label="变量/数据" />
+        <LegendItem color="#9ca3af" label="外部依赖" />
+        {hasDescription && (
+          <span className="text-[10px] text-gallery-gray ml-2">
+            点击节点查看详情
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LegendItem({ color, label }: { color: string; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div
+        className="w-3 h-3 rounded-sm"
+        style={{ backgroundColor: color }}
+      />
+      <span className="text-xs text-gallery-gray">{label}</span>
+    </div>
+  );
+}

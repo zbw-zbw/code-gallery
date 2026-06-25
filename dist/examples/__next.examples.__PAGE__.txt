@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[57104,["/_next/static/chunks/258vxpd0wuys9.js","/_next/static/chunks/3n3yvff_6qsfw.js","/_next/static/chunks/0tcqzk3vz7z-n.js"],"default"]
+3:I[26747,["/_next/static/chunks/258vxpd0wuys9.js","/_next/static/chunks/3n3yvff_6qsfw.js","/_next/static/chunks/0tcqzk3vz7z-n.js"],""]
+4:I[25355,["/_next/static/chunks/258vxpd0wuys9.js","/_next/static/chunks/3n3yvff_6qsfw.js"],"OutletBoundary"]
+5:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-gallery-white","children":[["$","section",null,{"className":"pt-24 pb-12 md:pt-32 md:pb-16","children":["$","div",null,{"className":"max-w-6xl mx-auto px-6 text-center","children":[["$","h1",null,{"className":"text-4xl md:text-5xl font-black tracking-tight text-gallery-black mb-4","children":"示例库"}],["$","p",null,{"className":"text-lg text-gallery-gray max-w-xl mx-auto","children":"探索不同类型的代码可视化"}]]}]}],["$","section",null,{"className":"pb-24 md:pb-32","children":["$","div",null,{"className":"max-w-6xl mx-auto px-6","children":["$","$L2",null,{}]}]}],["$","div",null,{"className":"text-center pb-16","children":["$","$L3",null,{"href":"/","className":"text-sm text-gallery-gray hover:text-code-purple transition-colors duration-200","children":"← 返回首页"}]}]]}],[["$","script","script-0",{"src":"/_next/static/chunks/0tcqzk3vz7z-n.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"2HriThBw8WG-JT0h9Ua_5"}
+6:null
