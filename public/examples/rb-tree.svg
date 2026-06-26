@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+  <defs>
+    <linearGradient id="bg-grad-rb-tree" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#181825"/>
+    </linearGradient>
+    <linearGradient id="bottom-fade-rb-tree" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#181825" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="glow-rb-tree" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="300" height="200" rx="8" ry="8" fill="url(#bg-grad-rb-tree)"/>
+  <rect x="0.5" y="0.5" width="299" height="199" rx="8" ry="8" fill="none" stroke="#313244" stroke-width="1"/>
+  <line x1="0" y1="26" x2="300" y2="26" stroke="#313244" stroke-width="0.5"/>
+  <circle cx="12" cy="14" r="5" fill="#f38ba8" filter="url(#glow-rb-tree)"/>
+  <circle cx="27" cy="14" r="5" fill="#f9e2af" filter="url(#glow-rb-tree)"/>
+  <circle cx="42" cy="14" r="5" fill="#a6e3a1" filter="url(#glow-rb-tree)"/>
+  <text x="150.0" y="18" text-anchor="middle" font-family="Menlo, Monaco, monospace" font-size="10" fill="#6c7086">rb-tree.ts</text>
+  <g>
+  <text x="12" y="48" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">1</text>
+  <text x="28" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">enum</text>
+  <text x="54.4" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="61.0" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Color</text>
+  <text x="94.0" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="100.6" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="107.19999999999999" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="113.79999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Red</text>
+  <text x="133.6" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="140.2" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="146.79999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Black</text>
+  <text x="179.79999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="186.39999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">}</text>
+  <text x="192.99999999999997" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="64" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">2</text>
+  <text x="28" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">class</text>
+  <text x="61.0" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="67.6" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBNode</text>
+  <text x="107.19999999999999" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="113.79999999999998" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="120.39999999999998" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="80" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">3</text>
+  <text x="28" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">color</text>
+  <text x="74.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="80.8" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="87.39999999999999" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="93.99999999999999" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Color</text>
+  <text x="126.99999999999999" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="133.6" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Red</text>
+  <text x="153.4" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="160.0" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="96" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">4</text>
+  <text x="28" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">constructor</text>
+  <text x="113.8" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="120.39999999999999" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">public</text>
+  <text x="160.0" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="166.6" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">val</text>
+  <text x="186.4" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="193.0" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="199.6" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">number</text>
+  <text x="239.2" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="245.79999999999998" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="252.39999999999998" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">public</text>
+  <text x="292.0" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="298.6" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">left</text>
+  <text x="325.0" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="331.6" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="338.20000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBNode</text>
+  <text x="377.80000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="384.4000000000001" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">|</text>
+  <text x="391.0000000000001" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="397.60000000000014" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="424.0000000000001" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="430.60000000000014" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="437.20000000000016" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="443.8000000000002" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="470.20000000000016" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="476.8000000000002" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="483.4000000000002" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">public</text>
+  <text x="523.0000000000002" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="529.6000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">right</text>
+  <text x="562.6000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="569.2000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="575.8000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBNode</text>
+  <text x="615.4000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="622.0000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">|</text>
+  <text x="628.6000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="635.2000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="661.6000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="668.2000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="674.8000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="681.4000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="707.8000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="714.4000000000004" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="721.0000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">public</text>
+  <text x="760.6000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="767.2000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">parent</text>
+  <text x="806.8000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="813.4000000000005" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="820.0000000000006" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBNode</text>
+  <text x="859.6000000000006" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="866.2000000000006" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">|</text>
+  <text x="872.8000000000006" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="879.4000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="905.8000000000006" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="912.4000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="919.0000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="925.6000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="952.0000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="958.6000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="965.2000000000007" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="971.8000000000008" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">}</text>
+  <text x="978.4000000000008" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="112" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">5</text>
+  <text x="28" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">}</text>
+  <text x="34.6" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="128" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">6</text>
+  <text x="28" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="144" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">7</text>
+  <text x="28" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">class</text>
+  <text x="61.0" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="67.6" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBTree</text>
+  <text x="107.19999999999999" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="113.79999999999998" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="120.39999999999998" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="160" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">8</text>
+  <text x="28" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">root</text>
+  <text x="67.6" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="74.19999999999999" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="80.79999999999998" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">RBNode</text>
+  <text x="120.39999999999998" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="126.99999999999997" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">|</text>
+  <text x="133.59999999999997" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="140.19999999999996" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="166.59999999999997" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="173.19999999999996" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="179.79999999999995" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="186.39999999999995" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">null</text>
+  <text x="212.79999999999995" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="219.39999999999995" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="176" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">9</text>
+  <text x="28" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">insert</text>
+  <text x="80.80000000000001" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="87.4" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">val</text>
+  <text x="107.2" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="113.8" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="120.39999999999999" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">number</text>
+  <text x="160.0" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="166.6" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="173.2" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="179.79999999999998" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  </g>
+  <rect x="0" y="160" width="300" height="40" fill="url(#bottom-fade-rb-tree)"/>
+</svg>

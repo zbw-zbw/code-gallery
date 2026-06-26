@@ -86,12 +86,9 @@ export default function ResultPanel({
     );
   }
 
-  // Main panel content (always rendered)
-  const hasContent = result !== null;
-
   return (
     <div className="h-full flex flex-col bg-gallery-white overflow-hidden relative">
-      {/* Loading overlay */}
+      {/* Loading overlay - always stacked on top of content/empty state */}
       <AnimatePresence>
         {isAnalyzing && (
           <motion.div
@@ -115,9 +112,9 @@ export default function ResultPanel({
         )}
       </AnimatePresence>
 
-      {/* Summary (only when has result) */}
-      {hasContent && result && (
+      {result ? (
         <>
+          {/* Summary */}
           <div className="px-5 py-3 bg-gallery-bg/50 flex items-start justify-between gap-4 flex-shrink-0">
             <div className="min-w-0">
               <p className="text-sm text-gallery-gray mb-0.5">代码概述</p>
@@ -190,10 +187,8 @@ export default function ResultPanel({
             </motion.div>
           </AnimatePresence>
         </>
-      )}
-
-      {/* Empty state (when no result and not loading) */}
-      {!hasContent && !isAnalyzing && (
+      ) : (
+        /* Empty state - rendered even during first analysis so overlay stacks on top */
         <div className="h-full flex flex-col items-center justify-center px-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-xl bg-code-bg flex items-center justify-center">

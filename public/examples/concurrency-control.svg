@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">
+  <defs>
+    <linearGradient id="bg-grad-concurrency-control" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#181825"/>
+    </linearGradient>
+    <linearGradient id="bottom-fade-concurrency-control" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#181825" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="glow-concurrency-control" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="300" height="200" rx="8" ry="8" fill="url(#bg-grad-concurrency-control)"/>
+  <rect x="0.5" y="0.5" width="299" height="199" rx="8" ry="8" fill="none" stroke="#313244" stroke-width="1"/>
+  <line x1="0" y1="26" x2="300" y2="26" stroke="#313244" stroke-width="0.5"/>
+  <circle cx="12" cy="14" r="5" fill="#f38ba8" filter="url(#glow-concurrency-control)"/>
+  <circle cx="27" cy="14" r="5" fill="#f9e2af" filter="url(#glow-concurrency-control)"/>
+  <circle cx="42" cy="14" r="5" fill="#a6e3a1" filter="url(#glow-concurrency-control)"/>
+  <text x="150.0" y="18" text-anchor="middle" font-family="Menlo, Monaco, monospace" font-size="10" fill="#6c7086">concurrency-control.ts</text>
+  <g>
+  <text x="12" y="48" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">1</text>
+  <text x="28" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">async</text>
+  <text x="61.0" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="67.6" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">function</text>
+  <text x="120.39999999999999" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="126.99999999999999" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">runWithLimit</text>
+  <text x="206.2" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&lt;</text>
+  <text x="212.79999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">T</text>
+  <text x="219.39999999999998" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&gt;</text>
+  <text x="225.99999999999997" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="232.59999999999997" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">tasks</text>
+  <text x="265.59999999999997" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="272.2" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="278.8" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="285.40000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="292.00000000000006" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="298.6000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="305.2000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=&gt;</text>
+  <text x="318.4000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="325.0000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Promise</text>
+  <text x="371.2000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&lt;</text>
+  <text x="377.8000000000001" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">T</text>
+  <text x="384.40000000000015" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&gt;</text>
+  <text x="391.00000000000017" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="397.6000000000002" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="404.2000000000002" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="410.80000000000024" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="417.40000000000026" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="424.0000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">limit</text>
+  <text x="457.0000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="463.6000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="470.20000000000033" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">number</text>
+  <text x="509.80000000000035" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="516.4000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="523.0000000000003" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="529.6000000000004" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Promise</text>
+  <text x="575.8000000000004" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&lt;</text>
+  <text x="582.4000000000004" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">T</text>
+  <text x="589.0000000000005" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="595.6000000000005" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="602.2000000000005" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&gt;</text>
+  <text x="608.8000000000005" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="615.4000000000005" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="622.0000000000006" y="48" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="64" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">2</text>
+  <text x="28" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">const</text>
+  <text x="74.2" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="80.8" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">results</text>
+  <text x="127.0" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="133.6" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="140.2" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">T</text>
+  <text x="146.79999999999998" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="153.39999999999998" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="159.99999999999997" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="166.59999999999997" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="173.19999999999996" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="179.79999999999995" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="186.39999999999995" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="192.99999999999994" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="199.59999999999994" y="64" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="80" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">3</text>
+  <text x="28" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">const</text>
+  <text x="74.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="80.8" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">executing</text>
+  <text x="140.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">:</text>
+  <text x="146.79999999999998" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="153.39999999999998" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Promise</text>
+  <text x="199.59999999999997" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&lt;</text>
+  <text x="206.19999999999996" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">void</text>
+  <text x="232.59999999999997" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&gt;</text>
+  <text x="239.19999999999996" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="245.79999999999995" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="252.39999999999995" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="258.99999999999994" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="265.59999999999997" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="272.2" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="278.8" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="285.40000000000003" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="292.00000000000006" y="80" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="96" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">4</text>
+  <text x="28" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">  </text>
+  <text x="41.2" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">for</text>
+  <text x="61.0" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="67.6" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="74.19999999999999" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">const</text>
+  <text x="107.19999999999999" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="113.79999999999998" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="120.39999999999998" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">i</text>
+  <text x="126.99999999999997" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">,</text>
+  <text x="133.59999999999997" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="140.19999999999996" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">task</text>
+  <text x="166.59999999999997" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="173.19999999999996" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="179.79999999999995" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">of</text>
+  <text x="192.99999999999994" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="199.59999999999994" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">tasks</text>
+  <text x="232.59999999999994" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="239.19999999999993" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">entries</text>
+  <text x="285.3999999999999" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="291.99999999999994" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="298.59999999999997" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="305.2" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="311.8" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="318.40000000000003" y="96" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="112" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">5</text>
+  <text x="28" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">    </text>
+  <text x="54.4" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">const</text>
+  <text x="87.4" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="94.0" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">p</text>
+  <text x="100.6" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="107.19999999999999" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="113.79999999999998" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="120.39999999999998" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">task</text>
+  <text x="146.79999999999998" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="153.39999999999998" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="159.99999999999997" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="166.59999999999997" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">then</text>
+  <text x="192.99999999999997" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="199.59999999999997" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">r</text>
+  <text x="206.19999999999996" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="212.79999999999995" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=&gt;</text>
+  <text x="225.99999999999994" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="232.59999999999994" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="239.19999999999993" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="245.79999999999993" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">results</text>
+  <text x="291.99999999999994" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">[</text>
+  <text x="298.59999999999997" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">i</text>
+  <text x="305.2" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">]</text>
+  <text x="311.8" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="318.40000000000003" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">=</text>
+  <text x="325.00000000000006" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="331.6000000000001" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">r</text>
+  <text x="338.2000000000001" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="344.8000000000001" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="351.40000000000015" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">}</text>
+  <text x="358.00000000000017" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="364.6000000000002" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="371.2000000000002" y="112" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="128" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">6</text>
+  <text x="28" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">    </text>
+  <text x="54.4" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">executing</text>
+  <text x="113.8" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="120.39999999999999" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">push</text>
+  <text x="146.79999999999998" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="153.39999999999998" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">p</text>
+  <text x="159.99999999999997" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="166.59999999999997" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="173.19999999999996" y="128" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="144" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">7</text>
+  <text x="28" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">    </text>
+  <text x="54.4" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">if</text>
+  <text x="67.6" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="74.19999999999999" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="80.79999999999998" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">executing</text>
+  <text x="140.2" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="146.79999999999998" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">length</text>
+  <text x="186.39999999999998" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="192.99999999999997" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">&gt;=</text>
+  <text x="206.19999999999996" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="212.79999999999995" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">limit</text>
+  <text x="245.79999999999995" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="252.39999999999995" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="258.99999999999994" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">{</text>
+  <text x="265.59999999999997" y="144" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="160" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">8</text>
+  <text x="28" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">      </text>
+  <text x="67.6" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">await</text>
+  <text x="100.6" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve"> </text>
+  <text x="107.19999999999999" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">Promise</text>
+  <text x="153.39999999999998" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">.</text>
+  <text x="159.99999999999997" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">race</text>
+  <text x="186.39999999999998" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">(</text>
+  <text x="192.99999999999997" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">executing</text>
+  <text x="252.39999999999998" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">)</text>
+  <text x="259.0" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">;</text>
+  <text x="265.6" y="160" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  <text x="12" y="176" text-anchor="end" font-family="Menlo, Monaco, monospace" font-size="10" fill="#45475a">9</text>
+  <text x="28" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">    </text>
+  <text x="54.4" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">}</text>
+  <text x="61.0" y="176" font-family="Menlo, Monaco, monospace" font-size="11" fill="#abb2bf" xml:space="preserve">
+</text>
+  </g>
+  <rect x="0" y="160" width="300" height="40" fill="url(#bottom-fade-concurrency-control)"/>
+</svg>

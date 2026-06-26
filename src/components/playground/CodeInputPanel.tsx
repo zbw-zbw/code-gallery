@@ -82,7 +82,7 @@ export default function CodeInputPanel({
   const highlightedHtml = getHighlightedHtml(code, language);
 
   return (
-    <div className="flex flex-col h-full bg-code-bg">
+    <div className="flex flex-col h-full min-h-0 bg-code-bg">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-3 bg-code-surface flex-shrink-0">
         <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ export default function CodeInputPanel({
       </div>
 
       {/* Code editor with syntax highlighting overlay */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 flex overflow-hidden relative">
         {/* Line numbers */}
         <div
           ref={lineNumbersRef}
@@ -134,7 +134,7 @@ export default function CodeInputPanel({
         </div>
 
         {/* Editor container */}
-        <div className="flex-1 relative">
+        <div className="flex-1 min-h-0 relative">
           {/* Syntax highlighted background layer */}
           <div
             ref={highlightRef}
@@ -170,7 +170,7 @@ export default function CodeInputPanel({
       </div>
 
       {/* Bottom info bar */}
-      <div className="px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between">
+      <div className="px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between flex-shrink-0">
         <span>
           共 {lineCount} 行 · 语言:{" "}
           {SUPPORTED_LANGUAGES.find((l) => l.value === language)?.label}

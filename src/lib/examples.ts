@@ -1,32 +1,103 @@
-import { AnalysisResult, Language } from "@/types";
+"use client";
+
+import { Language, AnalysisResult } from "@/types";
 
 export interface Example {
   id: string;
   title: string;
   description: string;
   category: "algorithm" | "pattern" | "async" | "data-structure";
+  difficulty: "easy" | "medium" | "hard";
   language: Language;
   code: string;
   preAnalyzed: AnalysisResult;
 }
 
 export const CATEGORY_LABELS: Record<string, string> = {
-  all: "全部",
+  all: "全部分类",
   algorithm: "算法",
   pattern: "设计模式",
   async: "异步",
   "data-structure": "数据结构",
 };
 
+export const DIFFICULTY_LABELS: Record<string, string> = {
+  all: "全部难度",
+  easy: "简单",
+  medium: "中等",
+  hard: "困难",
+};
+
+const DIFFICULTY_STYLES: Record<string, string> = {
+  easy: "bg-data-green/10 text-data-green",
+  medium: "bg-flow-blue/10 text-flow-blue",
+  hard: "bg-code-purple/10 text-code-purple",
+};
+
+function exampleHeader(
+  title: string,
+  language: Language
+): AnalysisResult["codeInput"] {
+  const ext: Record<Language, string> = {
+    javascript: "js",
+    typescript: "ts",
+    python: "py",
+    java: "java",
+    go: "go",
+    rust: "rs",
+    cpp: "cpp",
+  };
+  return {
+    code: "",
+    language,
+    fileName: `${title.toLowerCase().replace(/\s+/g, "-")}.${ext[language]}`,
+  };
+}
+
+const baseMermaid = (code: string) =>
+  code.replace(/^\n+/, "").replace(/\n+$/, "");
+
+function makePreAnalyzed(
+  code: string,
+  language: Language,
+  title: string,
+  summary: string,
+  executionSteps: AnalysisResult["executionSteps"],
+  architectureNodes: AnalysisResult["architecture"]["nodes"],
+  architectureEdges: AnalysisResult["architecture"]["edges"],
+  architectureMermaid: string,
+  dataFlowNodes: AnalysisResult["dataFlow"]["nodes"],
+  dataFlowEdges: AnalysisResult["dataFlow"]["edges"],
+  dataFlowMermaid: string
+): AnalysisResult {
+  return {
+    success: true,
+    codeInput: { ...exampleHeader(title, language), code },
+    summary,
+    executionSteps,
+    architecture: {
+      nodes: architectureNodes,
+      edges: architectureEdges,
+      mermaidCode: baseMermaid(architectureMermaid),
+    },
+    dataFlow: {
+      nodes: dataFlowNodes,
+      edges: dataFlowEdges,
+      mermaidCode: baseMermaid(dataFlowMermaid),
+    },
+  };
+}
+
+export { DIFFICULTY_STYLES };
+
 export const EXAMPLES: Example[] = [
-  // ──────────────────────────────────────────────
-  // 1. Bubble Sort
-  // ──────────────────────────────────────────────
+  // ========== Algorithm Easy ==========
   {
     id: "bubble-sort",
     title: "冒泡排序",
-    description: "经典排序算法，逐步比较相邻元素并交换",
+    description: "经典的 O(n²) 排序算法，通过相邻元素交换把最大值冒泡到末尾。",
     category: "algorithm",
+    difficulty: "easy",
     language: "javascript",
     code: `function bubbleSort(arr) {
   for (let i = 0; i < arr.length; i++) {
@@ -38,84 +109,58 @@ export const EXAMPLES: Example[] = [
   }
   return arr;
 }
+
 bubbleSort([5, 3, 8, 1, 4]);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "对数组进行冒泡排序，升序排列",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 1, description: "调用 bubbleSort，传入数组 [5, 3, 8, 1, 4]", variables: [{ name: "arr", value: "[5,3,8,1,4]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "外层循环开始，i = 0", variables: [{ name: "arr", value: "[5,3,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: true }], highlight: "loop-start" },
-        { stepNumber: 3, lineNumber: 3, description: "内层循环开始，j = 0", variables: [{ name: "arr", value: "[5,3,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "0", type: "number", changed: true }], highlight: "loop-start" },
-        { stepNumber: 4, lineNumber: 4, description: "比较 arr[0]=5 和 arr[1]=3，5 > 3 为 true", variables: [{ name: "arr", value: "[5,3,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "0", type: "number", changed: false }], highlight: "branch-true" },
-        { stepNumber: 5, lineNumber: 5, description: "交换 arr[0] 和 arr[1]，数组变为 [3, 5, 8, 1, 4]", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: true }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "0", type: "number", changed: false }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 3, description: "内层循环继续，j = 1", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "1", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 4, description: "比较 arr[1]=5 和 arr[2]=8，5 > 8 为 false", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "1", type: "number", changed: false }], highlight: "branch-false" },
-        { stepNumber: 8, lineNumber: 3, description: "内层循环继续，j = 2", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "2", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 9, lineNumber: 4, description: "比较 arr[2]=8 和 arr[3]=1，8 > 1 为 true", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "2", type: "number", changed: false }], highlight: "branch-true" },
-        { stepNumber: 10, lineNumber: 5, description: "交换 arr[2] 和 arr[3]，数组变为 [3, 5, 1, 8, 4]", variables: [{ name: "arr", value: "[3,5,1,8,4]", type: "array", changed: true }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "2", type: "number", changed: false }], highlight: "normal" },
-        { stepNumber: 11, lineNumber: 3, description: "内层循环继续，j = 3", variables: [{ name: "arr", value: "[3,5,1,8,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "3", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 12, lineNumber: 4, description: "比较 arr[3]=8 和 arr[4]=4，8 > 4 为 true", variables: [{ name: "arr", value: "[3,5,1,8,4]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "3", type: "number", changed: false }], highlight: "branch-true" },
-        { stepNumber: 13, lineNumber: 5, description: "交换 arr[3] 和 arr[4]，数组变为 [3, 5, 1, 4, 8]", variables: [{ name: "arr", value: "[3,5,1,4,8]", type: "array", changed: true }, { name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "3", type: "number", changed: false }], highlight: "normal" },
-        { stepNumber: 14, lineNumber: 2, description: "第一轮排序完成，最大值 8 已就位", variables: [{ name: "arr", value: "[3,5,1,4,8]", type: "array", changed: false }, { name: "i", value: "0", type: "number", changed: false }], highlight: "loop-end", annotation: "后续轮次继续排序剩余元素" },
-        { stepNumber: 15, lineNumber: 7, description: "排序完成，返回 [1, 3, 4, 5, 8]", variables: [{ name: "arr", value: "[1,3,4,5,8]", type: "array", changed: true }], highlight: "return" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "bubble-sort",
+      "对数组进行冒泡排序，逐步将较大的元素移动到右侧",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "外层循环开始，i = 0", variables: [{ name: "i", value: "0", type: "number", changed: true }, { name: "arr", value: "[5,3,8,1,4]", type: "array", changed: false }], highlight: "loop-start" },
+        { stepNumber: 2, lineNumber: 3, description: "内层循环开始，j = 0", variables: [{ name: "j", value: "0", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 3, lineNumber: 4, description: "比较 arr[0] 与 arr[1]：5 > 3", variables: [{ name: "arr[0]", value: "5", type: "number", changed: false }, { name: "arr[1]", value: "3", type: "number", changed: false }], highlight: "branch-true" },
+        { stepNumber: 4, lineNumber: 5, description: "交换 arr[0] 与 arr[1]，数组变为 [3,5,8,1,4]", variables: [{ name: "arr", value: "[3,5,8,1,4]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 7, description: "内层循环继续，j = 1", variables: [{ name: "j", value: "1", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 6, lineNumber: 9, description: "外层循环进入下一轮，i = 1", variables: [{ name: "i", value: "1", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 7, lineNumber: 10, description: "返回排序结果 [1,3,4,5,8]", variables: [{ name: "result", value: "[1,3,4,5,8]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "bubbleSort", label: "bubbleSort", type: "function", description: "冒泡排序主函数" },
-          { id: "arr", label: "arr (参数)", type: "variable" },
-          { id: "i", label: "i (循环变量)", type: "variable" },
-          { id: "j", label: "j (循环变量)", type: "variable" },
-        ],
-        edges: [
-          { from: "bubbleSort", to: "arr", label: "接收参数" },
-          { from: "bubbleSort", to: "i", label: "初始化" },
-          { from: "i", to: "j", label: "控制" },
-        ],
-        mermaidCode: `graph TD
-    A[bubbleSort] -->|接收参数| B["arr (参数)"]
-    A -->|初始化| C["i (循环变量)"]
-    C -->|控制| D["j (循环变量)"]
-    D -->|比较| E{"arr[j] > arr[j+1]"}
-    E -->|是| F[交换元素]
-    E -->|否| D
-    F --> D`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "输入数组", type: "input" },
-          { id: "compare", label: "比较相邻元素", type: "decision" },
-          { id: "swap", label: "交换位置", type: "process" },
-          { id: "next", label: "下一个元素", type: "process" },
-          { id: "output", label: "排序结果", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "compare", label: "传入数组" },
-          { from: "compare", to: "swap", label: "需要交换" },
-          { from: "swap", to: "next", label: "继续" },
-          { from: "compare", to: "next", label: "无需交换" },
-          { from: "next", to: "compare", label: "下一对" },
-          { from: "next", to: "output", label: "排序完成" },
-        ],
-        mermaidCode: `graph LR
-    A[输入数组] --> B{比较相邻元素}
-    B -->|需要交换| C[交换位置]
-    B -->|无需交换| D[下一个元素]
-    C --> D
-    D --> B
-    D --> E[排序结果]`,
-      },
-    },
+      [
+        { id: "bubbleSort", label: "bubbleSort", type: "function", description: "冒泡排序函数" },
+      ],
+      [],
+      `graph TD
+        A[调用 bubbleSort] --> B[bubbleSort 函数]
+        B --> C[双重循环比较相邻元素]
+        C --> D[返回排序后数组]`,
+      [
+        { id: "input", label: "输入数组", type: "input" },
+        { id: "loop", label: "双重循环", type: "process" },
+        { id: "swap", label: "相邻交换", type: "process" },
+        { id: "output", label: "排序结果", type: "output" },
+      ],
+      [
+        { from: "input", to: "loop" },
+        { from: "loop", to: "swap" },
+        { from: "swap", to: "output" },
+      ],
+      `graph TD
+        input[输入数组 [5,3,8,1,4]] --> loop[外层循环 i]
+        loop --> inner[内层循环 j]
+        inner --> compare{比较相邻元素}
+        compare -->|需要交换| swap[交换位置]
+        compare -->|无需交换| next[继续下一轮]
+        swap --> output[排序结果 [1,3,4,5,8]]
+        next --> output`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 2. Fibonacci
-  // ──────────────────────────────────────────────
   {
     id: "fibonacci",
     title: "斐波那契递归",
-    description: "经典递归算法，展示递归调用栈",
+    description: "用递归方式计算斐波那契数列，展示函数调用栈和递归返回过程。",
     category: "algorithm",
+    difficulty: "easy",
     language: "python",
     code: `def fibonacci(n):
     if n <= 1:
@@ -124,75 +169,67 @@ bubbleSort([5, 3, 8, 1, 4]);`,
 
 result = fibonacci(5)
 print(result)`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "python" },
-      summary: "递归计算第 N 个斐波那契数",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 7, description: "调用 fibonacci(5)", variables: [{ name: "n", value: "5", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "判断 n=5, 5 <= 1 为 false", variables: [{ name: "n", value: "5", type: "number", changed: false }], highlight: "branch-false" },
-        { stepNumber: 3, lineNumber: 4, description: "递归调用 fibonacci(4) + fibonacci(3)", variables: [{ name: "n", value: "5", type: "number", changed: false }], highlight: "function-call", annotation: "进入递归分支" },
-        { stepNumber: 4, lineNumber: 2, description: "fibonacci(4): 判断 4 <= 1 为 false", variables: [{ name: "n", value: "4", type: "number", changed: true }], highlight: "branch-false" },
-        { stepNumber: 5, lineNumber: 4, description: "fibonacci(4): 递归调用 fibonacci(3) + fibonacci(2)", variables: [{ name: "n", value: "4", type: "number", changed: false }], highlight: "function-call" },
-        { stepNumber: 6, lineNumber: 2, description: "fibonacci(3): 判断 3 <= 1 为 false", variables: [{ name: "n", value: "3", type: "number", changed: true }], highlight: "branch-false" },
-        { stepNumber: 7, lineNumber: 4, description: "fibonacci(3): 递归调用 fibonacci(2) + fibonacci(1)", variables: [{ name: "n", value: "3", type: "number", changed: false }], highlight: "function-call" },
-        { stepNumber: 8, lineNumber: 3, description: "fibonacci(1): 判断 1 <= 1 为 true，返回 1", variables: [{ name: "n", value: "1", type: "number", changed: true }], highlight: "branch-true" },
-        { stepNumber: 9, lineNumber: 2, description: "fibonacci(2): 判断 2 <= 1 为 false", variables: [{ name: "n", value: "2", type: "number", changed: true }], highlight: "branch-false" },
-        { stepNumber: 10, lineNumber: 3, description: "fibonacci(0): 判断 0 <= 1 为 true，返回 0", variables: [{ name: "n", value: "0", type: "number", changed: true }], highlight: "branch-true" },
-        { stepNumber: 11, lineNumber: 3, description: "fibonacci(1): 返回 1（基础情况）", variables: [{ name: "n", value: "1", type: "number", changed: false }], highlight: "return" },
-        { stepNumber: 12, lineNumber: 7, description: "fibonacci(5) = 5，赋值给 result", variables: [{ name: "result", value: "5", type: "number", changed: true }], highlight: "normal" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "python",
+      "fibonacci",
+      "通过递归调用计算第 n 个斐波那契数",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 fibonacci(5)", variables: [{ name: "n", value: "5", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "判断 n <= 1？5 > 1，继续递归", variables: [], highlight: "branch-false" },
+        { stepNumber: 3, lineNumber: 3, description: "展开 fibonacci(4) + fibonacci(3)", variables: [], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 1, description: "调用 fibonacci(4)", variables: [{ name: "n", value: "4", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 5, lineNumber: 3, description: "展开 fibonacci(3) + fibonacci(2)", variables: [], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 6, description: "最终结果 result = 5", variables: [{ name: "result", value: "5", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 7, description: "打印结果 5", variables: [{ name: "output", value: "5", type: "number", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "fib", label: "fibonacci", type: "function", description: "递归计算斐波那契数" },
-          { id: "base", label: "基础情况 (n<=1)", type: "function" },
-          { id: "recur", label: "递归分支", type: "function" },
-        ],
-        edges: [
-          { from: "fib", to: "base", label: "n <= 1" },
-          { from: "fib", to: "recur", label: "n > 1" },
-          { from: "recur", to: "fib", label: "递归调用" },
-        ],
-        mermaidCode: `graph TD
-    A[fibonacci] -->|n <= 1| B["基础情况 (n<=1)"]
-    A -->|n > 1| C[递归分支]
-    C -->|fib(n-1)| A
-    C -->|fib(n-2)| A
-    B --> D[返回 n]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "参数 n", type: "input" },
-          { id: "check", label: "判断 n<=1", type: "decision" },
-          { id: "return_n", label: "返回 n", type: "output" },
-          { id: "recur", label: "递归分解", type: "process" },
-          { id: "sum", label: "求和返回", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "check" },
-          { from: "check", to: "return_n", label: "是" },
-          { from: "check", to: "recur", label: "否" },
-          { from: "recur", to: "sum", label: "递归结果" },
-        ],
-        mermaidCode: `graph LR
-    A[参数 n] --> B{判断 n<=1}
-    B -->|是| C[返回 n]
-    B -->|否| D[递归分解]
-    D --> E[求和返回]`,
-      },
-    },
+      [
+        { id: "fibonacci", label: "fibonacci", type: "function", description: "递归计算斐波那契" },
+        { id: "base", label: "基准条件", type: "function", description: "n <= 1 时返回 n" },
+      ],
+      [
+        { from: "fibonacci", to: "fibonacci", label: "递归调用" },
+        { from: "fibonacci", to: "base", label: "终止" },
+      ],
+      `graph TD
+        A[fibonacci(5)] --> B[fibonacci(4)]
+        B --> C[fibonacci(3)]
+        C --> D[fibonacci(2)]
+        D --> E[fibonacci(1)]
+        D --> F[fibonacci(0)]
+        C --> G[fibonacci(1)]
+        B --> H[fibonacci(2)]
+        H --> I[fibonacci(1)]
+        H --> J[fibonacci(0)]`,
+      [
+        { id: "call", label: "初始调用 n=5", type: "input" },
+        { id: "recursion", label: "递归分解", type: "process" },
+        { id: "base", label: "基准返回", type: "process" },
+        { id: "sum", label: "结果汇总", type: "process" },
+        { id: "out", label: "输出 5", type: "output" },
+      ],
+      [
+        { from: "call", to: "recursion" },
+        { from: "recursion", to: "base" },
+        { from: "base", to: "sum" },
+        { from: "sum", to: "out" },
+      ],
+      `graph TD
+        call[调用 fibonacci(5)] --> recursion[递归分解为 fib(4)+fib(3)]
+        recursion --> base[到达基准 fib(1)/fib(0)]
+        base --> sum[逐层返回求和]
+        sum --> out[输出结果 5]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 3. Binary Search
-  // ──────────────────────────────────────────────
   {
     id: "binary-search",
     title: "二分查找",
-    description: "在有序数组中高效查找目标值",
+    description: "在有序数组中快速定位目标值，O(log n) 查找效率。",
     category: "algorithm",
-    language: "typescript",
-    code: `function binarySearch(arr: number[], target: number): number {
+    difficulty: "easy",
+    language: "javascript",
+    code: `function binarySearch(arr, target) {
   let left = 0, right = arr.length - 1;
   while (left <= right) {
     const mid = Math.floor((left + right) / 2);
@@ -202,390 +239,64 @@ print(result)`,
   }
   return -1;
 }
-binarySearch([1,3,5,7,9,11,13], 7);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "在有序数组中使用二分查找定位目标值",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 9, description: "调用 binarySearch，目标值 7", variables: [{ name: "arr", value: "[1,3,5,7,9,11,13]", type: "array", changed: true }, { name: "target", value: "7", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "初始化 left=0, right=6", variables: [{ name: "arr", value: "[1,3,5,7,9,11,13]", type: "array", changed: false }, { name: "target", value: "7", type: "number", changed: false }, { name: "left", value: "0", type: "number", changed: true }, { name: "right", value: "6", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 3, lineNumber: 3, description: "进入循环，left(0) <= right(6)", variables: [{ name: "left", value: "0", type: "number", changed: false }, { name: "right", value: "6", type: "number", changed: false }], highlight: "loop-start" },
-        { stepNumber: 4, lineNumber: 4, description: "计算 mid = 3, arr[3] = 7", variables: [{ name: "mid", value: "3", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 5, description: "比较 arr[3]=7 === target=7，匹配成功", variables: [{ name: "mid", value: "3", type: "number", changed: false }], highlight: "branch-true" },
-        { stepNumber: 6, lineNumber: 5, description: "返回索引 3", variables: [{ name: "mid", value: "3", type: "number", changed: false }], highlight: "return" },
+
+binarySearch([1, 3, 5, 7, 9], 7);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "binary-search",
+      "在有序数组中折半查找目标值",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "初始化 left = 0, right = 4", variables: [{ name: "left", value: "0", type: "number", changed: true }, { name: "right", value: "4", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 3, description: "进入 while 循环", variables: [], highlight: "loop-start" },
+        { stepNumber: 3, lineNumber: 4, description: "计算 mid = 2", variables: [{ name: "mid", value: "2", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 5, description: "arr[2] = 5 不等于 7", variables: [], highlight: "branch-false" },
+        { stepNumber: 5, lineNumber: 6, description: "5 < 7，调整 left = mid + 1 = 3", variables: [{ name: "left", value: "3", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 4, description: "mid = 3，arr[3] = 7，命中目标", variables: [{ name: "mid", value: "3", type: "number", changed: true }], highlight: "branch-true" },
+        { stepNumber: 7, lineNumber: 10, description: "返回索引 3", variables: [{ name: "result", value: "3", type: "number", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "bs", label: "binarySearch", type: "function", description: "二分查找函数" },
-          { id: "arr", label: "arr (有序数组)", type: "variable" },
-          { id: "target", label: "target (目标值)", type: "variable" },
-        ],
-        edges: [
-          { from: "bs", to: "arr", label: "接收" },
-          { from: "bs", to: "target", label: "接收" },
-        ],
-        mermaidCode: `graph TD
-    A[binarySearch] -->|接收| B["arr (有序数组)"]
-    A -->|接收| C["target (目标值)"]
-    A --> D{arr[mid] === target}
-    D -->|是| E[返回 mid]
-    D -->|否| F{arr[mid] < target}
-    F -->|是| G[搜索右半部分]
-    F -->|否| H[搜索左半部分]
-    G --> A
-    H --> A`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "有序数组 + 目标值", type: "input" },
-          { id: "calc_mid", label: "计算中间位置", type: "process" },
-          { id: "compare", label: "比较中间值", type: "decision" },
-          { id: "narrow", label: "缩小范围", type: "process" },
-          { id: "output", label: "返回索引", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "calc_mid" },
-          { from: "calc_mid", to: "compare" },
-          { from: "compare", to: "output", label: "匹配" },
-          { from: "compare", to: "narrow", label: "不匹配" },
-          { from: "narrow", to: "calc_mid", label: "继续" },
-        ],
-        mermaidCode: `graph LR
-    A[有序数组 + 目标值] --> B[计算中间位置]
-    B --> C{比较中间值}
-    C -->|匹配| D[返回索引]
-    C -->|不匹配| E[缩小范围]
-    E --> B`,
-      },
-    },
+      [
+        { id: "binarySearch", label: "binarySearch", type: "function", description: "二分查找函数" },
+      ],
+      [],
+      `graph TD
+        A[binarySearch] --> B[初始化 left/right]
+        B --> C[while 循环]
+        C --> D{命中?}
+        D -->|是| E[返回 mid]
+        D -->|否| F[调整 left/right]
+        F --> C`,
+      [
+        { id: "arr", label: "有序数组", type: "input" },
+        { id: "range", label: "维护查找区间", type: "process" },
+        { id: "mid", label: "取中点 mid", type: "process" },
+        { id: "compare", label: "比较 target", type: "process" },
+        { id: "idx", label: "返回索引", type: "output" },
+      ],
+      [
+        { from: "arr", to: "range" },
+        { from: "range", to: "mid" },
+        { from: "mid", to: "compare" },
+        { from: "compare", to: "idx" },
+      ],
+      `graph TD
+        arr[有序数组 [1,3,5,7,9]] --> range[left=0, right=4]
+        range --> mid[计算 mid]
+        mid --> compare{arr[mid] vs target}
+        compare -->|等于| idx[返回 mid]
+        compare -->|小于| adjustL[left = mid + 1]
+        compare -->|大于| adjustR[right = mid - 1]
+        adjustL --> range
+        adjustR --> range`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 4. Promise Chain
-  // ──────────────────────────────────────────────
-  {
-    id: "promise-chain",
-    title: "Promise 链",
-    description: "展示异步链式调用的执行顺序",
-    category: "async",
-    language: "javascript",
-    code: `function fetchUser(id) {
-  return fetch(\`/api/users/\${id}\`)
-    .then(res => res.json())
-    .then(user => user.name)
-    .then(name => console.log(name));
-}
-fetchUser(42);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "通过 Promise 链获取用户数据并提取名称",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 7, description: "调用 fetchUser(42)", variables: [{ name: "id", value: "42", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 3, description: "发起 fetch 请求 /api/users/42", variables: [{ name: "id", value: "42", type: "number", changed: false }], highlight: "normal", annotation: "异步操作，等待响应" },
-        { stepNumber: 3, lineNumber: 3, description: "收到 Response 对象", variables: [{ name: "res", value: "Response{}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 4, description: "调用 res.json() 解析响应体", variables: [{ name: "res", value: "Response{}", type: "object", changed: false }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 4, description: "获得 user 对象 { name: 'Alice', ... }", variables: [{ name: "user", value: '{"name":"Alice"}', type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 5, description: "提取 user.name = 'Alice'", variables: [{ name: "name", value: "'Alice'", type: "string", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 6, description: "console.log('Alice')，输出用户名", variables: [{ name: "name", value: "'Alice'", type: "string", changed: false }], highlight: "normal" },
-      ],
-      architecture: {
-        nodes: [
-          { id: "fetchUser", label: "fetchUser", type: "function", description: "获取用户信息" },
-          { id: "fetch", label: "fetch API", type: "external" },
-          { id: "json", label: "res.json()", type: "function" },
-          { id: "extract", label: "提取 name", type: "function" },
-          { id: "log", label: "console.log", type: "external" },
-        ],
-        edges: [
-          { from: "fetchUser", to: "fetch", label: "调用" },
-          { from: "fetch", to: "json", label: "then" },
-          { from: "json", to: "extract", label: "then" },
-          { from: "extract", to: "log", label: "then" },
-        ],
-        mermaidCode: `graph LR
-    A[fetchUser] -->|调用| B[fetch API]
-    B -->|then| C[res.json]
-    C -->|then| D[提取 name]
-    D -->|then| E[console.log]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "id", label: "用户 ID", type: "input" },
-          { id: "api", label: "API 请求", type: "process" },
-          { id: "response", label: "响应数据", type: "storage" },
-          { id: "parse", label: "JSON 解析", type: "process" },
-          { id: "name", label: "用户名", type: "output" },
-        ],
-        edges: [
-          { from: "id", to: "api", label: "42" },
-          { from: "api", to: "response", label: "Response" },
-          { from: "response", to: "parse" },
-          { from: "parse", to: "name", label: "Alice" },
-        ],
-        mermaidCode: `graph LR
-    A[用户 ID] -->|42| B[API 请求]
-    B -->|Response| C[响应数据]
-    C --> D[JSON 解析]
-    D -->|Alice| E[用户名]`,
-      },
-    },
-  },
-
-  // ──────────────────────────────────────────────
-  // 5. Pub/Sub Pattern
-  // ──────────────────────────────────────────────
-  {
-    id: "pub-sub",
-    title: "发布-订阅模式",
-    description: "简单的 EventEmitter 实现",
-    category: "pattern",
-    language: "typescript",
-    code: `class EventEmitter {
-  private events: Record<string, Function[]> = {};
-  on(event: string, fn: Function) {
-    (this.events[event] ||= []).push(fn);
-  }
-  emit(event: string, ...args: any[]) {
-    this.events[event]?.forEach(fn => fn(...args));
-  }
-}
-const bus = new EventEmitter();
-bus.on("data", (msg) => console.log(msg));
-bus.emit("data", "hello");`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "实现简单的发布-订阅事件系统",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 9, description: "创建 EventEmitter 实例 bus", variables: [{ name: "bus", value: "EventEmitter{}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 2, lineNumber: 10, description: "调用 bus.on('data', callback) 注册监听", variables: [{ name: "bus", value: "EventEmitter{}", type: "object", changed: false }], highlight: "function-call" },
-        { stepNumber: 3, lineNumber: 3, description: "on 方法：初始化 events['data'] 为空数组", variables: [{ name: "event", value: "'data'", type: "string", changed: true }, { name: "fn", value: "callback", type: "function", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 4, description: "on 方法：将 callback 推入 events['data'] 数组", variables: [{ name: "events", value: '{"data":[callback]}', type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 11, description: "调用 bus.emit('data', 'hello')", variables: [{ name: "event", value: "'data'", type: "string", changed: true }, { name: "args", value: "['hello']", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 6, lineNumber: 6, description: "emit 方法：遍历 events['data'] 中的回调", variables: [{ name: "events", value: '{"data":[callback]}', type: "object", changed: false }], highlight: "loop-start" },
-        { stepNumber: 7, lineNumber: 6, description: "执行 callback('hello')，输出 hello", variables: [{ name: "msg", value: "'hello'", type: "string", changed: true }], highlight: "normal" },
-      ],
-      architecture: {
-        nodes: [
-          { id: "emitter", label: "EventEmitter", type: "class", description: "事件发射器类" },
-          { id: "on", label: "on()", type: "function", description: "注册事件监听" },
-          { id: "emit", label: "emit()", type: "function", description: "触发事件" },
-          { id: "events", label: "events", type: "variable", description: "事件存储映射" },
-        ],
-        edges: [
-          { from: "emitter", to: "on", label: "方法" },
-          { from: "emitter", to: "emit", label: "方法" },
-          { from: "on", to: "events", label: "写入" },
-          { from: "emit", to: "events", label: "读取" },
-        ],
-        mermaidCode: `graph TD
-    A[EventEmitter] -->|方法| B["on()"]
-    A -->|方法| C["emit()"]
-    B -->|写入| D[events 映射]
-    C -->|读取| D
-    C -->|调用回调| E[订阅者]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "register", label: "注册监听", type: "input" },
-          { id: "store", label: "事件存储", type: "storage" },
-          { id: "trigger", label: "触发事件", type: "process" },
-          { id: "dispatch", label: "分发回调", type: "process" },
-          { id: "output", label: "执行结果", type: "output" },
-        ],
-        edges: [
-          { from: "register", to: "store", label: "callback" },
-          { from: "trigger", to: "dispatch" },
-          { from: "dispatch", to: "store", label: "查找回调" },
-          { from: "dispatch", to: "output", label: "执行" },
-        ],
-        mermaidCode: `graph LR
-    A[注册监听] -->|callback| B[事件存储]
-    C[触发事件] --> D[分发回调]
-    D -->|查找| B
-    D -->|执行| E[执行结果]`,
-      },
-    },
-  },
-
-  // ──────────────────────────────────────────────
-  // 6. Stack
-  // ──────────────────────────────────────────────
-  {
-    id: "stack",
-    title: "栈实现",
-    description: "后进先出数据结构的简单实现",
-    category: "data-structure",
-    language: "javascript",
-    code: `class Stack {
-  #items = [];
-  push(item) { this.#items.push(item); }
-  pop() { return this.#items.pop(); }
-  peek() { return this.#items.at(-1); }
-  get size() { return this.#items.length; }
-}
-const s = new Stack();
-s.push("a");
-s.push("b");
-s.pop();
-s.peek();`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "实现栈数据结构，支持 push、pop、peek 操作",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 9, description: "创建 Stack 实例 s", variables: [{ name: "s", value: "Stack{#items:[]}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 2, lineNumber: 10, description: "调用 s.push('a')", variables: [{ name: "item", value: "'a'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 3, lineNumber: 3, description: "将 'a' 压入栈，#items = ['a']", variables: [{ name: "#items", value: "['a']", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 11, description: "调用 s.push('b')", variables: [{ name: "item", value: "'b'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 5, lineNumber: 3, description: "将 'b' 压入栈，#items = ['a', 'b']", variables: [{ name: "#items", value: "['a','b']", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 12, description: "调用 s.pop()，弹出栈顶元素", variables: [{ name: "#items", value: "['a','b']", type: "array", changed: false }], highlight: "function-call" },
-        { stepNumber: 7, lineNumber: 4, description: "返回 'b'，#items = ['a']", variables: [{ name: "#items", value: "['a']", type: "array", changed: true }], highlight: "return" },
-        { stepNumber: 8, lineNumber: 13, description: "调用 s.peek()，查看栈顶", variables: [{ name: "#items", value: "['a']", type: "array", changed: false }], highlight: "function-call" },
-        { stepNumber: 9, lineNumber: 5, description: "返回栈顶元素 'a'，栈不变", variables: [{ name: "#items", value: "['a']", type: "array", changed: false }], highlight: "return" },
-      ],
-      architecture: {
-        nodes: [
-          { id: "stack", label: "Stack", type: "class", description: "栈类" },
-          { id: "push", label: "push()", type: "function" },
-          { id: "pop", label: "pop()", type: "function" },
-          { id: "peek", label: "peek()", type: "function" },
-          { id: "items", label: "#items", type: "variable" },
-        ],
-        edges: [
-          { from: "stack", to: "push", label: "方法" },
-          { from: "stack", to: "pop", label: "方法" },
-          { from: "stack", to: "peek", label: "方法" },
-          { from: "push", to: "items", label: "写入" },
-          { from: "pop", to: "items", label: "读取并移除" },
-          { from: "peek", to: "items", label: "只读" },
-        ],
-        mermaidCode: `graph TD
-    A[Stack] -->|方法| B["push()"]
-    A -->|方法| C["pop()"]
-    A -->|方法| D["peek()"]
-    B -->|写入| E["#items"]
-    C -->|读取并移除| E
-    D -->|只读| E`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "push_input", label: "push 输入", type: "input" },
-          { id: "stack_store", label: "栈存储", type: "storage" },
-          { id: "pop_output", label: "pop 输出", type: "output" },
-          { id: "peek_output", label: "peek 输出", type: "output" },
-        ],
-        edges: [
-          { from: "push_input", to: "stack_store", label: "压入" },
-          { from: "stack_store", to: "pop_output", label: "弹出" },
-          { from: "stack_store", to: "peek_output", label: "查看" },
-        ],
-        mermaidCode: `graph LR
-    A[push 输入] -->|压入| B[栈存储]
-    B -->|弹出| C[pop 输出]
-    B -->|查看| D[peek 输出]`,
-      },
-    },
-  },
-
-  // ──────────────────────────────────────────────
-  // 7. Quick Sort (NEW)
-  // ──────────────────────────────────────────────
-  {
-    id: "quick-sort",
-    title: "快速排序",
-    description: "高效的分治排序算法，通过选取基准元素分区排序",
-    category: "algorithm",
-    language: "python",
-    code: `def quick_sort(arr):
-    if len(arr) <= 1:
-        return arr
-    pivot = arr[len(arr) // 2]
-    left = [x for x in arr if x < pivot]
-    middle = [x for x in arr if x == pivot]
-    right = [x for x in arr if x > pivot]
-    return quick_sort(left) + middle + quick_sort(right)
-
-result = quick_sort([5, 3, 8, 1, 4, 7])
-print(result)`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "python" },
-      summary: "使用快速排序对数组进行升序排列",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 9, description: "调用 quick_sort([5, 3, 8, 1, 4, 7])", variables: [{ name: "arr", value: "[5,3,8,1,4,7]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "判断 len(arr)=6, 6 <= 1 为 false", variables: [{ name: "arr", value: "[5,3,8,1,4,7]", type: "array", changed: false }], highlight: "branch-false" },
-        { stepNumber: 3, lineNumber: 3, description: "选取基准 pivot = arr[3] = 1", variables: [{ name: "pivot", value: "1", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 4, description: "构建 left 分区：比 1 小的元素 = []", variables: [{ name: "left", value: "[]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 5, description: "构建 middle 分区：等于 1 的元素 = [1]", variables: [{ name: "middle", value: "[1]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 6, description: "构建 right 分区：比 1 大的元素 = [5,3,8,4,7]", variables: [{ name: "right", value: "[5,3,8,4,7]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 7, description: "递归调用 quick_sort(left) 和 quick_sort(right)", variables: [{ name: "left", value: "[]", type: "array", changed: false }, { name: "right", value: "[5,3,8,4,7]", type: "array", changed: false }], highlight: "function-call", annotation: "进入递归分支" },
-        { stepNumber: 8, lineNumber: 2, description: "quick_sort([]): len=0 <= 1 为 true，返回 []", variables: [{ name: "arr", value: "[]", type: "array", changed: true }], highlight: "branch-true" },
-        { stepNumber: 9, lineNumber: 3, description: "quick_sort([5,3,8,4,7]): 选取 pivot = arr[2] = 8", variables: [{ name: "arr", value: "[5,3,8,4,7]", type: "array", changed: true }, { name: "pivot", value: "8", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 10, lineNumber: 7, description: "递归分区完成，拼接结果 [1] + [5,3,8,4,7] 排序结果", variables: [{ name: "left", value: "[]", type: "array", changed: false }, { name: "middle", value: "[1]", type: "array", changed: false }, { name: "right", value: "[1,3,4,5,7,8]", type: "array", changed: true }], highlight: "normal" },
-      ],
-      architecture: {
-        nodes: [
-          { id: "qs", label: "quick_sort", type: "function", description: "快速排序递归函数" },
-          { id: "pivot", label: "pivot (基准)", type: "variable", description: "分区基准值" },
-          { id: "left", label: "left 分区", type: "variable" },
-          { id: "middle", label: "middle 分区", type: "variable" },
-          { id: "right", label: "right 分区", type: "variable" },
-        ],
-        edges: [
-          { from: "qs", to: "pivot", label: "选取基准" },
-          { from: "qs", to: "left", label: "构建" },
-          { from: "qs", to: "middle", label: "构建" },
-          { from: "qs", to: "right", label: "构建" },
-          { from: "qs", to: "qs", label: "递归调用" },
-        ],
-        mermaidCode: `graph TD
-    A[quick_sort] -->|选取基准| B["pivot (基准)"]
-    A -->|构建| C["left 分区"]
-    A -->|构建| D["middle 分区"]
-    A -->|构建| E["right 分区"]
-    A -->|递归调用| A
-    C -->|x < pivot| A
-    E -->|x > pivot| A`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "输入数组", type: "input" },
-          { id: "base_check", label: "判断长度<=1", type: "decision" },
-          { id: "partition", label: "分区操作", type: "process" },
-          { id: "recur", label: "递归排序", type: "process" },
-          { id: "merge", label: "拼接结果", type: "process" },
-          { id: "output", label: "排序结果", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "base_check", label: "传入" },
-          { from: "base_check", to: "output", label: "是(直接返回)" },
-          { from: "base_check", to: "partition", label: "否" },
-          { from: "partition", to: "recur", label: "left/right" },
-          { from: "recur", to: "merge", label: "子数组排序结果" },
-          { from: "merge", to: "output", label: "拼接" },
-        ],
-        mermaidCode: `graph LR
-    A[输入数组] --> B{判断长度<=1}
-    B -->|是| C[排序结果]
-    B -->|否| D[分区操作]
-    D -->|left/right| E[递归排序]
-    E -->|子数组结果| F[拼接结果]
-    F --> C`,
-      },
-    },
-  },
-
-  // ──────────────────────────────────────────────
-  // 8. Two Sum (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "two-sum",
     title: "两数之和",
-    description: "使用哈希表高效查找数组中和为目标值的两个元素",
+    description: "用哈希表在 O(n) 时间内找到和为目标值的两个数。",
     category: "algorithm",
+    difficulty: "easy",
     language: "javascript",
     code: `function twoSum(nums, target) {
   const map = new Map();
@@ -598,78 +309,308 @@ print(result)`,
   }
   return [];
 }
+
 twoSum([2, 7, 11, 15], 9);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "在数组中找到两个数使其和等于目标值，返回索引",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 10, description: "调用 twoSum([2,7,11,15], 9)", variables: [{ name: "nums", value: "[2,7,11,15]", type: "array", changed: true }, { name: "target", value: "9", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "初始化空哈希表 map", variables: [{ name: "map", value: "Map{}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 3, lineNumber: 3, description: "进入循环，i = 0", variables: [{ name: "i", value: "0", type: "number", changed: true }], highlight: "loop-start" },
-        { stepNumber: 4, lineNumber: 4, description: "计算 complement = 9 - nums[0] = 9 - 2 = 7", variables: [{ name: "complement", value: "7", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 5, description: "map.has(7) 为 false，7 不在 map 中", variables: [{ name: "map", value: "Map{}", type: "object", changed: false }], highlight: "branch-false" },
-        { stepNumber: 6, lineNumber: 8, description: "map.set(2, 0)，存入当前元素", variables: [{ name: "map", value: "Map{2:0}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 3, description: "循环继续，i = 1", variables: [{ name: "i", value: "1", type: "number", changed: true }], highlight: "loop-start" },
-        { stepNumber: 8, lineNumber: 4, description: "计算 complement = 9 - nums[1] = 9 - 7 = 2", variables: [{ name: "complement", value: "2", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 9, lineNumber: 5, description: "map.has(2) 为 true，2 在 map 中", variables: [{ name: "map", value: "Map{2:0}", type: "object", changed: false }], highlight: "branch-true" },
-        { stepNumber: 10, lineNumber: 6, description: "返回 [map.get(2), 1] = [0, 1]", variables: [{ name: "map", value: "Map{2:0}", type: "object", changed: false }, { name: "i", value: "1", type: "number", changed: false }], highlight: "return" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "two-sum",
+      "利用哈希表一次遍历找出两数之和的索引",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "初始化空哈希表 map", variables: [{ name: "map", value: "Map(0)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 3, description: "进入 for 循环，i = 0", variables: [{ name: "i", value: "0", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 3, lineNumber: 4, description: "complement = 9 - 2 = 7", variables: [{ name: "complement", value: "7", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 5, description: "map 中没有 7，继续", variables: [], highlight: "branch-false" },
+        { stepNumber: 5, lineNumber: 8, description: "将 nums[0]=2 存入 map", variables: [{ name: "map", value: "Map(1) {2=>0}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 3, description: "i = 1，nums[1] = 7", variables: [{ name: "i", value: "1", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 7, lineNumber: 5, description: "map 中存在 7，返回索引 [0, 1]", variables: [{ name: "result", value: "[0,1]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "twoSum", label: "twoSum", type: "function", description: "两数之和函数" },
-          { id: "map", label: "map (哈希表)", type: "variable", description: "存储已遍历的元素" },
-          { id: "i", label: "i (循环变量)", type: "variable" },
-          { id: "complement", label: "complement", type: "variable" },
-        ],
-        edges: [
-          { from: "twoSum", to: "map", label: "初始化" },
-          { from: "twoSum", to: "i", label: "控制循环" },
-          { from: "i", to: "complement", label: "计算" },
-          { from: "complement", to: "map", label: "查找" },
-        ],
-        mermaidCode: `graph TD
-    A[twoSum] -->|初始化| B["map (哈希表)"]
-    A -->|控制循环| C["i (循环变量)"]
-    C -->|计算| D[complement]
-    D -->|查找| B
-    B -->|命中| E[返回索引]
-    B -->|未命中| F[存入 map]
-    F --> C`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "数组 + 目标值", type: "input" },
-          { id: "calc", label: "计算补数", type: "process" },
-          { id: "lookup", label: "哈希表查找", type: "decision" },
-          { id: "store", label: "存入哈希表", type: "storage" },
-          { id: "output", label: "返回索引对", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "calc", label: "target - nums[i]" },
-          { from: "calc", to: "lookup", label: "complement" },
-          { from: "lookup", to: "output", label: "找到匹配" },
-          { from: "lookup", to: "store", label: "未找到" },
-          { from: "store", to: "calc", label: "下一元素" },
-        ],
-        mermaidCode: `graph LR
-    A[数组 + 目标值] -->|target - nums[i]| B[计算补数]
-    B -->|complement| C{哈希表查找}
-    C -->|找到匹配| D[返回索引对]
-    C -->|未找到| E[存入哈希表]
-    E -->|下一元素| B`,
-      },
-    },
+      [
+        { id: "twoSum", label: "twoSum", type: "function", description: "两数之和函数" },
+        { id: "map", label: "哈希表", type: "function", description: "存储已遍历数值" },
+      ],
+      [
+        { from: "twoSum", to: "map", label: "查询/写入" },
+      ],
+      `graph TD
+        A[输入 nums, target] --> B[初始化 map]
+        B --> C[遍历数组]
+        C --> D{map 中存在 complement?}
+        D -->|是| E[返回结果]
+        D -->|否| F[存入 map]
+        F --> C`,
+      [
+        { id: "input", label: "nums, target", type: "input" },
+        { id: "loop", label: "遍历数组", type: "process" },
+        { id: "lookup", label: "查找 complement", type: "process" },
+        { id: "store", label: "存入当前数", type: "process" },
+        { id: "out", label: "索引 [0,1]", type: "output" },
+      ],
+      [
+        { from: "input", to: "loop" },
+        { from: "loop", to: "lookup" },
+        { from: "lookup", to: "out", label: "命中" },
+        { from: "lookup", to: "store", label: "未命中" },
+        { from: "store", to: "loop" },
+      ],
+      `graph TD
+        input[输入 nums=[2,7,11,15], target=9] --> loop[i=0]
+        loop --> lookup{map 中是否有 complement}
+        lookup -->|是| out[返回 [map.get(7), 1]]
+        lookup -->|否| store[map.set(nums[i], i)]
+        store --> loop`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 9. Merge Sort (NEW)
-  // ──────────────────────────────────────────────
+  {
+    id: "selection-sort",
+    title: "选择排序",
+    description: "每轮选择最小元素放到正确位置，展示索引交换过程。",
+    category: "algorithm",
+    difficulty: "easy",
+    language: "javascript",
+    code: `function selectionSort(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    let minIdx = i;
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[j] < arr[minIdx]) minIdx = j;
+    }
+    [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+  }
+  return arr;
+}
+
+selectionSort([64, 25, 12, 22, 11]);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "selection-sort",
+      "选择排序：每次从未排序区间选出最小元素放到已排序区间末尾",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "外层循环 i = 0", variables: [{ name: "i", value: "0", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 2, lineNumber: 3, description: "假设当前最小索引 minIdx = 0", variables: [{ name: "minIdx", value: "0", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 4, description: "内层循环 j = 1，查找最小值", variables: [{ name: "j", value: "1", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 4, lineNumber: 5, description: "arr[4]=11 是最小值，minIdx = 4", variables: [{ name: "minIdx", value: "4", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 7, description: "交换 arr[0] 与 arr[4]，数组变为 [11,25,12,22,64]", variables: [{ name: "arr", value: "[11,25,12,22,64]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 10, description: "返回排序结果 [11,12,22,25,64]", variables: [{ name: "result", value: "[11,12,22,25,64]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "selectionSort", label: "selectionSort", type: "function", description: "选择排序函数" },
+      ],
+      [],
+      `graph TD
+        A[selectionSort] --> B[外层循环 i]
+        B --> C[查找最小值索引]
+        C --> D[交换 arr[i] 与 arr[minIdx]]
+        D --> B`,
+      [
+        { id: "arr", label: "数组", type: "input" },
+        { id: "find", label: "查找最小", type: "process" },
+        { id: "swap", label: "交换位置", type: "process" },
+        { id: "out", label: "排序结果", type: "output" },
+      ],
+      [
+        { from: "arr", to: "find" },
+        { from: "find", to: "swap" },
+        { from: "swap", to: "out" },
+      ],
+      `graph TD
+        arr[数组 [64,25,12,22,11]] --> find[查找最小值]
+        find --> swap[交换到已排序区]
+        swap --> arr
+        arr --> out[排序结果]`
+    ),
+  },
+
+  {
+    id: "palindrome",
+    title: "回文判断",
+    description: "判断字符串是否正读反读相同，展示双指针收敛过程。",
+    category: "algorithm",
+    difficulty: "easy",
+    language: "python",
+    code: `def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        if s[left] != s[right]:
+            return False
+        left += 1
+        right -= 1
+    return True
+
+print(is_palindrome("racecar"))`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "python",
+      "palindrome",
+      "使用双指针从两端向中间比较字符",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "初始化 left = 0, right = 6", variables: [{ name: "left", value: "0", type: "number", changed: true }, { name: "right", value: "6", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 3, description: "进入 while 循环", variables: [], highlight: "loop-start" },
+        { stepNumber: 3, lineNumber: 4, description: "比较 s[0]='r' 与 s[6]='r'，相同", variables: [], highlight: "branch-true" },
+        { stepNumber: 4, lineNumber: 6, description: "left 增加到 1，right 减少到 5", variables: [{ name: "left", value: "1", type: "number", changed: true }, { name: "right", value: "5", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 7, description: "所有字符都比较完成，返回 True", variables: [{ name: "result", value: "True", type: "boolean", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "is_palindrome", label: "is_palindrome", type: "function", description: "回文判断函数" },
+      ],
+      [],
+      `graph TD
+        A[is_palindrome] --> B[初始化双指针]
+        B --> C[比较字符]
+        C --> D{相同?}
+        D -->|否| E[返回 False]
+        D -->|是| F[移动指针]
+        F --> C
+        C --> G[返回 True]`,
+      [
+        { id: "s", label: "字符串", type: "input" },
+        { id: "pointers", label: "双指针", type: "process" },
+        { id: "compare", label: "字符比较", type: "process" },
+        { id: "out", label: "True", type: "output" },
+      ],
+      [
+        { from: "s", to: "pointers" },
+        { from: "pointers", to: "compare" },
+        { from: "compare", to: "out" },
+      ],
+      `graph TD
+        s[字符串 racecar] --> pointers[left=0, right=6]
+        pointers --> compare{比较 s[left] 与 s[right]}
+        compare -->|相等| move[同时向中间移动]
+        compare -->|不等| false[返回 False]
+        move --> pointers
+        pointers --> out[返回 True]`
+    ),
+  },
+
+  {
+    id: "array-unique",
+    title: "数组去重",
+    description: "利用 Set 快速去除数组中的重复元素。",
+    category: "algorithm",
+    difficulty: "easy",
+    language: "typescript",
+    code: `function unique<T>(arr: T[]): T[] {
+  return [...new Set(arr)];
+}
+
+const result = unique([1, 2, 2, 3, 3, 3]);
+console.log(result);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "array-unique",
+      "使用 Set 去重后展开为数组",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 unique 泛型函数", variables: [{ name: "arr", value: "[1,2,2,3,3,3]", type: "array", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "创建 Set 自动去重", variables: [{ name: "set", value: "Set(3) {1,2,3}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 2, description: "展开 Set 得到 [1,2,3]", variables: [{ name: "result", value: "[1,2,3]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "unique", label: "unique", type: "function", description: "数组去重函数" },
+        { id: "set", label: "Set", type: "function", description: "集合去重" },
+      ],
+      [
+        { from: "unique", to: "set" },
+      ],
+      `graph TD
+        A[输入数组] --> B[Set 去重]
+        B --> C[展开为数组]
+        C --> D[返回]`,
+      [
+        { id: "input", label: "数组 [1,2,2,3,3,3]", type: "input" },
+        { id: "set", label: "Set 去重", type: "process" },
+        { id: "spread", label: "展开", type: "process" },
+        { id: "out", label: "[1,2,3]", type: "output" },
+      ],
+      [
+        { from: "input", to: "set" },
+        { from: "set", to: "spread" },
+        { from: "spread", to: "out" },
+      ],
+      `graph TD
+        input[原数组] --> set[转换为 Set]
+        set --> spread[展开操作符 ...]
+        spread --> out[去重后的数组]`
+    ),
+  },
+
+  // ========== Algorithm Medium ==========
+  {
+    id: "quick-sort",
+    title: "快速排序",
+    description: "Python 实现的分治排序，展示分区与递归过程。",
+    category: "algorithm",
+    difficulty: "medium",
+    language: "python",
+    code: `def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[0]
+    left = [x for x in arr[1:] if x < pivot]
+    right = [x for x in arr[1:] if x >= pivot]
+    return quick_sort(left) + [pivot] + quick_sort(right)
+
+print(quick_sort([3, 6, 8, 10, 1, 2, 1]))`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "python",
+      "quick-sort",
+      "以第一个元素为基准，递归地对左右子数组排序",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 quick_sort([3,6,8,10,1,2,1])", variables: [{ name: "arr", value: "[3,6,8,10,1,2,1]", type: "array", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "数组长度大于 1，继续执行", variables: [], highlight: "branch-false" },
+        { stepNumber: 3, lineNumber: 3, description: "选择 pivot = 3", variables: [{ name: "pivot", value: "3", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 4, description: "left = [1,2,1]（小于 pivot 的元素）", variables: [{ name: "left", value: "[1,2,1]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 5, description: "right = [6,8,10]（大于等于 pivot 的元素）", variables: [{ name: "right", value: "[6,8,10]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 6, description: "递归排序后合并 [1,1,2] + [3] + [6,8,10]", variables: [{ name: "result", value: "[1,1,2,3,6,8,10]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "quick_sort", label: "quick_sort", type: "function", description: "快速排序函数" },
+      ],
+      [],
+      `graph TD
+        A[quick_sort] --> B{长度 <= 1?}
+        B -->|是| C[直接返回]
+        B -->|否| D[选 pivot]
+        D --> E[划分 left/right]
+        E --> F[递归排序]
+        F --> G[合并结果]`,
+      [
+        { id: "input", label: "数组", type: "input" },
+        { id: "pivot", label: "选择 pivot", type: "process" },
+        { id: "partition", label: "分区", type: "process" },
+        { id: "recurse", label: "递归排序", type: "process" },
+        { id: "merge", label: "合并", type: "process" },
+        { id: "out", label: "排序结果", type: "output" },
+      ],
+      [
+        { from: "input", to: "pivot" },
+        { from: "pivot", to: "partition" },
+        { from: "partition", to: "recurse" },
+        { from: "recurse", to: "merge" },
+        { from: "merge", to: "out" },
+      ],
+      `graph TD
+        input[原数组] --> pivot[选基准 arr[0]=3]
+        pivot --> partition{按大小分区}
+        partition --> left[left=[1,2,1]]
+        partition --> right[right=[6,8,10]]
+        left --> recurseL[递归排序 left]
+        right --> recurseR[递归排序 right]
+        recurseL --> merge[left + [pivot] + right]
+        recurseR --> merge
+        merge --> out[结果]`
+    ),
+  },
+
   {
     id: "merge-sort",
     title: "归并排序",
-    description: "分治策略的经典实现，递归拆分数组再合并",
+    description: "TypeScript 递归拆分数组再合并有序子数组。",
     category: "algorithm",
+    difficulty: "medium",
     language: "typescript",
     code: `function mergeSort(arr: number[]): number[] {
   if (arr.length <= 1) return arr;
@@ -681,864 +622,1290 @@ twoSum([2, 7, 11, 15], 9);`,
 
 function merge(left: number[], right: number[]): number[] {
   const result: number[] = [];
-  let i = 0, j = 0;
-  while (i < left.length && j < right.length) {
-    if (left[i] <= right[j]) {
-      result.push(left[i++]);
-    } else {
-      result.push(right[j++]);
-    }
+  while (left.length && right.length) {
+    if (left[0] < right[0]) result.push(left.shift()!);
+    else result.push(right.shift()!);
   }
-  return result.concat(left.slice(i)).concat(right.slice(j));
+  return [...result, ...left, ...right];
 }
 
 mergeSort([38, 27, 43, 3, 9, 82, 10]);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "使用归并排序对数组进行升序排列",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 17, description: "调用 mergeSort([38, 27, 43, 3, 9, 82, 10])", variables: [{ name: "arr", value: "[38,27,43,3,9,82,10]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "判断 arr.length=7, 7 <= 1 为 false", variables: [{ name: "arr", value: "[38,27,43,3,9,82,10]", type: "array", changed: false }], highlight: "branch-false" },
-        { stepNumber: 3, lineNumber: 3, description: "计算 mid = 3，将数组拆分为左右两半", variables: [{ name: "mid", value: "3", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 4, description: "递归调用 mergeSort([38,27,43]) 处理左半部分", variables: [{ name: "left", value: "[38,27,43]", type: "array", changed: true }], highlight: "function-call", annotation: "进入左子树" },
-        { stepNumber: 5, lineNumber: 5, description: "递归调用 mergeSort([3,9,82,10]) 处理右半部分", variables: [{ name: "right", value: "[3,9,82,10]", type: "array", changed: true }], highlight: "function-call", annotation: "进入右子树" },
-        { stepNumber: 6, lineNumber: 6, description: "调用 merge 合并左右两个有序数组", variables: [{ name: "left", value: "[27,38,43]", type: "array", changed: true }, { name: "right", value: "[3,9,10,82]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 7, lineNumber: 9, description: "merge：初始化 result=[]，i=0, j=0", variables: [{ name: "result", value: "[]", type: "array", changed: true }, { name: "i", value: "0", type: "number", changed: true }, { name: "j", value: "0", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 8, lineNumber: 10, description: "比较 left[0]=27 和 right[0]=3，27 <= 3 为 false", variables: [{ name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "0", type: "number", changed: false }], highlight: "branch-false" },
-        { stepNumber: 9, lineNumber: 13, description: "result.push(right[0])，result=[3]，j++", variables: [{ name: "result", value: "[3]", type: "array", changed: true }, { name: "j", value: "1", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 10, lineNumber: 10, description: "比较 left[0]=27 和 right[1]=9，27 <= 9 为 false", variables: [{ name: "i", value: "0", type: "number", changed: false }, { name: "j", value: "1", type: "number", changed: false }], highlight: "branch-false" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "merge-sort",
+      "分治法排序：递归拆分后再合并两个有序数组",
+      [
+        { stepNumber: 1, lineNumber: 2, description: "数组长度 7，需要拆分", variables: [{ name: "arr", value: "[38,27,43,3,9,82,10]", type: "array", changed: false }], highlight: "branch-false" },
+        { stepNumber: 2, lineNumber: 3, description: "mid = 3", variables: [{ name: "mid", value: "3", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 4, description: "递归排序左半部分 [38,27,43]", variables: [{ name: "left", value: "[27,38,43]", type: "array", changed: true }], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 5, description: "递归排序右半部分 [3,9,82,10]", variables: [{ name: "right", value: "[3,9,10,82]", type: "array", changed: true }], highlight: "function-call" },
+        { stepNumber: 5, lineNumber: 6, description: "合并左右有序数组", variables: [], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 12, description: "merge 函数中逐个比较并入 result", variables: [{ name: "result", value: "[3,9,10,27,38,43,82]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "ms", label: "mergeSort", type: "function", description: "归并排序递归函数" },
-          { id: "merge", label: "merge", type: "function", description: "合并两个有序数组" },
-          { id: "mid", label: "mid (中点)", type: "variable" },
-        ],
-        edges: [
-          { from: "ms", to: "mid", label: "计算中点" },
-          { from: "ms", to: "ms", label: "递归左半" },
-          { from: "ms", to: "ms", label: "递归右半" },
-          { from: "ms", to: "merge", label: "合并结果" },
-        ],
-        mermaidCode: `graph TD
-    A[mergeSort] -->|计算中点| B["mid"]
-    A -->|递归| A
-    A -->|合并| C[merge]
-    A -->|arr.length <= 1| D[返回 arr]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "输入数组", type: "input" },
-          { id: "split", label: "拆分数组", type: "process" },
-          { id: "recur_left", label: "递归排序左半", type: "process" },
-          { id: "recur_right", label: "递归排序右半", type: "process" },
-          { id: "merge_process", label: "合并有序数组", type: "process" },
-          { id: "output", label: "排序结果", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "split", label: "传入" },
-          { from: "split", to: "recur_left", label: "左半部分" },
-          { from: "split", to: "recur_right", label: "右半部分" },
-          { from: "recur_left", to: "merge_process", label: "有序左" },
-          { from: "recur_right", to: "merge_process", label: "有序右" },
-          { from: "merge_process", to: "output", label: "合并结果" },
-        ],
-        mermaidCode: `graph LR
-    A[输入数组] --> B[拆分数组]
-    B -->|左半部分| C[递归排序左半]
-    B -->|右半部分| D[递归排序右半]
-    C -->|有序左| E[合并有序数组]
-    D -->|有序右| E
-    E --> F[排序结果]`,
-      },
-    },
+      [
+        { id: "mergeSort", label: "mergeSort", type: "function", description: "归并排序函数" },
+        { id: "merge", label: "merge", type: "function", description: "合并两个有序数组" },
+      ],
+      [
+        { from: "mergeSort", to: "mergeSort", label: "递归拆分" },
+        { from: "mergeSort", to: "merge", label: "合并" },
+      ],
+      `graph TD
+        A[mergeSort] --> B{长度 <= 1?}
+        B -->|是| C[返回]
+        B -->|否| D[拆分为 left/right]
+        D --> E[递归 mergeSort]
+        E --> F[merge 合并]
+        F --> G[返回]`,
+      [
+        { id: "arr", label: "数组", type: "input" },
+        { id: "split", label: "拆半", type: "process" },
+        { id: "recurse", label: "递归排序", type: "process" },
+        { id: "merge", label: "merge", type: "process" },
+        { id: "out", label: "有序数组", type: "output" },
+      ],
+      [
+        { from: "arr", to: "split" },
+        { from: "split", to: "recurse" },
+        { from: "recurse", to: "merge" },
+        { from: "merge", to: "out" },
+      ],
+      `graph TD
+        arr[原数组] --> split[拆分为两半]
+        split --> recurseL[递归排序左半]
+        split --> recurseR[递归排序右半]
+        recurseL --> merge[合并两个有序数组]
+        recurseR --> merge
+        merge --> out[最终结果]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 10. DFS Tree Traversal (NEW)
-  // ──────────────────────────────────────────────
+  // ========== Algorithm Hard ==========
   {
     id: "dfs-tree",
     title: "深度优先搜索",
-    description: "递归实现树的深度优先遍历",
+    description: "JavaScript 递归遍历二叉树，展示前序遍历顺序。",
     category: "algorithm",
+    difficulty: "hard",
     language: "javascript",
-    code: `function dfs(node, result = []) {
-  if (!node) return result;
-  result.push(node.value);
-  dfs(node.left, result);
-  dfs(node.right, result);
-  return result;
+    code: `function preorder(node) {
+  if (!node) return;
+  console.log(node.value);
+  preorder(node.left);
+  preorder(node.right);
 }
 
-const tree = {
+const root = {
   value: 1,
   left: { value: 2, left: { value: 4 }, right: { value: 5 } },
-  right: { value: 3, right: { value: 6 } },
+  right: { value: 3, left: { value: 6 }, right: { value: 7 } }
 };
-
-const order = dfs(tree);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "对二叉树进行前序深度优先遍历，输出节点值序列",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 15, description: "调用 dfs(tree)，根节点值为 1", variables: [{ name: "node", value: "{value:1}", type: "object", changed: true }, { name: "result", value: "[]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "节点不为 null，继续遍历", variables: [{ name: "node", value: "{value:1}", type: "object", changed: false }], highlight: "branch-false" },
-        { stepNumber: 3, lineNumber: 3, description: "将节点值 1 推入 result", variables: [{ name: "result", value: "[1]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 4, description: "递归遍历左子树 node.left，值为 2", variables: [{ name: "node", value: "{value:2}", type: "object", changed: true }], highlight: "function-call", annotation: "进入左子树" },
-        { stepNumber: 5, lineNumber: 3, description: "将节点值 2 推入 result", variables: [{ name: "result", value: "[1,2]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 4, description: "递归遍历左子树的左子节点，值为 4", variables: [{ name: "node", value: "{value:4}", type: "object", changed: true }], highlight: "function-call" },
-        { stepNumber: 7, lineNumber: 3, description: "将节点值 4 推入 result", variables: [{ name: "result", value: "[1,2,4]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 8, lineNumber: 4, description: "节点 4 的左子节点为 null，返回", variables: [{ name: "node", value: "null", type: "object", changed: true }], highlight: "return" },
-        { stepNumber: 9, lineNumber: 5, description: "节点 4 的右子节点为 null，返回", variables: [{ name: "node", value: "null", type: "object", changed: true }], highlight: "return" },
-        { stepNumber: 10, lineNumber: 5, description: "回到节点 2，遍历右子树 node.right，值为 5", variables: [{ name: "node", value: "{value:5}", type: "object", changed: true }], highlight: "function-call", annotation: "进入右子树" },
+preorder(root);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "dfs-tree",
+      "前序遍历二叉树：根节点 → 左子树 → 右子树",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 preorder(root)", variables: [{ name: "node", value: "root(1)", type: "object", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 3, description: "输出节点值 1", variables: [{ name: "output", value: "1", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 4, description: "递归遍历左子树", variables: [], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 3, description: "输出节点值 2", variables: [{ name: "output", value: "1,2", type: "string", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 4, description: "递归遍历左子树的左子节点 4", variables: [{ name: "node", value: "node(4)", type: "object", changed: true }], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 3, description: "输出节点值 4", variables: [{ name: "output", value: "1,2,4", type: "string", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 1, description: "右子节点为空，返回", variables: [], highlight: "branch-false" },
+        { stepNumber: 8, lineNumber: 5, description: "遍历完左子树，回溯遍历右子树 5", variables: [{ name: "node", value: "node(5)", type: "object", changed: true }], highlight: "function-call" },
+        { stepNumber: 9, lineNumber: 12, description: "完整遍历序列 1,2,4,5,3,6,7", variables: [{ name: "sequence", value: "1,2,4,5,3,6,7", type: "string", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "dfs", label: "dfs", type: "function", description: "深度优先搜索递归函数" },
-          { id: "node", label: "node (当前节点)", type: "variable", description: "二叉树节点" },
-          { id: "result", label: "result (结果数组)", type: "variable" },
-        ],
-        edges: [
-          { from: "dfs", to: "node", label: "检查" },
-          { from: "dfs", to: "result", label: "写入" },
-          { from: "dfs", to: "dfs", label: "递归左子树" },
-          { from: "dfs", to: "dfs", label: "递归右子树" },
-        ],
-        mermaidCode: `graph TD
-    A[dfs] -->|检查| B["node (当前节点)"]
-    A -->|写入| C["result (结果数组)"]
-    A -->|递归左子树| A
-    A -->|递归右子树| A
-    B -->|为 null| D[返回 result]
-    B -->|不为 null| E[推入节点值]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "树根节点", type: "input" },
-          { id: "visit", label: "访问当前节点", type: "process" },
-          { id: "push", label: "记录节点值", type: "storage" },
-          { id: "go_left", label: "遍历左子树", type: "process" },
-          { id: "go_right", label: "遍历右子树", type: "process" },
-          { id: "output", label: "遍历序列", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "visit", label: "当前节点" },
-          { from: "visit", to: "push", label: "节点值" },
-          { from: "push", to: "go_left", label: "左子节点" },
-          { from: "go_left", to: "visit", label: "递归" },
-          { from: "go_left", to: "go_right", label: "左子树完成" },
-          { from: "go_right", to: "visit", label: "递归" },
-          { from: "go_right", to: "output", label: "遍历完成" },
-        ],
-        mermaidCode: `graph LR
-    A[树根节点] --> B[访问当前节点]
-    B --> C[记录节点值]
-    C --> D[遍历左子树]
-    D -->|递归| B
-    D -->|左子树完成| E[遍历右子树]
-    E -->|递归| B
-    E -->|遍历完成| F[遍历序列]`,
-      },
-    },
+      [
+        { id: "preorder", label: "preorder", type: "function", description: "前序遍历" },
+        { id: "node", label: "TreeNode", type: "function", description: "树节点" },
+      ],
+      [
+        { from: "preorder", to: "preorder", label: "递归" },
+        { from: "preorder", to: "node", label: "访问" },
+      ],
+      `graph TD
+        A[preorder] --> B{node?}
+        B -->|否| C[返回]
+        B -->|是| D[访问当前节点]
+        D --> E[preorder(left)]
+        D --> F[preorder(right)]`,
+      [
+        { id: "root", label: "根节点 1", type: "input" },
+        { id: "visit", label: "访问当前节点", type: "process" },
+        { id: "left", label: "递归左子树", type: "process" },
+        { id: "right", label: "递归右子树", type: "process" },
+        { id: "out", label: "输出序列", type: "output" },
+      ],
+      [
+        { from: "root", to: "visit" },
+        { from: "visit", to: "left" },
+        { from: "visit", to: "right" },
+        { from: "left", to: "out" },
+        { from: "right", to: "out" },
+      ],
+      `graph TD
+        root[节点 1] --> visit[输出 1]
+        visit --> left[递归左子树 2]
+        visit --> right[递归右子树 3]
+        left --> visit
+        right --> visit
+        visit --> out[序列 1,2,4,5,3,6,7]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 11. Singleton Pattern (NEW)
-  // ──────────────────────────────────────────────
+  {
+    id: "quick-sort-in-place",
+    title: "快速排序（原地）",
+    description: "JavaScript 原地分区快排，O(log n) 额外空间。",
+    category: "algorithm",
+    difficulty: "hard",
+    language: "javascript",
+    code: `function quickSortInPlace(arr, left = 0, right = arr.length - 1) {
+  if (left >= right) return;
+  const pivot = partition(arr, left, right);
+  quickSortInPlace(arr, left, pivot - 1);
+  quickSortInPlace(arr, pivot + 1, right);
+}
+
+function partition(arr, left, right) {
+  const pivot = arr[right];
+  let i = left;
+  for (let j = left; j < right; j++) {
+    if (arr[j] < pivot) {
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      i++;
+    }
+  }
+  [arr[i], arr[right]] = [arr[right], arr[i]];
+  return i;
+}
+
+const a = [3, 6, 8, 10, 1, 2, 1];
+quickSortInPlace(a);
+console.log(a);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "quick-sort-in-place",
+      "原地快速排序：partition 后将 pivot 放到正确位置，再递归排序两侧",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 quickSortInPlace，left=0, right=6", variables: [{ name: "left", value: "0", type: "number", changed: true }, { name: "right", value: "6", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 3, description: "调用 partition，以 arr[6]=1 为 pivot", variables: [], highlight: "function-call" },
+        { stepNumber: 3, lineNumber: 9, description: "partition 中 i 从 0 开始", variables: [{ name: "i", value: "0", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 11, description: "遍历数组，所有元素 >= 1，i 保持 0", variables: [{ name: "j", value: "5", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 5, lineNumber: 15, description: "交换 arr[0] 与 arr[6]，pivot 归位", variables: [{ name: "arr", value: "[1,6,8,10,3,2,1]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 16, description: "返回 pivot 索引 0", variables: [{ name: "pivot", value: "0", type: "number", changed: true }], highlight: "return" },
+        { stepNumber: 7, lineNumber: 4, description: "递归排序左半部分 quickSortInPlace(arr, 0, -1)", variables: [], highlight: "function-call" },
+        { stepNumber: 8, lineNumber: 5, description: "递归排序右半部分 quickSortInPlace(arr, 1, 6)", variables: [], highlight: "function-call" },
+        { stepNumber: 9, lineNumber: 24, description: "最终数组 [1,1,2,3,6,8,10]", variables: [{ name: "a", value: "[1,1,2,3,6,8,10]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "quickSortInPlace", label: "quickSortInPlace", type: "function", description: "原地快排" },
+        { id: "partition", label: "partition", type: "function", description: "原地分区" },
+      ],
+      [
+        { from: "quickSortInPlace", to: "partition" },
+        { from: "quickSortInPlace", to: "quickSortInPlace", label: "递归" },
+      ],
+      `graph TD
+        A[quickSortInPlace] --> B{left >= right?}
+        B -->|否| C[partition]
+        C --> D[递归左]
+        C --> E[递归右]
+        B -->|是| F[返回]`,
+      [
+        { id: "arr", label: "数组", type: "input" },
+        { id: "pivot", label: "选 pivot", type: "process" },
+        { id: "partition", label: "原地分区", type: "process" },
+        { id: "recurse", label: "递归排序", type: "process" },
+        { id: "out", label: "有序数组", type: "output" },
+      ],
+      [
+        { from: "arr", to: "pivot" },
+        { from: "pivot", to: "partition" },
+        { from: "partition", to: "recurse" },
+        { from: "recurse", to: "out" },
+      ],
+      `graph TD
+        arr[原数组] --> pivot[选择右侧为 pivot]
+        pivot --> partition[i 指针分区]
+        partition --> recurseL[递归左侧]
+        partition --> recurseR[递归右侧]
+        recurseL --> out[有序数组]
+        recurseR --> out`
+    ),
+  },
+
+  // ========== Pattern Easy/Medium ==========
+  {
+    id: "pub-sub",
+    title: "发布订阅模式",
+    description: "实现 EventEmitter，展示事件订阅与发布机制。",
+    category: "pattern",
+    difficulty: "medium",
+    language: "javascript",
+    code: `class EventEmitter {
+  events = {};
+  on(event, callback) {
+    if (!this.events[event]) this.events[event] = [];
+    this.events[event].push(callback);
+  }
+  emit(event, data) {
+    if (this.events[event]) {
+      this.events[event].forEach(cb => cb(data));
+    }
+  }
+}
+
+const emitter = new EventEmitter();
+emitter.on("hello", name => console.log("Hi, " + name));
+emitter.emit("hello", "Alice");`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "pub-sub",
+      "发布订阅模式：通过事件名维护回调数组，发布时依次执行",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 EventEmitter 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 events = {}", variables: [{ name: "events", value: "{}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 3, description: 'on("hello", callback) 订阅事件', variables: [{ name: "event", value: "hello", type: "string", changed: true }], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 4, description: 'events["hello"] 不存在，初始化为空数组', variables: [{ name: "events", value: "{hello: []}", type: "object", changed: true }], highlight: "branch-true" },
+        { stepNumber: 5, lineNumber: 6, description: '将回调存入 events["hello"]', variables: [{ name: "events", value: "{hello: [fn]}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 7, description: 'emit("hello", "Alice") 发布事件', variables: [{ name: "event", value: "hello", type: "string", changed: true }], highlight: "function-call" },
+        { stepNumber: 7, lineNumber: 9, description: "执行回调，输出 Hi, Alice", variables: [{ name: "output", value: "Hi, Alice", type: "string", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "EventEmitter", label: "EventEmitter", type: "class", description: "事件中心" },
+        { id: "subscriber", label: "订阅者", type: "function", description: "订阅回调" },
+        { id: "publisher", label: "发布者", type: "function", description: "触发事件" },
+      ],
+      [
+        { from: "subscriber", to: "EventEmitter", label: "on" },
+        { from: "publisher", to: "EventEmitter", label: "emit" },
+        { from: "EventEmitter", to: "subscriber", label: "通知" },
+      ],
+      `graph TD
+        A[订阅者] -->|on| B[EventEmitter]
+        C[发布者] -->|emit| B
+        B -->|通知| A`,
+      [
+        { id: "sub", label: "订阅回调", type: "input" },
+        { id: "store", label: "events 存储", type: "process" },
+        { id: "pub", label: "发布事件", type: "input" },
+        { id: "dispatch", label: "派发回调", type: "process" },
+        { id: "out", label: "输出", type: "output" },
+      ],
+      [
+        { from: "sub", to: "store" },
+        { from: "pub", to: "dispatch" },
+        { from: "store", to: "dispatch" },
+        { from: "dispatch", to: "out" },
+      ],
+      `graph TD
+        sub[on("hello", callback)] --> store[events["hello"] = [fn]]
+        pub[emit("hello", "Alice")] --> dispatch[遍历回调数组]
+        store --> dispatch
+        dispatch --> out[输出 Hi, Alice]`
+    ),
+  },
+
   {
     id: "singleton",
     title: "单例模式",
-    description: "确保一个类只有一个实例并提供全局访问点",
+    description: "TypeScript 实现确保全局只有一个 Logger 实例。",
     category: "pattern",
+    difficulty: "medium",
     language: "typescript",
-    code: `class Database {
-  private static instance: Database | null = null;
-  private connection: string;
-
-  private constructor(config: string) {
-    this.connection = config;
-  }
-
-  static getInstance(config?: string): Database {
-    if (!Database.instance) {
-      Database.instance = new Database(config || "default");
+    code: `class Logger {
+  private static instance: Logger;
+  private constructor() {}
+  static getInstance() {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
     }
-    return Database.instance;
+    return Logger.instance;
+  }
+  log(msg: string) {
+    console.log("[LOG] " + msg);
   }
 }
 
-const db1 = Database.getInstance("prod-db");
-const db2 = Database.getInstance("test-db");
-console.log(db1 === db2);`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "通过单例模式确保 Database 类只有一个实例",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 14, description: "调用 Database.getInstance('prod-db')", variables: [{ name: "config", value: "'prod-db'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 8, description: "检查 Database.instance 是否存在，为 null", variables: [{ name: "Database.instance", value: "null", type: "object", changed: false }], highlight: "branch-true" },
-        { stepNumber: 3, lineNumber: 9, description: "创建新实例 new Database('prod-db')", variables: [{ name: "Database.instance", value: "Database{connection:'prod-db'}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 10, description: "返回 Database.instance，赋值给 db1", variables: [{ name: "db1", value: "Database{...}", type: "object", changed: true }], highlight: "return" },
-        { stepNumber: 5, lineNumber: 15, description: "调用 Database.getInstance('test-db')", variables: [{ name: "config", value: "'test-db'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 6, lineNumber: 8, description: "检查 Database.instance 是否存在，已有实例", variables: [{ name: "Database.instance", value: "Database{...}", type: "object", changed: false }], highlight: "branch-false" },
-        { stepNumber: 7, lineNumber: 10, description: "直接返回已有实例，忽略 'test-db' 配置", variables: [{ name: "db2", value: "Database{...}", type: "object", changed: true }], highlight: "return", annotation: "返回同一实例" },
-        { stepNumber: 8, lineNumber: 16, description: "比较 db1 === db2，结果为 true", variables: [{ name: "db1", value: "Database{...}", type: "object", changed: false }, { name: "db2", value: "Database{...}", type: "object", changed: false }], highlight: "normal" },
+const a = Logger.getInstance();
+const b = Logger.getInstance();
+console.log(a === b);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "singleton",
+      "单例模式：通过静态 instance 确保类只有一个实例",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Logger 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "静态 instance 初始为 undefined", variables: [{ name: "Logger.instance", value: "undefined", type: "undefined", changed: false }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 5, description: "调用 Logger.getInstance()", variables: [], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 6, description: "instance 不存在，创建新实例", variables: [{ name: "Logger.instance", value: "Logger {}", type: "object", changed: true }], highlight: "branch-true" },
+        { stepNumber: 5, lineNumber: 9, description: "返回单例对象 a", variables: [{ name: "a", value: "Logger {}", type: "object", changed: true }], highlight: "return" },
+        { stepNumber: 6, lineNumber: 14, description: "再次调用 getInstance()，直接返回已有实例 b", variables: [{ name: "b", value: "Logger {}", type: "object", changed: true }], highlight: "return" },
+        { stepNumber: 7, lineNumber: 15, description: "a === b 为 true，确认是同一实例", variables: [{ name: "same", value: "true", type: "boolean", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "db", label: "Database", type: "class", description: "数据库连接单例类" },
-          { id: "instance", label: "static instance", type: "variable", description: "静态实例引用" },
-          { id: "getInstance", label: "getInstance()", type: "function", description: "获取唯一实例" },
-          { id: "constructor", label: "constructor", type: "function", description: "私有构造函数" },
-        ],
-        edges: [
-          { from: "db", to: "getInstance", label: "静态方法" },
-          { from: "db", to: "constructor", label: "私有" },
-          { from: "getInstance", to: "instance", label: "检查/创建" },
-          { from: "constructor", to: "instance", label: "初始化" },
-        ],
-        mermaidCode: `graph TD
-    A[Database] -->|静态方法| B["getInstance()"]
-    A -->|私有| C[constructor]
-    B -->|检查/创建| D["static instance"]
-    C -->|初始化| D
-    B -->|返回| D`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "call", label: "调用 getInstance", type: "input" },
-          { id: "check", label: "实例是否存在", type: "decision" },
-          { id: "create", label: "创建新实例", type: "process" },
-          { id: "return_existing", label: "返回已有实例", type: "output" },
-          { id: "return_new", label: "返回新实例", type: "output" },
-        ],
-        edges: [
-          { from: "call", to: "check" },
-          { from: "check", to: "return_existing", label: "是" },
-          { from: "check", to: "create", label: "否" },
-          { from: "create", to: "return_new" },
-        ],
-        mermaidCode: `graph LR
-    A[调用 getInstance] --> B{实例是否存在}
-    B -->|是| C[返回已有实例]
-    B -->|否| D[创建新实例]
-    D --> E[返回新实例]`,
-      },
-    },
+      [
+        { id: "Logger", label: "Logger", type: "class", description: "日志单例类" },
+        { id: "instance", label: "static instance", type: "function", description: "唯一实例引用" },
+      ],
+      [
+        { from: "Logger", to: "instance", label: "getInstance" },
+      ],
+      `graph TD
+        A[Logger.getInstance] --> B{instance?}
+        B -->|否| C[创建实例]
+        B -->|是| D[返回实例]
+        C --> D`,
+      [
+        { id: "call", label: "getInstance()", type: "input" },
+        { id: "check", label: "检查 instance", type: "process" },
+        { id: "create", label: "创建实例", type: "process" },
+        { id: "return", label: "返回实例", type: "process" },
+        { id: "out", label: "同一引用", type: "output" },
+      ],
+      [
+        { from: "call", to: "check" },
+        { from: "check", to: "create", label: "首次" },
+        { from: "check", to: "return", label: "已存在" },
+        { from: "create", to: "return" },
+        { from: "return", to: "out" },
+      ],
+      `graph TD
+        call[调用 getInstance] --> check{instance 是否存在}
+        check -->|否| create[创建 Logger 实例]
+        check -->|是| return[返回已有实例]
+        create --> return
+        return --> out[a === b 为 true]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 12. Observer Pattern (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "observer",
     title: "观察者模式",
-    description: "定义对象间一对多的依赖关系，状态变化时自动通知所有观察者",
+    description: "Subject 维护观察者列表，状态变化时通知所有观察者。",
     category: "pattern",
+    difficulty: "medium",
     language: "javascript",
     code: `class Subject {
-  constructor() {
-    this.observers = [];
-  }
+  observers = [];
   subscribe(observer) {
     this.observers.push(observer);
   }
   notify(data) {
-    this.observers.forEach(obs => obs.update(data));
+    this.observers.forEach(o => o.update(data));
   }
 }
 
 class Observer {
-  constructor(name) {
-    this.name = name;
-  }
   update(data) {
-    console.log(\`\${this.name} received: \${data}\`);
+    console.log("收到通知: " + data);
   }
 }
 
 const subject = new Subject();
-const obs1 = new Observer("Observer A");
-const obs2 = new Observer("Observer B");
-subject.subscribe(obs1);
-subject.subscribe(obs2);
-subject.notify("Hello World");`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "实现观察者模式，主题对象通知所有订阅的观察者",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 22, description: "创建 Subject 实例 subject", variables: [{ name: "subject", value: "Subject{observers:[]}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 2, lineNumber: 23, description: "创建 Observer 实例 obs1 'Observer A'", variables: [{ name: "obs1", value: "Observer{name:'Observer A'}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 3, lineNumber: 24, description: "创建 Observer 实例 obs2 'Observer B'", variables: [{ name: "obs2", value: "Observer{name:'Observer B'}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 25, description: "调用 subject.subscribe(obs1) 订阅观察者A", variables: [{ name: "subject.observers", value: "[obs1]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 5, lineNumber: 26, description: "调用 subject.subscribe(obs2) 订阅观察者B", variables: [{ name: "subject.observers", value: "[obs1,obs2]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 6, lineNumber: 27, description: "调用 subject.notify('Hello World')", variables: [{ name: "data", value: "'Hello World'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 7, lineNumber: 8, description: "遍历 observers 数组，逐个调用 update", variables: [{ name: "subject.observers", value: "[obs1,obs2]", type: "array", changed: false }], highlight: "loop-start" },
-        { stepNumber: 8, lineNumber: 8, description: "调用 obs1.update('Hello World')，输出日志", variables: [{ name: "obs1", value: "Observer A", type: "object", changed: false }], highlight: "normal" },
-        { stepNumber: 9, lineNumber: 8, description: "调用 obs2.update('Hello World')，输出日志", variables: [{ name: "obs2", value: "Observer B", type: "object", changed: false }], highlight: "loop-end" },
+subject.subscribe(new Observer());
+subject.notify("新消息");`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "observer",
+      "观察者模式：Subject 状态变化时遍历通知所有 Observer",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Subject 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 observers 为空数组", variables: [{ name: "observers", value: "[]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 3, description: "Observer 订阅 Subject", variables: [{ name: "observer", value: "Observer {}", type: "object", changed: true }], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 4, description: "将观察者加入列表", variables: [{ name: "observers", value: "[Observer]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 7, description: "Subject 状态变化，调用 notify", variables: [{ name: "data", value: "新消息", type: "string", changed: true }], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 8, description: "遍历 observers，调用 update", variables: [], highlight: "loop-start" },
+        { stepNumber: 7, lineNumber: 14, description: "输出 收到通知: 新消息", variables: [{ name: "output", value: "收到通知: 新消息", type: "string", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "subject", label: "Subject", type: "class", description: "主题类，管理观察者" },
-          { id: "observer", label: "Observer", type: "class", description: "观察者类" },
-          { id: "subscribe", label: "subscribe()", type: "function", description: "订阅方法" },
-          { id: "notify", label: "notify()", type: "function", description: "通知方法" },
-          { id: "update", label: "update()", type: "function", description: "更新方法" },
-        ],
-        edges: [
-          { from: "subject", to: "subscribe", label: "方法" },
-          { from: "subject", to: "notify", label: "方法" },
-          { from: "observer", to: "update", label: "方法" },
-          { from: "subscribe", to: "observer", label: "注册" },
-          { from: "notify", to: "update", label: "调用" },
-        ],
-        mermaidCode: `graph TD
-    A[Subject] -->|方法| B["subscribe()"]
-    A -->|方法| C["notify()"]
-    D[Observer] -->|方法| E["update()"]
-    B -->|注册| D
-    C -->|调用| E`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "register", label: "注册观察者", type: "input" },
-          { id: "observers_list", label: "观察者列表", type: "storage" },
-          { id: "state_change", label: "状态变化", type: "process" },
-          { id: "dispatch", label: "广播通知", type: "process" },
-          { id: "observer_update", label: "观察者更新", type: "output" },
-        ],
-        edges: [
-          { from: "register", to: "observers_list", label: "添加" },
-          { from: "state_change", to: "dispatch", label: "触发" },
-          { from: "dispatch", to: "observers_list", label: "读取" },
-          { from: "dispatch", to: "observer_update", label: "逐个通知" },
-        ],
-        mermaidCode: `graph LR
-    A[注册观察者] -->|添加| B[观察者列表]
-    C[状态变化] -->|触发| D[广播通知]
-    D -->|读取| B
-    D -->|逐个通知| E[观察者更新]`,
-      },
-    },
+      [
+        { id: "Subject", label: "Subject", type: "class", description: "被观察目标" },
+        { id: "Observer", label: "Observer", type: "class", description: "观察者" },
+      ],
+      [
+        { from: "Observer", to: "Subject", label: "subscribe" },
+        { from: "Subject", to: "Observer", label: "notify" },
+      ],
+      `graph TD
+        A[Observer] -->|subscribe| B[Subject]
+        B -->|notify| A`,
+      [
+        { id: "sub", label: "Observer", type: "input" },
+        { id: "list", label: "observers 列表", type: "process" },
+        { id: "change", label: "状态变化", type: "input" },
+        { id: "notify", label: "遍历通知", type: "process" },
+        { id: "out", label: "收到通知", type: "output" },
+      ],
+      [
+        { from: "sub", to: "list" },
+        { from: "change", to: "notify" },
+        { from: "list", to: "notify" },
+        { from: "notify", to: "out" },
+      ],
+      `graph TD
+        sub[Observer 订阅] --> list[observers 列表]
+        change[状态变化] --> notify[遍历调用 update]
+        list --> notify
+        notify --> out[观察者收到更新]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 13. Factory Pattern (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "factory",
     title: "工厂模式",
-    description: "通过工厂方法创建对象，隐藏实例化逻辑",
+    description: "TypeScript 根据类型参数创建不同 Shape 对象。",
     category: "pattern",
+    difficulty: "hard",
     language: "typescript",
     code: `interface Shape {
-  draw(): void;
+  draw(): string;
 }
 
 class Circle implements Shape {
-  constructor(public radius: number) {}
-  draw() {
-    console.log(\`Drawing circle with radius \${this.radius}\`);
+  draw() { return "画圆形"; }
+}
+
+class Square implements Shape {
+  draw() { return "画方形"; }
+}
+
+class ShapeFactory {
+  create(type: "circle" | "square"): Shape {
+    if (type === "circle") return new Circle();
+    return new Square();
   }
 }
 
-class Rectangle implements Shape {
-  constructor(public width: number, public height: number) {}
-  draw() {
-    console.log(\`Drawing rect \${this.width}x\${this.height}\`);
-  }
-}
-
-function createShape(type: string, ...args: number[]): Shape {
-  switch (type) {
-    case "circle":
-      return new Circle(args[0]);
-    case "rectangle":
-      return new Rectangle(args[0], args[1]);
-    default:
-      throw new Error(\`Unknown shape: \${type}\`);
-  }
-}
-
-const circle = createShape("circle", 5);
-const rect = createShape("rectangle", 3, 4);
-circle.draw();
-rect.draw();`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "通过工厂方法根据类型创建不同的图形对象",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 25, description: "调用 createShape('circle', 5)", variables: [{ name: "type", value: "'circle'", type: "string", changed: true }, { name: "args", value: "[5]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 18, description: "switch 匹配 case 'circle'", variables: [{ name: "type", value: "'circle'", type: "string", changed: false }], highlight: "branch-true" },
-        { stepNumber: 3, lineNumber: 19, description: "创建 Circle 实例，radius = 5", variables: [{ name: "circle", value: "Circle{radius:5}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 26, description: "调用 createShape('rectangle', 3, 4)", variables: [{ name: "type", value: "'rectangle'", type: "string", changed: true }, { name: "args", value: "[3,4]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 5, lineNumber: 20, description: "switch 匹配 case 'rectangle'", variables: [{ name: "type", value: "'rectangle'", type: "string", changed: false }], highlight: "branch-true" },
-        { stepNumber: 6, lineNumber: 21, description: "创建 Rectangle 实例，width=3, height=4", variables: [{ name: "rect", value: "Rectangle{width:3,height:4}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 27, description: "调用 circle.draw()，输出绘制圆形", variables: [{ name: "circle", value: "Circle{radius:5}", type: "object", changed: false }], highlight: "function-call" },
-        { stepNumber: 8, lineNumber: 28, description: "调用 rect.draw()，输出绘制矩形", variables: [{ name: "rect", value: "Rectangle{width:3,height:4}", type: "object", changed: false }], highlight: "normal" },
+const factory = new ShapeFactory();
+const shape = factory.create("circle");
+console.log(shape.draw());`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "factory",
+      "工厂模式：根据输入类型创建对应的具体 Shape 对象",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Shape 接口", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 3, description: "定义 Circle 类实现 Shape", variables: [], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 7, description: "定义 Square 类实现 Shape", variables: [], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 12, description: '调用 factory.create("circle")', variables: [{ name: "type", value: "circle", type: "string", changed: true }], highlight: "function-call" },
+        { stepNumber: 5, lineNumber: 13, description: "type 为 circle，创建 Circle 实例", variables: [{ name: "shape", value: "Circle {}", type: "object", changed: true }], highlight: "branch-true" },
+        { stepNumber: 6, lineNumber: 18, description: "调用 shape.draw()，输出 画圆形", variables: [{ name: "output", value: "画圆形", type: "string", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "factory", label: "createShape", type: "function", description: "工厂函数" },
-          { id: "shape", label: "Shape (接口)", type: "module", description: "图形接口" },
-          { id: "circle", label: "Circle", type: "class", description: "圆形类" },
-          { id: "rectangle", label: "Rectangle", type: "class", description: "矩形类" },
-        ],
-        edges: [
-          { from: "factory", to: "shape", label: "返回" },
-          { from: "circle", to: "shape", label: "实现" },
-          { from: "rectangle", to: "shape", label: "实现" },
-          { from: "factory", to: "circle", label: "创建" },
-          { from: "factory", to: "rectangle", label: "创建" },
-        ],
-        mermaidCode: `graph TD
-    A[createShape 工厂] -->|创建| B[Circle]
-    A -->|创建| C[Rectangle]
-    B -->|实现| D["Shape 接口"]
-    C -->|实现| D
-    A -->|返回| D`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "类型 + 参数", type: "input" },
-          { id: "switch", label: "类型判断", type: "decision" },
-          { id: "create_circle", label: "创建圆形", type: "process" },
-          { id: "create_rect", label: "创建矩形", type: "process" },
-          { id: "output", label: "Shape 对象", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "switch", label: "type" },
-          { from: "switch", to: "create_circle", label: "circle" },
-          { from: "switch", to: "create_rect", label: "rectangle" },
-          { from: "create_circle", to: "output" },
-          { from: "create_rect", to: "output" },
-        ],
-        mermaidCode: `graph LR
-    A[类型 + 参数] -->|type| B{类型判断}
-    B -->|circle| C[创建圆形]
-    B -->|rectangle| D[创建矩形]
-    C --> E[Shape 对象]
-    D --> E`,
-      },
-    },
+      [
+        { id: "ShapeFactory", label: "ShapeFactory", type: "class", description: "工厂类" },
+        { id: "Shape", label: "Shape", type: "module", description: "图形接口" },
+        { id: "Circle", label: "Circle", type: "class", description: "圆形" },
+        { id: "Square", label: "Square", type: "class", description: "方形" },
+      ],
+      [
+        { from: "ShapeFactory", to: "Circle", label: "type=circle" },
+        { from: "ShapeFactory", to: "Square", label: "type=square" },
+        { from: "Circle", to: "Shape", label: "implements" },
+        { from: "Square", to: "Shape", label: "implements" },
+      ],
+      `graph TD
+        A[ShapeFactory] --> B{类型判断}
+        B -->|circle| C[创建 Circle]
+        B -->|square| D[创建 Square]
+        C --> E[返回 Shape]
+        D --> E`,
+      [
+        { id: "type", label: "type=circle", type: "input" },
+        { id: "factory", label: "ShapeFactory", type: "process" },
+        { id: "create", label: "创建 Circle", type: "process" },
+        { id: "draw", label: "调用 draw", type: "process" },
+        { id: "out", label: "画圆形", type: "output" },
+      ],
+      [
+        { from: "type", to: "factory" },
+        { from: "factory", to: "create", label: "circle" },
+        { from: "create", to: "draw" },
+        { from: "draw", to: "out" },
+      ],
+      `graph TD
+        type[type=circle] --> factory[ShapeFactory]
+        factory --> create[创建 Circle 对象]
+        create --> draw[调用 draw()]
+        draw --> out[输出 画圆形]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 14. Async/Await (NEW)
-  // ──────────────────────────────────────────────
+  {
+    id: "counter-closure",
+    title: "计数器闭包",
+    description: "JavaScript 闭包实现私有计数器，展示作用域链。",
+    category: "pattern",
+    difficulty: "easy",
+    language: "javascript",
+    code: `function createCounter() {
+  let count = 0;
+  return {
+    increment() { count++; },
+    get() { return count; }
+  };
+}
+
+const counter = createCounter();
+counter.increment();
+counter.increment();
+console.log(counter.get());`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "counter-closure",
+      "闭包：内部函数保持对外部 count 变量的引用",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 createCounter()", variables: [], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 count = 0", variables: [{ name: "count", value: "0", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 8, description: "返回包含 increment 和 get 的对象 counter", variables: [{ name: "counter", value: "{increment, get}", type: "object", changed: true }], highlight: "return" },
+        { stepNumber: 4, lineNumber: 10, description: "调用 counter.increment()，count 增加到 1", variables: [{ name: "count", value: "1", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 5, lineNumber: 11, description: "再次调用 increment()，count 增加到 2", variables: [{ name: "count", value: "2", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 12, description: "调用 counter.get() 返回 2", variables: [{ name: "output", value: "2", type: "number", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "createCounter", label: "createCounter", type: "function", description: "创建计数器" },
+        { id: "closure", label: "闭包作用域", type: "function", description: "保存 count 状态" },
+      ],
+      [
+        { from: "createCounter", to: "closure", label: "返回" },
+        { from: "closure", to: "closure", label: "increment" },
+      ],
+      `graph TD
+        A[createCounter] --> B[初始化 count]
+        B --> C[返回 increment/get]
+        C --> D[increment 修改闭包 count]
+        D --> E[get 读取闭包 count]`,
+      [
+        { id: "call", label: "createCounter()", type: "input" },
+        { id: "scope", label: "闭包作用域", type: "process" },
+        { id: "inc", label: "increment", type: "input" },
+        { id: "get", label: "get", type: "input" },
+        { id: "out", label: "输出 2", type: "output" },
+      ],
+      [
+        { from: "call", to: "scope" },
+        { from: "scope", to: "inc" },
+        { from: "inc", to: "scope" },
+        { from: "scope", to: "get" },
+        { from: "get", to: "out" },
+      ],
+      `graph TD
+        call[调用 createCounter] --> scope[闭包持有 count=0]
+        scope --> inc[调用 increment]
+        inc --> scope[count 更新]
+        scope --> get[调用 get]
+        get --> out[返回 2]`
+    ),
+  },
+
+  {
+    id: "debounce",
+    title: "防抖函数",
+    description: "TypeScript 实现防抖，延迟执行并取消之前的定时器。",
+    category: "pattern",
+    difficulty: "medium",
+    language: "typescript",
+    code: `function debounce<T extends (...args: any[]) => void>(fn: T, wait: number) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+const log = debounce((msg: string) => console.log(msg), 300);
+log("a");
+log("ab");
+log("abc");`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "debounce",
+      "防抖：连续触发时只执行最后一次调用",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 debounce 创建防抖函数", variables: [{ name: "wait", value: "300", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 timer = null", variables: [{ name: "timer", value: "null", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 6, description: '第一次调用 log("a")，timer 为空，设置定时器', variables: [{ name: "timer", value: "Timeout", type: "object", changed: true }], highlight: "branch-false" },
+        { stepNumber: 4, lineNumber: 4, description: '第二次调用 log("ab")，清除之前的 timer', variables: [{ name: "timer", value: "null", type: "object", changed: true }], highlight: "branch-true" },
+        { stepNumber: 5, lineNumber: 5, description: "重新设置新的定时器等待 300ms", variables: [{ name: "timer", value: "Timeout", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 10, description: '第三次调用 log("abc")，再次清除并重置', variables: [], highlight: "branch-true" },
+        { stepNumber: 7, lineNumber: 5, description: "300ms 后只执行最后一次，输出 abc", variables: [{ name: "output", value: "abc", type: "string", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "debounce", label: "debounce", type: "function", description: "高阶函数" },
+        { id: "timer", label: "timer", type: "function", description: "定时器引用" },
+      ],
+      [
+        { from: "debounce", to: "timer", label: "set/clear" },
+      ],
+      `graph TD
+        A[调用 log] --> B{timer?}
+        B -->|是| C[clearTimeout]
+        C --> D[setTimeout]
+        B -->|否| D
+        D --> E[延迟执行 fn]`,
+      [
+        { id: "call", label: "连续调用", type: "input" },
+        { id: "check", label: "检查 timer", type: "process" },
+        { id: "clear", label: "清除旧定时器", type: "process" },
+        { id: "set", label: "设置新定时器", type: "process" },
+        { id: "exec", label: "执行最后一次", type: "process" },
+        { id: "out", label: "输出 abc", type: "output" },
+      ],
+      [
+        { from: "call", to: "check" },
+        { from: "check", to: "clear", label: "有 timer" },
+        { from: "clear", to: "set" },
+        { from: "check", to: "set", label: "无 timer" },
+        { from: "set", to: "exec" },
+        { from: "exec", to: "out" },
+      ],
+      `graph TD
+        call[连续调用 log] --> check{timer 是否存在}
+        check -->|是| clear[clearTimeout]
+        check -->|否| set[setTimeout]
+        clear --> set
+        set --> exec[延迟执行 fn]
+        exec --> out[输出 abc]`
+    ),
+  },
+
+  {
+    id: "iterator",
+    title: "迭代器模式",
+    description: "TypeScript 自定义集合的 Symbol.iterator 实现。",
+    category: "pattern",
+    difficulty: "medium",
+    language: "typescript",
+    code: `class Range {
+  constructor(private start: number, private end: number) {}
+  *[Symbol.iterator]() {
+    for (let i = this.start; i <= this.end; i++) {
+      yield i;
+    }
+  }
+}
+
+const range = new Range(1, 3);
+for (const n of range) {
+  console.log(n);
+}`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "iterator",
+      "迭代器模式：通过生成器定义 Range 集合的遍历方式",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Range 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 start=1, end=3", variables: [{ name: "start", value: "1", type: "number", changed: true }, { name: "end", value: "3", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 8, description: "创建 Range(1, 3) 实例", variables: [{ name: "range", value: "Range {}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 9, description: "for...of 调用迭代器", variables: [{ name: "n", value: "1", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 5, lineNumber: 10, description: "输出 1", variables: [{ name: "output", value: "1", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 9, description: "迭代器继续，n = 2", variables: [{ name: "n", value: "2", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 7, lineNumber: 10, description: "输出 2", variables: [{ name: "output", value: "2", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 8, lineNumber: 9, description: "迭代器继续，n = 3", variables: [{ name: "n", value: "3", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 9, lineNumber: 10, description: "输出 3，迭代结束", variables: [{ name: "output", value: "3", type: "number", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "Range", label: "Range", type: "class", description: "可迭代范围" },
+        { id: "iterator", label: "Symbol.iterator", type: "function", description: "迭代器生成器" },
+      ],
+      [
+        { from: "Range", to: "iterator", label: "实现" },
+      ],
+      `graph TD
+        A[Range 类] --> B[实现 Symbol.iterator]
+        B --> C[生成器 yield]
+        C --> D[for...of 消费]`,
+      [
+        { id: "range", label: "Range(1,3)", type: "input" },
+        { id: "iter", label: "迭代器", type: "process" },
+        { id: "yield", label: "yield i", type: "process" },
+        { id: "out", label: "输出 1,2,3", type: "output" },
+      ],
+      [
+        { from: "range", to: "iter" },
+        { from: "iter", to: "yield" },
+        { from: "yield", to: "out" },
+      ],
+      `graph TD
+        range[Range(1,3)] --> iter[Symbol.iterator]
+        iter --> yield[生成器 yield i]
+        yield --> out[for...of 输出 1,2,3]`
+    ),
+  },
+
+  // ========== Async ==========
+  {
+    id: "promise-chain",
+    title: "Promise 链式调用",
+    description: "顺序执行多个异步操作，展示 then 链的数据流转。",
+    category: "async",
+    difficulty: "medium",
+    language: "javascript",
+    code: `function fetchUser(id) {
+  return Promise.resolve({ id, name: "Alice" });
+}
+
+fetchUser(1)
+  .then(user => user.name)
+  .then(name => name.toUpperCase())
+  .then(upper => console.log(upper));`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "promise-chain",
+      "Promise 链：fetchUser 返回 Promise，then 链传递处理结果",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 fetchUser(1)", variables: [{ name: "id", value: "1", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: '返回 Promise.resolve({id:1, name:"Alice"})', variables: [{ name: "promise", value: "Promise", type: "object", changed: true }], highlight: "return" },
+        { stepNumber: 3, lineNumber: 5, description: "第一个 then 获取 user 对象", variables: [{ name: "user", value: "{id:1, name:Alice}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 5, description: '返回 user.name = "Alice"', variables: [{ name: "name", value: "Alice", type: "string", changed: true }], highlight: "return" },
+        { stepNumber: 5, lineNumber: 6, description: '第二个 then 转为大写返回 "ALICE"', variables: [{ name: "upper", value: "ALICE", type: "string", changed: true }], highlight: "return" },
+        { stepNumber: 6, lineNumber: 7, description: "第三个 then 输出 ALICE", variables: [{ name: "output", value: "ALICE", type: "string", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "fetchUser", label: "fetchUser", type: "function", description: "返回 Promise" },
+        { id: "then1", label: "then 1", type: "function", description: "获取 name" },
+        { id: "then2", label: "then 2", type: "function", description: "转大写" },
+        { id: "then3", label: "then 3", type: "function", description: "输出" },
+      ],
+      [
+        { from: "fetchUser", to: "then1" },
+        { from: "then1", to: "then2" },
+        { from: "then2", to: "then3" },
+      ],
+      `graph TD
+        A[fetchUser] --> B[then 1]
+        B --> C[then 2]
+        C --> D[then 3]`,
+      [
+        { id: "call", label: "fetchUser(1)", type: "input" },
+        { id: "p1", label: "Promise<user>", type: "process" },
+        { id: "p2", label: "Promise<name>", type: "process" },
+        { id: "p3", label: "Promise<upper>", type: "process" },
+        { id: "out", label: "ALICE", type: "output" },
+      ],
+      [
+        { from: "call", to: "p1" },
+        { from: "p1", to: "p2" },
+        { from: "p2", to: "p3" },
+        { from: "p3", to: "out" },
+      ],
+      `graph TD
+        call[fetchUser(1)] --> p1[Promise.resolve(user)]
+        p1 --> p2[then: 提取 name]
+        p2 --> p3[then: 转为大写]
+        p3 --> out[输出 ALICE]`
+    ),
+  },
+
   {
     id: "async-await",
     title: "Async/Await 顺序请求",
-    description: "使用 async/await 按顺序执行多个异步请求",
+    description: "用 async/await 顺序获取用户资料和文章列表。",
     category: "async",
+    difficulty: "medium",
     language: "javascript",
-    code: `async function fetchUserData(userId) {
-  const profile = await fetch(\`/api/users/\${userId}\`);
-  const profileData = await profile.json();
-
-  const posts = await fetch(\`/api/users/\${userId}/posts\`);
-  const postsData = await posts.json();
-
-  return { profile: profileData, posts: postsData };
+    code: `async function loadUserData(userId) {
+  const profile = await fetchProfile(userId);
+  const posts = await fetchPosts(profile.id);
+  return { profile, posts };
 }
 
-fetchUserData(42).then(data => console.log(data));`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "使用 async/await 顺序获取用户资料和文章列表",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 10, description: "调用 fetchUserData(42)", variables: [{ name: "userId", value: "42", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 2, description: "await fetch('/api/users/42')，等待响应", variables: [{ name: "userId", value: "42", type: "number", changed: false }], highlight: "normal", annotation: "异步等待，暂停执行" },
-        { stepNumber: 3, lineNumber: 2, description: "收到 profile Response 对象", variables: [{ name: "profile", value: "Response{}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 3, description: "await profile.json()，解析用户资料", variables: [{ name: "profile", value: "Response{}", type: "object", changed: false }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 3, description: "获得 profileData = { name: 'Alice', age: 30 }", variables: [{ name: "profileData", value: '{"name":"Alice"}', type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 5, description: "await fetch('/api/users/42/posts')，等待响应", variables: [{ name: "posts", value: "Response{}", type: "object", changed: true }], highlight: "normal", annotation: "第二个异步请求" },
-        { stepNumber: 7, lineNumber: 6, description: "await posts.json()，解析文章列表", variables: [{ name: "posts", value: "Response{}", type: "object", changed: false }], highlight: "normal" },
-        { stepNumber: 8, lineNumber: 6, description: "获得 postsData = [{ title: 'Hello' }]", variables: [{ name: "postsData", value: "[{title:'Hello'}]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 9, lineNumber: 8, description: "返回 { profile: profileData, posts: postsData }", variables: [{ name: "profileData", value: '{"name":"Alice"}', type: "object", changed: false }, { name: "postsData", value: "[{title:'Hello'}]", type: "array", changed: false }], highlight: "return" },
-        { stepNumber: 10, lineNumber: 10, description: ".then 回调输出合并数据", variables: [{ name: "data", value: "{profile,posts}", type: "object", changed: true }], highlight: "normal" },
+function fetchProfile(id) {
+  return Promise.resolve({ id, name: "Alice" });
+}
+
+function fetchPosts(id) {
+  return Promise.resolve([{ title: "Hello" }]);
+}
+
+loadUserData(1).then(console.log);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "async-await",
+      "async/await 让异步代码像同步一样顺序执行",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 loadUserData(1)", variables: [{ name: "userId", value: "1", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "await fetchProfile(1)，等待 Promise 完成", variables: [{ name: "profile", value: "{id:1, name:Alice}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 3, description: "await fetchPosts(1)，等待文章列表", variables: [{ name: "posts", value: "[{title:Hello}]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 4, description: "返回 {profile, posts}", variables: [{ name: "result", value: "{profile, posts}", type: "object", changed: true }], highlight: "return" },
+        { stepNumber: 5, lineNumber: 14, description: "then 打印最终结果", variables: [{ name: "output", value: "{profile:{...}, posts:[...]}", type: "object", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "fetchUserData", label: "fetchUserData", type: "function", description: "异步获取用户数据" },
-          { id: "fetchProfile", label: "fetch 用户资料", type: "external" },
-          { id: "fetchPosts", label: "fetch 文章列表", type: "external" },
-          { id: "parseProfile", label: "解析 profile.json", type: "function" },
-          { id: "parsePosts", label: "解析 posts.json", type: "function" },
-        ],
-        edges: [
-          { from: "fetchUserData", to: "fetchProfile", label: "await" },
-          { from: "fetchProfile", to: "parseProfile", label: "await" },
-          { from: "fetchUserData", to: "fetchPosts", label: "await" },
-          { from: "fetchPosts", to: "parsePosts", label: "await" },
-          { from: "parseProfile", to: "fetchUserData", label: "返回数据" },
-          { from: "parsePosts", to: "fetchUserData", label: "返回数据" },
-        ],
-        mermaidCode: `graph TD
-    A[fetchUserData] -->|await| B["fetch 用户资料"]
-    B -->|await| C["解析 profile.json"]
-    C --> D["返回 profileData"]
-    A -->|await| E["fetch 文章列表"]
-    E -->|await| F["解析 posts.json"]
-    F --> G["返回 postsData"]
-    D --> H[合并返回]
-    G --> H`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "userId", label: "用户 ID", type: "input" },
-          { id: "req_profile", label: "请求用户资料", type: "process" },
-          { id: "res_profile", label: "资料响应", type: "storage" },
-          { id: "req_posts", label: "请求文章列表", type: "process" },
-          { id: "res_posts", label: "文章响应", type: "storage" },
-          { id: "merge", label: "合并数据", type: "process" },
-          { id: "output", label: "返回结果", type: "output" },
-        ],
-        edges: [
-          { from: "userId", to: "req_profile", label: "42" },
-          { from: "req_profile", to: "res_profile", label: "Response" },
-          { from: "userId", to: "req_posts", label: "42" },
-          { from: "req_posts", to: "res_posts", label: "Response" },
-          { from: "res_profile", to: "merge" },
-          { from: "res_posts", to: "merge" },
-          { from: "merge", to: "output" },
-        ],
-        mermaidCode: `graph LR
-    A[用户 ID] -->|42| B[请求用户资料]
-    A -->|42| C[请求文章列表]
-    B --> D[资料响应]
-    C --> E[文章响应]
-    D --> F[合并数据]
-    E --> F
-    F --> G[返回结果]`,
-      },
-    },
+      [
+        { id: "loadUserData", label: "loadUserData", type: "function", description: "async 函数" },
+        { id: "fetchProfile", label: "fetchProfile", type: "function", description: "获取用户资料" },
+        { id: "fetchPosts", label: "fetchPosts", type: "function", description: "获取文章" },
+      ],
+      [
+        { from: "loadUserData", to: "fetchProfile" },
+        { from: "fetchProfile", to: "fetchPosts" },
+        { from: "fetchPosts", to: "loadUserData" },
+      ],
+      `graph TD
+        A[loadUserData] --> B[await fetchProfile]
+        B --> C[await fetchPosts]
+        C --> D[返回结果]`,
+      [
+        { id: "userId", label: "userId=1", type: "input" },
+        { id: "profile", label: "获取 profile", type: "process" },
+        { id: "posts", label: "获取 posts", type: "process" },
+        { id: "combine", label: "组合结果", type: "process" },
+        { id: "out", label: "输出", type: "output" },
+      ],
+      [
+        { from: "userId", to: "profile" },
+        { from: "profile", to: "posts" },
+        { from: "posts", to: "combine" },
+        { from: "combine", to: "out" },
+      ],
+      `graph TD
+        userId[userId=1] --> profile[await fetchProfile]
+        profile --> posts[await fetchPosts]
+        posts --> combine[组合 {profile, posts}]
+        combine --> out[输出结果]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 15. Race Condition (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "race-condition",
-    title: "Promise.race 与 Promise.all",
-    description: "展示 Promise 竞态和多任务并行处理的差异",
+    title: "Promise 竞速与全等",
+    description: "对比 Promise.race 和 Promise.all 的行为差异。",
     category: "async",
+    difficulty: "hard",
     language: "javascript",
-    code: `function delay(ms, value) {
-  return new Promise(resolve => setTimeout(() => resolve(value), ms));
-}
+    code: `const p1 = new Promise(r => setTimeout(() => r("slow"), 300));
+const p2 = new Promise(r => setTimeout(() => r("fast"), 100));
 
-async function demo() {
-  // Promise.race: 取最先完成的结果
-  const fastest = await Promise.race([
-    delay(300, "slow"),
-    delay(100, "fast"),
-    delay(200, "medium"),
-  ]);
-  console.log("race:", fastest);
-
-  // Promise.all: 等待全部完成
-  const results = await Promise.all([
-    delay(100, "a"),
-    delay(200, "b"),
-    delay(300, "c"),
-  ]);
-  console.log("all:", results);
-}
-
-demo();`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "对比 Promise.race 和 Promise.all 的执行行为",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 7, description: "调用 demo()，开始异步演示", variables: [], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 10, description: "创建 3 个 delay Promise 同时启动", variables: [{ name: "delay(300)", value: "Pending", type: "promise", changed: true }, { name: "delay(100)", value: "Pending", type: "promise", changed: true }, { name: "delay(200)", value: "Pending", type: "promise", changed: true }], highlight: "normal", annotation: "3 个定时器同时开始" },
-        { stepNumber: 3, lineNumber: 10, description: "Promise.race 等待最快完成的 Promise", variables: [{ name: "fastest", value: "Pending", type: "string", changed: false }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 10, description: "delay(100) 最先完成，resolve('fast')", variables: [{ name: "fastest", value: "'fast'", type: "string", changed: true }], highlight: "normal" },
-        { stepNumber: 5, lineNumber: 15, description: "console.log('race: fast')，输出竞速结果", variables: [{ name: "fastest", value: "'fast'", type: "string", changed: false }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 18, description: "创建 3 个新的 delay Promise 同时启动", variables: [{ name: "delay(100)", value: "Pending", type: "promise", changed: true }, { name: "delay(200)", value: "Pending", type: "promise", changed: true }, { name: "delay(300)", value: "Pending", type: "promise", changed: true }], highlight: "normal", annotation: "3 个新定时器同时开始" },
-        { stepNumber: 7, lineNumber: 18, description: "Promise.all 等待全部 Promise 完成", variables: [{ name: "results", value: "Pending", type: "array", changed: false }], highlight: "normal" },
-        { stepNumber: 8, lineNumber: 18, description: "delay(100) 完成，results 中记录 'a'", variables: [{ name: "results[0]", value: "'a'", type: "string", changed: true }], highlight: "normal" },
-        { stepNumber: 9, lineNumber: 18, description: "delay(200) 完成，results 中记录 'b'", variables: [{ name: "results[1]", value: "'b'", type: "string", changed: true }], highlight: "normal" },
-        { stepNumber: 10, lineNumber: 18, description: "delay(300) 完成，results = ['a', 'b', 'c']，全部就绪", variables: [{ name: "results", value: "['a','b','c']", type: "array", changed: true }], highlight: "normal" },
+Promise.race([p1, p2]).then(winner => console.log("race:", winner));
+Promise.all([p1, p2]).then(values => console.log("all:", values));`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "race-condition",
+      "Promise.race 返回最快完成的 Promise，Promise.all 等待全部完成",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "创建 p1，300ms 后 resolve", variables: [{ name: "p1", value: "Promise", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "创建 p2，100ms 后 resolve", variables: [{ name: "p2", value: "Promise", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 4, description: "Promise.race 等待最快结果", variables: [], highlight: "function-call" },
+        { stepNumber: 4, lineNumber: 4, description: "p2 先完成，输出 race: fast", variables: [{ name: "winner", value: "fast", type: "string", changed: true }], highlight: "return" },
+        { stepNumber: 5, lineNumber: 5, description: "Promise.all 等待两个 Promise 全部完成", variables: [], highlight: "function-call" },
+        { stepNumber: 6, lineNumber: 5, description: "300ms 后两个都完成，输出 all: [slow, fast]", variables: [{ name: "values", value: "[slow, fast]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "demo", label: "demo", type: "function", description: "异步演示函数" },
-          { id: "delay", label: "delay", type: "function", description: "延迟 Promise 工厂" },
-          { id: "race", label: "Promise.race", type: "function", description: "竞速选择" },
-          { id: "all", label: "Promise.all", type: "function", description: "全部等待" },
-        ],
-        edges: [
-          { from: "demo", to: "delay", label: "创建" },
-          { from: "demo", to: "race", label: "调用" },
-          { from: "demo", to: "all", label: "调用" },
-          { from: "delay", to: "race", label: "传入" },
-          { from: "delay", to: "all", label: "传入" },
-        ],
-        mermaidCode: `graph TD
-    A[demo] -->|创建| B[delay]
-    B -->|传入| C["Promise.race"]
-    B -->|传入| D["Promise.all"]
-    A -->|调用| C
-    A -->|调用| D
-    C -->|最先完成| E["返回最快结果"]
-    D -->|全部完成| F["返回结果数组"]`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "promises", label: "Promise 集合", type: "input" },
-          { id: "race_gate", label: "竞速门", type: "decision" },
-          { id: "fastest", label: "最快结果", type: "output" },
-          { id: "all_gate", label: "全部完成门", type: "process" },
-          { id: "all_results", label: "结果数组", type: "output" },
-        ],
-        edges: [
-          { from: "promises", to: "race_gate", label: "同时启动" },
-          { from: "race_gate", to: "fastest", label: "第一个 resolve" },
-          { from: "promises", to: "all_gate", label: "同时启动" },
-          { from: "all_gate", to: "all_results", label: "全部 resolve" },
-        ],
-        mermaidCode: `graph LR
-    A[Promise 集合] -->|同时启动| B{竞速门}
-    B -->|第一个 resolve| C[最快结果]
-    A -->|同时启动| D[全部完成门]
-    D -->|全部 resolve| E[结果数组]`,
-      },
-    },
+      [
+        { id: "p1", label: "p1", type: "function", description: "300ms Promise" },
+        { id: "p2", label: "p2", type: "function", description: "100ms Promise" },
+        { id: "race", label: "Promise.race", type: "function", description: "竞速" },
+        { id: "all", label: "Promise.all", type: "function", description: "全部" },
+      ],
+      [
+        { from: "p1", to: "race" },
+        { from: "p2", to: "race" },
+        { from: "p1", to: "all" },
+        { from: "p2", to: "all" },
+      ],
+      `graph TD
+        A[p1 slow] --> B[Promise.race]
+        C[p2 fast] --> B
+        B --> D[race: fast]
+        A --> E[Promise.all]
+        C --> E
+        E --> F[all: [slow, fast]]`,
+      [
+        { id: "p1", label: "p1 (300ms)", type: "input" },
+        { id: "p2", label: "p2 (100ms)", type: "input" },
+        { id: "race", label: "Promise.race", type: "process" },
+        { id: "all", label: "Promise.all", type: "process" },
+        { id: "outRace", label: "fast", type: "output" },
+        { id: "outAll", label: "[slow, fast]", type: "output" },
+      ],
+      [
+        { from: "p1", to: "race" },
+        { from: "p2", to: "race" },
+        { from: "p1", to: "all" },
+        { from: "p2", to: "all" },
+        { from: "race", to: "outRace" },
+        { from: "all", to: "outAll" },
+      ],
+      `graph TD
+        p1[p1 300ms] --> race[Promise.race]
+        p2[p2 100ms] --> race
+        race --> outRace[输出 fast]
+        p1 --> all[Promise.all]
+        p2 --> all
+        all --> outAll[输出 [slow, fast]]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 16. Linked List (NEW)
-  // ──────────────────────────────────────────────
+  {
+    id: "concurrency-control",
+    title: "Promise 并发控制",
+    description: "TypeScript 实现最大并发数限制的任务调度器。",
+    category: "async",
+    difficulty: "hard",
+    language: "typescript",
+    code: `async function runWithLimit<T>(tasks: (() => Promise<T>)[], limit: number): Promise<T[]> {
+  const results: T[] = [];
+  const executing: Promise<void>[] = [];
+  for (const [i, task] of tasks.entries()) {
+    const p = task().then(r => { results[i] = r; });
+    executing.push(p);
+    if (executing.length >= limit) {
+      await Promise.race(executing);
+    }
+  }
+  await Promise.all(executing);
+  return results;
+}
+
+const tasks = [1, 2, 3, 4].map(n => () => Promise.resolve(n * 2));
+runWithLimit(tasks, 2).then(console.log);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "concurrency-control",
+      "限制并发数：同时最多运行 limit 个任务，完成一个再补充一个",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "调用 runWithLimit(tasks, 2)", variables: [{ name: "limit", value: "2", type: "number", changed: true }], highlight: "function-call" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 results 和 executing 数组", variables: [{ name: "results", value: "[]", type: "array", changed: true }, { name: "executing", value: "[]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 4, description: "开始遍历任务，i=0", variables: [{ name: "i", value: "0", type: "number", changed: true }], highlight: "loop-start" },
+        { stepNumber: 4, lineNumber: 5, description: "执行任务 0，结果 2 存入 results[0]", variables: [{ name: "results", value: "[2]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 6, description: "executing 长度 1 < limit 2，继续", variables: [{ name: "executing", value: "[Promise]", type: "array", changed: true }], highlight: "branch-false" },
+        { stepNumber: 6, lineNumber: 5, description: "执行任务 1，结果 4 存入 results[1]", variables: [{ name: "results", value: "[2,4]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 7, description: "executing 长度达到 2，等待任一完成", variables: [], highlight: "function-call" },
+        { stepNumber: 8, lineNumber: 10, description: "所有任务完成，results = [2,4,6,8]", variables: [{ name: "results", value: "[2,4,6,8]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "runWithLimit", label: "runWithLimit", type: "function", description: "并发控制函数" },
+        { id: "tasks", label: "tasks", type: "function", description: "任务数组" },
+      ],
+      [
+        { from: "runWithLimit", to: "tasks", label: "调度" },
+      ],
+      `graph TD
+        A[runWithLimit] --> B[维护 executing 队列]
+        B --> C{队列满?}
+        C -->|是| D[await Promise.race]
+        C -->|否| E[继续添加任务]
+        D --> E
+        E --> F[await Promise.all]
+        F --> G[返回 results]`,
+      [
+        { id: "tasks", label: "4 个任务", type: "input" },
+        { id: "queue", label: "executing 队列", type: "process" },
+        { id: "limit", label: "限制并发=2", type: "process" },
+        { id: "race", label: "等待完成一个", type: "process" },
+        { id: "all", label: "等待全部", type: "process" },
+        { id: "out", label: "[2,4,6,8]", type: "output" },
+      ],
+      [
+        { from: "tasks", to: "queue" },
+        { from: "queue", to: "limit" },
+        { from: "limit", to: "race", label: "满" },
+        { from: "limit", to: "all", label: "遍历完" },
+        { from: "race", to: "queue" },
+        { from: "all", to: "out" },
+      ],
+      `graph TD
+        tasks[任务列表] --> queue[executing 队列]
+        queue --> limit{队列长度 >= limit?}
+        limit -->|是| race[Promise.race 等待一个完成]
+        limit -->|否| queue
+        race --> queue
+        queue --> all[Promise.all 等待剩余]
+        all --> out[返回 results]`
+    ),
+  },
+
+  // ========== Data Structure ==========
+  {
+    id: "stack",
+    title: "栈实现",
+    description: "用数组实现 LIFO 栈，展示 push 和 pop 操作。",
+    category: "data-structure",
+    difficulty: "easy",
+    language: "javascript",
+    code: `class Stack {
+  items = [];
+  push(item) { this.items.push(item); }
+  pop() { return this.items.pop(); }
+  peek() { return this.items[this.items.length - 1]; }
+}
+
+const s = new Stack();
+s.push(1);
+s.push(2);
+console.log(s.pop());`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "stack",
+      "栈（Stack）：后进先出的数据结构",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Stack 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 items = []", variables: [{ name: "items", value: "[]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 7, description: "创建 Stack 实例 s", variables: [{ name: "s", value: "Stack {}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 8, description: "push(1)，items = [1]", variables: [{ name: "items", value: "[1]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 9, description: "push(2)，items = [1,2]", variables: [{ name: "items", value: "[1,2]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 10, description: "pop() 移除并返回栈顶 2", variables: [{ name: "popped", value: "2", type: "number", changed: true }, { name: "items", value: "[1]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "Stack", label: "Stack", type: "class", description: "栈类" },
+      ],
+      [],
+      `graph TD
+        A[Stack] --> B[push]
+        A --> C[pop]
+        A --> D[peek]`,
+      [
+        { id: "push", label: "push", type: "input" },
+        { id: "stack", label: "栈顶", type: "process" },
+        { id: "pop", label: "pop", type: "output" },
+      ],
+      [
+        { from: "push", to: "stack" },
+        { from: "stack", to: "pop" },
+      ],
+      `graph TD
+        push[push 1, push 2] --> stack[栈顶 -> 2]
+        stack --> pop[pop 返回 2]`
+    ),
+  },
+
   {
     id: "linked-list",
     title: "链表实现",
-    description: "带有头节点和尾指针的单向链表数据结构",
+    description: "JavaScript 单向链表，支持 append 和 toArray。",
     category: "data-structure",
+    difficulty: "easy",
     language: "javascript",
-    code: `class Node {
-  constructor(value) {
-    this.value = value;
+    code: `class ListNode {
+  constructor(val) {
+    this.val = val;
     this.next = null;
   }
 }
 
 class LinkedList {
-  constructor() {
-    this.head = null;
-    this.size = 0;
+  head = null;
+  append(val) {
+    if (!this.head) { this.head = new ListNode(val); return; }
+    let cur = this.head;
+    while (cur.next) cur = cur.next;
+    cur.next = new ListNode(val);
   }
-
-  append(value) {
-    const node = new Node(value);
-    if (!this.head) {
-      this.head = node;
-    } else {
-      let current = this.head;
-      while (current.next) {
-        current = current.next;
-      }
-      current.next = node;
-    }
-    this.size++;
-  }
-
   toArray() {
-    const arr = [];
-    let current = this.head;
-    while (current) {
-      arr.push(current.value);
-      current = current.next;
-    }
-    return arr;
+    const res = [];
+    let cur = this.head;
+    while (cur) { res.push(cur.val); cur = cur.next; }
+    return res;
   }
 }
 
 const list = new LinkedList();
-list.append(10);
-list.append(20);
-list.append(30);
+list.append(1);
+list.append(2);
 console.log(list.toArray());`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "javascript" },
-      summary: "实现链表数据结构，支持追加和转换为数组",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 35, description: "创建 LinkedList 实例 list", variables: [{ name: "list", value: "LinkedList{head:null,size:0}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 2, lineNumber: 36, description: "调用 list.append(10)", variables: [{ name: "value", value: "10", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 3, lineNumber: 12, description: "创建 Node(10)，head 为 null，直接设为 head", variables: [{ name: "list.head", value: "Node{value:10,next:null}", type: "object", changed: true }, { name: "list.size", value: "1", type: "number", changed: true }], highlight: "branch-true" },
-        { stepNumber: 4, lineNumber: 37, description: "调用 list.append(20)", variables: [{ name: "value", value: "20", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 5, lineNumber: 15, description: "head 不为 null，遍历找到尾节点", variables: [{ name: "current", value: "Node{value:10}", type: "object", changed: true }], highlight: "branch-false" },
-        { stepNumber: 6, lineNumber: 18, description: "尾节点的 next 指向 Node(20)", variables: [{ name: "list.head.next", value: "Node{value:20,next:null}", type: "object", changed: true }, { name: "list.size", value: "2", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 38, description: "调用 list.append(30)", variables: [{ name: "value", value: "30", type: "number", changed: true }], highlight: "function-call" },
-        { stepNumber: 8, lineNumber: 16, description: "遍历链表，current 从 head 移到 tail", variables: [{ name: "current", value: "Node{value:20}", type: "object", changed: true }], highlight: "loop-start" },
-        { stepNumber: 9, lineNumber: 18, description: "尾节点 next 指向 Node(30)，size=3", variables: [{ name: "list.size", value: "3", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 10, lineNumber: 39, description: "调用 list.toArray()，返回 [10, 20, 30]", variables: [{ name: "arr", value: "[10,20,30]", type: "array", changed: true }], highlight: "return" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "linked-list",
+      "单向链表：节点通过 next 指针连接",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 ListNode 节点类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 7, description: "定义 LinkedList 类", variables: [], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 18, description: "创建空链表 list", variables: [{ name: "head", value: "null", type: "object", changed: false }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 19, description: "append(1)，head 指向新节点 1", variables: [{ name: "head", value: "ListNode(1)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 20, description: "append(2)，遍历到尾节点后追加", variables: [{ name: "head.next", value: "ListNode(2)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 21, description: "toArray 遍历链表得到 [1, 2]", variables: [{ name: "result", value: "[1,2]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "ll", label: "LinkedList", type: "class", description: "链表类" },
-          { id: "node", label: "Node", type: "class", description: "节点类" },
-          { id: "head", label: "head", type: "variable", description: "头指针" },
-          { id: "append", label: "append()", type: "function" },
-          { id: "toArray", label: "toArray()", type: "function" },
-        ],
-        edges: [
-          { from: "ll", to: "head", label: "属性" },
-          { from: "ll", to: "append", label: "方法" },
-          { from: "ll", to: "toArray", label: "方法" },
-          { from: "append", to: "node", label: "创建" },
-          { from: "node", to: "node", label: "next" },
-        ],
-        mermaidCode: `graph TD
-    A[LinkedList] -->|属性| B[head]
-    A -->|方法| C["append()"]
-    A -->|方法| D["toArray()"]
-    C -->|创建| E[Node]
-    E -->|next| E`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "追加值", type: "input" },
-          { id: "create_node", label: "创建节点", type: "process" },
-          { id: "find_tail", label: "找到尾节点", type: "process" },
-          { id: "link", label: "链接节点", type: "process" },
-          { id: "traverse", label: "遍历链表", type: "process" },
-          { id: "output", label: "数组结果", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "create_node", label: "value" },
-          { from: "create_node", to: "find_tail" },
-          { from: "find_tail", to: "link", label: "tail.next" },
-          { from: "link", to: "traverse" },
-          { from: "traverse", to: "output", label: "收集值" },
-        ],
-        mermaidCode: `graph LR
-    A[追加值] -->|value| B[创建节点]
-    B --> C[找到尾节点]
-    C -->|tail.next| D[链接节点]
-    D --> E[遍历链表]
-    E -->|收集值| F[数组结果]`,
-      },
-    },
+      [
+        { id: "LinkedList", label: "LinkedList", type: "class", description: "链表类" },
+        { id: "ListNode", label: "ListNode", type: "class", description: "节点类" },
+      ],
+      [
+        { from: "LinkedList", to: "ListNode", label: "包含" },
+      ],
+      `graph TD
+        A[LinkedList] --> B[ListNode]
+        B --> C[next]
+        C --> D[ListNode]
+        D --> E[null]`,
+      [
+        { id: "append", label: "append", type: "input" },
+        { id: "head", label: "head", type: "process" },
+        { id: "tail", label: "tail.next", type: "process" },
+        { id: "toArray", label: "toArray", type: "process" },
+        { id: "out", label: "[1,2]", type: "output" },
+      ],
+      [
+        { from: "append", to: "head" },
+        { from: "head", to: "tail" },
+        { from: "tail", to: "toArray" },
+        { from: "toArray", to: "out" },
+      ],
+      `graph TD
+        append[append 1, append 2] --> head[head -> 1]
+        head --> tail[1.next -> 2]
+        tail --> toArray[遍历链表]
+        toArray --> out[输出 [1,2]]`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 17. Queue (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "queue",
     title: "队列实现",
-    description: "先进先出数据结构的 TypeScript 实现",
+    description: "TypeScript 泛型队列，先进先出。",
     category: "data-structure",
+    difficulty: "easy",
     language: "typescript",
     code: `class Queue<T> {
   private items: T[] = [];
+  enqueue(item: T) { this.items.push(item); }
+  dequeue(): T | undefined { return this.items.shift(); }
+  size(): number { return this.items.length; }
+}
 
-  enqueue(item: T): void {
-    this.items.push(item);
+const q = new Queue<number>();
+q.enqueue(10);
+q.enqueue(20);
+console.log(q.dequeue());`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "queue",
+      "队列（Queue）：先进先出的数据结构",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Queue 泛型类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "初始化 items = []", variables: [{ name: "items", value: "[]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 8, description: "创建 Queue<number> 实例", variables: [{ name: "q", value: "Queue {}", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 9, description: "enqueue(10)，items = [10]", variables: [{ name: "items", value: "[10]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 10, description: "enqueue(20)，items = [10,20]", variables: [{ name: "items", value: "[10,20]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 11, description: "dequeue() 移除队首 10", variables: [{ name: "dequeued", value: "10", type: "number", changed: true }, { name: "items", value: "[20]", type: "array", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "Queue", label: "Queue", type: "class", description: "队列类" },
+      ],
+      [],
+      `graph TD
+        A[Queue] --> B[enqueue 队尾]
+        A --> C[dequeue 队首]`,
+      [
+        { id: "enqueue", label: "enqueue", type: "input" },
+        { id: "tail", label: "队尾入队", type: "process" },
+        { id: "head", label: "队首出队", type: "process" },
+        { id: "out", label: "10", type: "output" },
+      ],
+      [
+        { from: "enqueue", to: "tail" },
+        { from: "tail", to: "head" },
+        { from: "head", to: "out" },
+      ],
+      `graph TD
+        enqueue[enqueue 10, enqueue 20] --> tail[队尾: 20]
+        tail --> head[队首: 10]
+        head --> out[dequeue 返回 10]`
+    ),
+  },
+
+  {
+    id: "lru-cache",
+    title: "LRU 缓存",
+    description: "JavaScript 实现最近最少使用缓存，展示 Map 顺序。",
+    category: "data-structure",
+    difficulty: "medium",
+    language: "javascript",
+    code: `class LRUCache {
+  cache = new Map();
+  constructor(capacity) { this.capacity = capacity; }
+  get(key) {
+    if (!this.cache.has(key)) return -1;
+    const val = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, val);
+    return val;
   }
-
-  dequeue(): T | undefined {
-    return this.items.shift();
-  }
-
-  peek(): T | undefined {
-    return this.items[0];
-  }
-
-  get size(): number {
-    return this.items.length;
-  }
-
-  isEmpty(): boolean {
-    return this.items.length === 0;
+  put(key, value) {
+    if (this.cache.has(key)) this.cache.delete(key);
+    this.cache.set(key, value);
+    if (this.cache.size > this.capacity) {
+      const first = this.cache.keys().next().value;
+      this.cache.delete(first);
+    }
   }
 }
 
-const queue = new Queue<string>();
-queue.enqueue("first");
-queue.enqueue("second");
-queue.enqueue("third");
-console.log(queue.dequeue()); // "first"
-console.log(queue.peek());   // "second"
-console.log(queue.size);     // 2`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "typescript" },
-      summary: "实现泛型队列数据结构，支持入队、出队、查看等操作",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 21, description: "创建 Queue 实例，泛型为 string", variables: [{ name: "queue", value: "Queue{items:[]}", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 2, lineNumber: 22, description: "调用 queue.enqueue('first')", variables: [{ name: "item", value: "'first'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 3, lineNumber: 3, description: "将 'first' 压入 items，items=['first']", variables: [{ name: "items", value: "['first']", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 23, description: "调用 queue.enqueue('second')", variables: [{ name: "item", value: "'second'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 5, lineNumber: 3, description: "将 'second' 压入 items，items=['first','second']", variables: [{ name: "items", value: "['first','second']", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 24, description: "调用 queue.enqueue('third')", variables: [{ name: "item", value: "'third'", type: "string", changed: true }], highlight: "function-call" },
-        { stepNumber: 7, lineNumber: 3, description: "将 'third' 压入 items，items=['first','second','third']", variables: [{ name: "items", value: "['first','second','third']", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 8, lineNumber: 25, description: "调用 queue.dequeue()，移除队首", variables: [{ name: "items", value: "['first','second','third']", type: "array", changed: false }], highlight: "function-call" },
-        { stepNumber: 9, lineNumber: 6, description: "返回 'first'，items=['second','third']", variables: [{ name: "items", value: "['second','third']", type: "array", changed: true }], highlight: "return" },
-        { stepNumber: 10, lineNumber: 26, description: "调用 queue.peek()，查看队首", variables: [{ name: "items", value: "['second','third']", type: "array", changed: false }], highlight: "function-call" },
+const cache = new LRUCache(2);
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);
+cache.put(3, 3);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "javascript",
+      "lru-cache",
+      "LRU 缓存：使用 Map 维护访问顺序，超出容量时淘汰最久未使用的项",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 LRUCache 类", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 3, description: "初始化 capacity = 2", variables: [{ name: "capacity", value: "2", type: "number", changed: true }], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 15, description: "put(1,1)，cache = {1:1}", variables: [{ name: "cache", value: "Map(1)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 16, description: "put(2,2)，cache = {1:1, 2:2}", variables: [{ name: "cache", value: "Map(2)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 5, lineNumber: 17, description: "get(1) 命中，移到最新位置 cache = {2:2, 1:1}", variables: [{ name: "cache", value: "Map(2)", type: "object", changed: true }, { name: "result", value: "1", type: "number", changed: true }], highlight: "branch-true" },
+        { stepNumber: 6, lineNumber: 18, description: "put(3,3)，容量超了，删除最旧的 key 2", variables: [{ name: "cache", value: "Map(2)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 18, description: "最终 cache = {1:1, 3:3}", variables: [{ name: "cache", value: "Map {1=>1, 3=>3}", type: "object", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "queue", label: "Queue<T>", type: "class", description: "泛型队列类" },
-          { id: "enqueue", label: "enqueue()", type: "function", description: "入队操作" },
-          { id: "dequeue", label: "dequeue()", type: "function", description: "出队操作" },
-          { id: "peek", label: "peek()", type: "function", description: "查看队首" },
-          { id: "items", label: "items", type: "variable", description: "内部数组存储" },
-        ],
-        edges: [
-          { from: "queue", to: "enqueue", label: "方法" },
-          { from: "queue", to: "dequeue", label: "方法" },
-          { from: "queue", to: "peek", label: "方法" },
-          { from: "enqueue", to: "items", label: "尾部推入" },
-          { from: "dequeue", to: "items", label: "头部移除" },
-          { from: "peek", to: "items", label: "只读首元素" },
-        ],
-        mermaidCode: `graph TD
-    A["Queue<T>"] -->|方法| B["enqueue()"]
-    A -->|方法| C["dequeue()"]
-    A -->|方法| D["peek()"]
-    B -->|尾部推入| E[items]
-    C -->|头部移除| E
-    D -->|只读| E`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "enqueue_input", label: "入队元素", type: "input" },
-          { id: "queue_store", label: "队列存储", type: "storage" },
-          { id: "dequeue_output", label: "出队元素", type: "output" },
-          { id: "peek_output", label: "查看队首", type: "output" },
-        ],
-        edges: [
-          { from: "enqueue_input", to: "queue_store", label: "尾部入队" },
-          { from: "queue_store", to: "dequeue_output", label: "头部出队" },
-          { from: "queue_store", to: "peek_output", label: "查看" },
-        ],
-        mermaidCode: `graph LR
-    A[入队元素] -->|尾部入队| B[队列存储]
-    B -->|头部出队| C[出队元素]
-    B -->|查看| D[查看队首]`,
-      },
-    },
+      [
+        { id: "LRUCache", label: "LRUCache", type: "class", description: "LRU 缓存" },
+        { id: "Map", label: "Map", type: "function", description: "维护顺序" },
+      ],
+      [
+        { from: "LRUCache", to: "Map", label: "操作" },
+      ],
+      `graph TD
+        A[put/get] --> B[更新 Map 顺序]
+        B --> C{超出容量?}
+        C -->|是| D[删除最旧 key]
+        C -->|否| E[保持]`,
+      [
+        { id: "put", label: "put", type: "input" },
+        { id: "get", label: "get", type: "input" },
+        { id: "map", label: "Map 维护顺序", type: "process" },
+        { id: "evict", label: "淘汰最旧", type: "process" },
+        { id: "out", label: "缓存状态", type: "output" },
+      ],
+      [
+        { from: "put", to: "map" },
+        { from: "get", to: "map" },
+        { from: "map", to: "evict", label: "超容" },
+        { from: "evict", to: "out" },
+        { from: "map", to: "out" },
+      ],
+      `graph TD
+        put[put/get] --> map[Map 维护访问顺序]
+        map --> evict{容量超过 2?}
+        evict -->|是| remove[删除最久未使用]
+        evict -->|否| keep[保留]
+        remove --> out[最终缓存状态]
+        keep --> out`
+    ),
   },
 
-  // ──────────────────────────────────────────────
-  // 18. Binary Tree Traversal (NEW)
-  // ──────────────────────────────────────────────
   {
     id: "binary-tree",
-    title: "二叉树遍历",
-    description: "Python 实现二叉树的层序遍历（BFS）",
+    title: "二叉树层序遍历",
+    description: "Python 广度优先搜索遍历二叉树，展示队列使用。",
     category: "data-structure",
+    difficulty: "hard",
     language: "python",
     code: `from collections import deque
 
@@ -1551,92 +1918,149 @@ class TreeNode:
 def level_order(root):
     if not root:
         return []
-    result = []
-    queue = deque([root])
+    result, queue = [], deque([root])
     while queue:
-        level_size = len(queue)
-        level = []
-        for _ in range(level_size):
-            node = queue.popleft()
-            level.append(node.val)
-            if node.left:
-                queue.append(node.left)
-            if node.right:
-                queue.append(node.right)
-        result.append(level)
+        node = queue.popleft()
+        result.append(node.val)
+        if node.left: queue.append(node.left)
+        if node.right: queue.append(node.right)
     return result
 
-#        1
-#      /   \\
-#     2     3
-#    / \\   /
-#   4   5 6
-root = TreeNode(1,
-    TreeNode(2, TreeNode(4), TreeNode(5)),
-    TreeNode(3, TreeNode(6), None))
+root = TreeNode(1, TreeNode(2), TreeNode(3))
 print(level_order(root))`,
-    preAnalyzed: {
-      success: true,
-      codeInput: { code: "", language: "python" },
-      summary: "使用 BFS 层序遍历二叉树，按层输出节点值",
-      executionSteps: [
-        { stepNumber: 1, lineNumber: 8, description: "调用 level_order(root)，根节点值为 1", variables: [{ name: "root", value: "TreeNode{val:1}", type: "object", changed: true }, { name: "result", value: "[]", type: "array", changed: true }], highlight: "function-call" },
-        { stepNumber: 2, lineNumber: 9, description: "root 不为 None，继续执行", variables: [{ name: "root", value: "TreeNode{val:1}", type: "object", changed: false }], highlight: "branch-false" },
-        { stepNumber: 3, lineNumber: 11, description: "初始化 queue = deque([root])", variables: [{ name: "queue", value: "deque([TreeNode{val:1}])", type: "object", changed: true }], highlight: "normal" },
-        { stepNumber: 4, lineNumber: 12, description: "进入 while 循环，queue 不为空", variables: [{ name: "queue", value: "deque([TreeNode{val:1}])", type: "object", changed: false }], highlight: "loop-start" },
-        { stepNumber: 5, lineNumber: 13, description: "level_size = 1，开始处理第一层", variables: [{ name: "level_size", value: "1", type: "number", changed: true }], highlight: "normal" },
-        { stepNumber: 6, lineNumber: 15, description: "弹出 node(1)，level=[1]", variables: [{ name: "node", value: "TreeNode{val:1}", type: "object", changed: true }, { name: "level", value: "[1]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 7, lineNumber: 17, description: "node.left(2) 存在，加入 queue", variables: [{ name: "queue", value: "deque([TreeNode{val:2}])", type: "object", changed: true }], highlight: "branch-true" },
-        { stepNumber: 8, lineNumber: 19, description: "node.right(3) 存在，加入 queue", variables: [{ name: "queue", value: "deque([TreeNode{val:2},TreeNode{val:3}])", type: "object", changed: true }], highlight: "branch-true" },
-        { stepNumber: 9, lineNumber: 20, description: "第一层完成，result.append([1])", variables: [{ name: "result", value: "[[1]]", type: "array", changed: true }], highlight: "normal" },
-        { stepNumber: 10, lineNumber: 12, description: "第二轮循环，处理第二层节点 2 和 3", variables: [{ name: "queue", value: "deque([TreeNode{val:2},TreeNode{val:3}])", type: "object", changed: false }, { name: "level_size", value: "2", type: "number", changed: true }], highlight: "loop-start", annotation: "开始处理第二层" },
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "python",
+      "binary-tree",
+      "二叉树 BFS：用队列按层逐节点访问",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "导入 deque 队列", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 9, description: "调用 level_order(root)", variables: [{ name: "root", value: "TreeNode(1)", type: "object", changed: true }], highlight: "function-call" },
+        { stepNumber: 3, lineNumber: 12, description: "初始化 result=[]，queue=[root]", variables: [{ name: "result", value: "[]", type: "array", changed: true }, { name: "queue", value: "deque([1])", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 13, description: "进入 while 循环", variables: [], highlight: "loop-start" },
+        { stepNumber: 5, lineNumber: 14, description: "弹出队首节点 1，result=[1]", variables: [{ name: "result", value: "[1]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 15, description: "左子节点 2 入队，queue=[2]", variables: [{ name: "queue", value: "deque([2])", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 16, description: "右子节点 3 入队，queue=[2,3]", variables: [{ name: "queue", value: "deque([2,3])", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 8, lineNumber: 14, description: "弹出节点 2，result=[1,2]", variables: [{ name: "result", value: "[1,2]", type: "array", changed: true }], highlight: "normal" },
+        { stepNumber: 9, lineNumber: 17, description: "返回层序遍历结果 [1,2,3]", variables: [{ name: "result", value: "[1,2,3]", type: "array", changed: true }], highlight: "return" },
       ],
-      architecture: {
-        nodes: [
-          { id: "lot", label: "level_order", type: "function", description: "层序遍历函数" },
-          { id: "root", label: "root (根节点)", type: "variable" },
-          { id: "queue", label: "queue (队列)", type: "variable", description: "BFS 辅助队列" },
-          { id: "result", label: "result (结果)", type: "variable" },
-        ],
-        edges: [
-          { from: "lot", to: "root", label: "接收" },
-          { from: "lot", to: "queue", label: "初始化" },
-          { from: "lot", to: "result", label: "写入" },
-          { from: "queue", to: "queue", label: "子节点入队" },
-        ],
-        mermaidCode: `graph TD
-    A[level_order] -->|接收| B["root (根节点)"]
-    A -->|初始化| C["queue (队列)"]
-    A -->|写入| D["result (结果)"]
-    C -->|子节点入队| C
-    C -->|出队| E[处理节点]
-    E --> D`,
-      },
-      dataFlow: {
-        nodes: [
-          { id: "input", label: "根节点", type: "input" },
-          { id: "init_queue", label: "初始化队列", type: "process" },
-          { id: "dequeue", label: "出队节点", type: "process" },
-          { id: "enqueue_children", label: "子节点入队", type: "process" },
-          { id: "record_level", label: "记录层级", type: "storage" },
-          { id: "output", label: "层序结果", type: "output" },
-        ],
-        edges: [
-          { from: "input", to: "init_queue", label: "root" },
-          { from: "init_queue", to: "dequeue", label: "队列" },
-          { from: "dequeue", to: "enqueue_children", label: "当前节点" },
-          { from: "enqueue_children", to: "dequeue", label: "更新队列" },
-          { from: "dequeue", to: "record_level", label: "节点值" },
-          { from: "record_level", to: "output", label: "层级完成" },
-        ],
-        mermaidCode: `graph LR
-    A[根节点] -->|root| B[初始化队列]
-    B -->|队列| C[出队节点]
-    C -->|当前节点| D[子节点入队]
-    D -->|更新队列| C
-    C -->|节点值| E[记录层级]
-    E -->|层级完成| F[层序结果]`,
-      },
-    },
+      [
+        { id: "level_order", label: "level_order", type: "function", description: "层序遍历" },
+        { id: "TreeNode", label: "TreeNode", type: "class", description: "树节点" },
+      ],
+      [
+        { from: "level_order", to: "TreeNode", label: "访问" },
+      ],
+      `graph TD
+        A[level_order] --> B[初始化队列]
+        B --> C[while 队列非空]
+        C --> D[出队访问]
+        D --> E[左右子节点入队]
+        E --> C`,
+      [
+        { id: "root", label: "根节点 1", type: "input" },
+        { id: "queue", label: "队列", type: "process" },
+        { id: "visit", label: "访问节点", type: "process" },
+        { id: "enqueue", label: "子节点入队", type: "process" },
+        { id: "out", label: "[1,2,3]", type: "output" },
+      ],
+      [
+        { from: "root", to: "queue" },
+        { from: "queue", to: "visit" },
+        { from: "visit", to: "enqueue" },
+        { from: "enqueue", to: "queue" },
+        { from: "visit", to: "out" },
+      ],
+      `graph TD
+        root[根节点 1] --> queue[初始化 queue=[1]]
+        queue --> visit[弹出访问 1]
+        visit --> enqueue[左2右3入队]
+        enqueue --> queue
+        queue --> visit2[弹出访问 2]
+        visit2 --> out[结果 [1,2,3]]`
+    ),
+  },
+
+  {
+    id: "rb-tree",
+    title: "红黑树插入",
+    description: "TypeScript 简化红黑树插入与旋转，展示自平衡过程。",
+    category: "data-structure",
+    difficulty: "hard",
+    language: "typescript",
+    code: `enum Color { Red, Black }
+class RBNode {
+  color = Color.Red;
+  constructor(public val: number, public left: RBNode | null = null, public right: RBNode | null = null, public parent: RBNode | null = null) {}
+}
+
+class RBTree {
+  root: RBNode | null = null;
+  insert(val: number) {
+    const node = new RBNode(val);
+    if (!this.root) { this.root = node; node.color = Color.Black; return; }
+    // 简化：仅展示 BST 插入，平衡旋转省略
+    let cur = this.root;
+    while (true) {
+      if (val < cur.val) {
+        if (!cur.left) { cur.left = node; node.parent = cur; break; }
+        cur = cur.left;
+      } else {
+        if (!cur.right) { cur.right = node; node.parent = cur; break; }
+        cur = cur.right;
+      }
+    }
+  }
+}
+
+const tree = new RBTree();
+tree.insert(10);
+tree.insert(5);
+tree.insert(15);`,
+    preAnalyzed: makePreAnalyzed(
+      "",
+      "typescript",
+      "rb-tree",
+      "红黑树：在 BST 插入基础上维护颜色与平衡（简化版展示插入过程）",
+      [
+        { stepNumber: 1, lineNumber: 1, description: "定义 Color 枚举", variables: [], highlight: "normal" },
+        { stepNumber: 2, lineNumber: 2, description: "定义 RBNode 节点类", variables: [], highlight: "normal" },
+        { stepNumber: 3, lineNumber: 8, description: "定义 RBTree 类", variables: [], highlight: "normal" },
+        { stepNumber: 4, lineNumber: 11, description: "插入 10，root 为空，设为黑色根节点", variables: [{ name: "root", value: "RBNode(10, Black)", type: "object", changed: true }], highlight: "branch-true" },
+        { stepNumber: 5, lineNumber: 11, description: "插入 5，比 10 小，放到左子节点，颜色为红", variables: [{ name: "root.left", value: "RBNode(5, Red)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 6, lineNumber: 11, description: "插入 15，比 10 大，放到右子节点，颜色为红", variables: [{ name: "root.right", value: "RBNode(15, Red)", type: "object", changed: true }], highlight: "normal" },
+        { stepNumber: 7, lineNumber: 27, description: "最终树结构：10(黑)/5(红)/15(红)", variables: [{ name: "tree", value: "{root:10, left:5, right:15}", type: "object", changed: true }], highlight: "return" },
+      ],
+      [
+        { id: "RBTree", label: "RBTree", type: "class", description: "红黑树" },
+        { id: "RBNode", label: "RBNode", type: "class", description: "红黑树节点" },
+      ],
+      [
+        { from: "RBTree", to: "RBNode", label: "包含" },
+      ],
+      `graph TD
+        A[RBTree.insert] --> B{BST 定位}
+        B --> C[插入新节点]
+        C --> D[颜色调整]
+        D --> E[旋转平衡]`,
+      [
+        { id: "insert", label: "insert", type: "input" },
+        { id: "bst", label: "BST 定位", type: "process" },
+        { id: "color", label: "颜色调整", type: "process" },
+        { id: "rotate", label: "旋转平衡", type: "process" },
+        { id: "out", label: "平衡树", type: "output" },
+      ],
+      [
+        { from: "insert", to: "bst" },
+        { from: "bst", to: "color" },
+        { from: "color", to: "rotate" },
+        { from: "rotate", to: "out" },
+      ],
+      `graph TD
+        insert[插入 10,5,15] --> bst[BST 定位]
+        bst --> color[新节点设为红色]
+        color --> rotate[必要时旋转平衡]
+        rotate --> out[最终红黑树结构]`
+    ),
   },
 ];

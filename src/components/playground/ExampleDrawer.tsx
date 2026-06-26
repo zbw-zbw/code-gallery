@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { EXAMPLES, CATEGORY_LABELS } from "@/lib/examples";
+import { EXAMPLES, CATEGORY_LABELS, DIFFICULTY_LABELS, DIFFICULTY_STYLES } from "@/lib/examples";
 import { Example } from "@/lib/examples";
 import { SUPPORTED_LANGUAGES } from "@/lib/constants";
 
@@ -13,16 +13,52 @@ interface ExampleDrawerProps {
 export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("all");
+  const [difficulty, setDifficulty] = useState("all");
 
   const categories = Object.keys(CATEGORY_LABELS);
-  const filtered =
-    category === "all"
-      ? EXAMPLES
-      : EXAMPLES.filter((e) => e.category === category);
+  const difficulties = Object.keys(DIFFICULTY_LABELS);
+
+  const filtered = EXAMPLES.filter((e) => {
+    const matchCategory = category === "all" || e.category === category;
+    const matchDifficulty = difficulty === "all" || e.difficulty === difficulty;
+    return matchCategory && matchDifficulty;
+  });
 
   const handleSelect = (example: Example) => {
     onSelect(example);
     setOpen(false);
+  };
+
+  const renderExampleItem = (example: Example) => {
+    const lang = SUPPORTED_LANGUAGES.find((l) => l.value === example.language);
+    return (
+      <button
+        key={example.id}
+        onClick={() => handleSelect(example)}
+        className="w-full text-left p-4 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-white"
+      >
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <h4 className="text-sm font-medium text-gallery-black">
+            {example.title}
+          </h4>
+          {lang && (
+            <span
+              className="w-2 h-2 rounded-sm flex-shrink-0"
+              style={{ backgroundColor: lang.color }}
+            />
+          )}
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gallery-bg text-gallery-gray">
+            {CATEGORY_LABELS[example.category]}
+          </span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded ${DIFFICULTY_STYLES[example.difficulty]}`}>
+            {DIFFICULTY_LABELS[example.difficulty]}
+          </span>
+        </div>
+        <p className="text-xs text-gallery-gray leading-relaxed">
+          {example.description}
+        </p>
+      </button>
+    );
   };
 
   return (
@@ -73,57 +109,50 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                   </button>
                 </div>
 
-                {/* Category filter */}
-                <div className="flex gap-2 px-6 py-3 overflow-x-auto flex-shrink-0">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setCategory(cat)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
-                        category === cat
-                          ? "bg-code-purple text-white"
-                          : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
-                      }`}
-                    >
-                      {CATEGORY_LABELS[cat]}
-                    </button>
-                  ))}
+                {/* Filters */}
+                <div className="px-6 flex-shrink-0">
+                  <div className="flex gap-2 py-2 overflow-x-auto">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setCategory(cat)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+                          category === cat
+                            ? "bg-code-purple text-white"
+                            : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
+                        }`}
+                      >
+                        {CATEGORY_LABELS[cat]}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 py-2 overflow-x-auto">
+                    {difficulties.map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDifficulty(d)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+                          difficulty === d
+                            ? "bg-gallery-black text-white"
+                            : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
+                        }`}
+                      >
+                        {DIFFICULTY_LABELS[d]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Example list */}
-                <div className="flex-1 overflow-auto p-4 space-y-3">
+                {/* Example list - fixed flex layout */}
+                <div className="flex-1 min-h-0 overflow-auto p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {filtered.map((example) => {
-                      const lang = SUPPORTED_LANGUAGES.find(
-                        (l) => l.value === example.language
-                      );
-                      return (
-                        <button
-                          key={example.id}
-                          onClick={() => handleSelect(example)}
-                          className="w-full text-left p-4 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-white"
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="text-sm font-medium text-gallery-black">
-                              {example.title}
-                            </h4>
-                            {lang && (
-                              <span
-                                className="w-2 h-2 rounded-sm flex-shrink-0"
-                                style={{ backgroundColor: lang.color }}
-                              />
-                            )}
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gallery-bg text-gallery-gray">
-                              {CATEGORY_LABELS[example.category]}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gallery-gray leading-relaxed">
-                            {example.description}
-                          </p>
-                        </button>
-                      );
-                    })}
+                    {filtered.map(renderExampleItem)}
                   </div>
+                  {filtered.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center text-gallery-gray text-sm">
+                      没有符合条件的示例
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -150,55 +179,50 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                 </button>
               </div>
 
-              {/* Category filter */}
-              <div className="flex gap-2 px-5 py-3 overflow-x-auto flex-shrink-0">
-                {categories.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
-                      category === cat
-                        ? "bg-code-purple text-white"
-                        : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
-                    }`}
-                  >
-                    {CATEGORY_LABELS[cat]}
-                  </button>
-                ))}
+              {/* Filters */}
+              <div className="px-5 flex-shrink-0">
+                <div className="flex gap-2 py-2 overflow-x-auto">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setCategory(cat)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+                        category === cat
+                          ? "bg-code-purple text-white"
+                          : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
+                      }`}
+                    >
+                      {CATEGORY_LABELS[cat]}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2 py-2 overflow-x-auto">
+                  {difficulties.map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDifficulty(d)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors duration-200 ${
+                        difficulty === d
+                          ? "bg-gallery-black text-white"
+                          : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
+                      }`}
+                    >
+                      {DIFFICULTY_LABELS[d]}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Example list */}
-              <div className="flex-1 overflow-auto p-4 space-y-3">
-                {filtered.map((example) => {
-                  const lang = SUPPORTED_LANGUAGES.find(
-                    (l) => l.value === example.language
-                  );
-                  return (
-                    <button
-                      key={example.id}
-                      onClick={() => handleSelect(example)}
-                      className="w-full text-left p-4 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-white"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="text-sm font-medium text-gallery-black">
-                          {example.title}
-                        </h4>
-                        {lang && (
-                          <span
-                            className="w-2 h-2 rounded-sm flex-shrink-0"
-                            style={{ backgroundColor: lang.color }}
-                          />
-                        )}
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-gallery-bg text-gallery-gray">
-                          {CATEGORY_LABELS[example.category]}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gallery-gray leading-relaxed">
-                        {example.description}
-                      </p>
-                    </button>
-                  );
-                })}
+              <div className="flex-1 min-h-0 overflow-auto p-4">
+                <div className="space-y-3">
+                  {filtered.map(renderExampleItem)}
+                </div>
+                {filtered.length === 0 && (
+                  <div className="h-full flex flex-col items-center justify-center text-gallery-gray text-sm">
+                    没有符合条件的示例
+                  </div>
+                )}
               </div>
             </motion.div>
           </>
