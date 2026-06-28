@@ -82,7 +82,7 @@ export default function CodeInputPanel({
   const highlightedHtml = getHighlightedHtml(code, language);
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-code-bg">
+    <div className="flex flex-col flex-1 min-h-0 bg-code-bg">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3 sm:px-4 py-3 bg-code-surface flex-shrink-0 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">

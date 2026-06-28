@@ -37,7 +37,6 @@ function PlaygroundContent() {
 
     setIsAnalyzing(true);
     setError(null);
-    setResult(null);
 
     try {
       const response = await fetch("/api/analyze", {
@@ -69,9 +68,9 @@ function PlaygroundContent() {
 
   return (
     <PlaygroundLayout>
-      <div className="h-full flex flex-col md:flex-row overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
         {/* Left: Code input - fills full height */}
-        <div className="h-[50vh] md:h-full flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col">
           <CodeInputPanel
             code={code}
             language={language}
@@ -84,7 +83,7 @@ function PlaygroundContent() {
         </div>
 
         {/* Right: Result - fills full height */}
-        <div className="h-[50vh] md:h-full flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 min-h-0 flex flex-col">
           <ResultPanel
             result={result}
             isAnalyzing={isAnalyzing}

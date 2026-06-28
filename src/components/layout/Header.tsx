@@ -46,12 +46,12 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="flex items-center gap-6">
-          <a
-            href="#features"
+          <Link
+            href="/#features"
             className="text-sm text-gallery-gray hover:text-gallery-black transition-colors duration-200 hidden sm:block"
           >
             功能
-          </a>
+          </Link>
           <Link
             href="/examples"
             className="text-sm text-gallery-gray hover:text-gallery-black transition-colors duration-200 hidden sm:block"
@@ -90,13 +90,13 @@ export default function Header() {
       {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="sm:hidden bg-gallery-white px-4 py-3 space-y-1">
-          <a
-            href="#features"
+          <Link
+            href="/#features"
             onClick={() => setMenuOpen(false)}
             className="block px-3 py-2.5 rounded-lg text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
           >
             功能
-          </a>
+          </Link>
           <Link
             href="/examples"
             onClick={() => setMenuOpen(false)}
