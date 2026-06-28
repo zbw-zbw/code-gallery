@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +16,20 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  useFocusTrap({ open: menuOpen, onClose: () => setMenuOpen(false), containerRef: menuRef });
 
   return (
     <header
@@ -69,7 +85,9 @@ export default function Header() {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
-            aria-label="菜单"
+            aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
             {menuOpen ? (
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -89,7 +107,11 @@ export default function Header() {
 
       {/* Mobile dropdown menu */}
       {menuOpen && (
-        <div className="sm:hidden bg-gallery-white px-4 py-3 space-y-1">
+        <div
+          ref={menuRef}
+          id="mobile-menu"
+          className="sm:hidden bg-gallery-white px-4 py-3 space-y-1"
+        >
           <Link
             href="/#features"
             onClick={() => setMenuOpen(false)}
