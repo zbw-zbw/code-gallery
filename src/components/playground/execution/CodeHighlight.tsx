@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ExecutionStep } from "@/types";
 import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
+import { useToast } from "@/components/shared/Toast";
 
 interface CodeHighlightProps {
   code: string;
@@ -40,6 +41,8 @@ export default function CodeHighlight({
   currentStep,
   fileName,
 }: CodeHighlightProps) {
+  const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
   const lines = useMemo(() => code.split("\n"), [code]);
   const currentStepData = steps[currentStep];
   const activeLine = currentStepData?.lineNumber ?? 0;
@@ -63,6 +66,17 @@ export default function CodeHighlight({
     }
   }, [activeLine]);
 
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      showToast("代码已复制");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      showToast("复制失败");
+    }
+  }, [code, showToast]);
+
   return (
     <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden">
       {/* Title bar */}
@@ -72,9 +86,26 @@ export default function CodeHighlight({
           <div className="w-3 h-3 rounded-full bg-yellow-400" />
           <div className="w-3 h-3 rounded-full bg-green-400" />
         </div>
-        <span className="text-xs text-gallery-gray ml-2 font-mono">
+        <span className="text-xs text-gallery-gray ml-2 font-mono flex-1 truncate">
           {fileName || "code.js"}
         </span>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs text-gallery-gray hover:text-code-text hover:bg-gallery-border/20 transition-colors duration-200"
+          aria-label="复制代码"
+          title="复制代码"
+        >
+          {copied ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Code area */}

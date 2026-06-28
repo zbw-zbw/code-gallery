@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, ReactNode } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo, ReactNode } from "react";
 import { Language } from "@/types";
 import { detectLanguage, SUPPORTED_LANGUAGES } from "@/lib/constants";
 import LanguageSelector from "./LanguageSelector";
@@ -56,8 +56,13 @@ export default function CodeInputPanel({
     }
   }, []);
 
-  // Handle Tab key to insert spaces
+  // Handle Tab key to insert spaces + Ctrl/Cmd+Enter to analyze
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      if (!isEmpty && !isAnalyzing) onAnalyze();
+      return;
+    }
     if (e.key === "Tab") {
       e.preventDefault();
       const target = e.currentTarget;
@@ -78,11 +83,11 @@ export default function CodeInputPanel({
     textareaRef.current?.focus();
   };
 
-  const lines = Array.from({ length: lineCount }, (_, i) => i + 1);
+  const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);
   const isEmpty = code.trim().length === 0;
 
-  // Syntax highlighted HTML for overlay
-  const highlightedHtml = getHighlightedHtml(code, language);
+  // Syntax highlighted HTML for overlay (memoized for performance)
+  const highlightedHtml = useMemo(() => getHighlightedHtml(code, language), [code, language]);
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-code-bg">
@@ -103,6 +108,7 @@ export default function CodeInputPanel({
           <button
             onClick={onAnalyze}
             disabled={isEmpty || isAnalyzing}
+            title="Ctrl+Enter"
             className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
               isEmpty || isAnalyzing
                 ? "bg-gallery-border text-gallery-gray cursor-not-allowed"

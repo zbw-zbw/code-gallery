@@ -22,6 +22,7 @@ export default function ExecutionView({
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
+  const [showShortcuts, setShowShortcuts] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const totalSteps = steps.length;
@@ -163,7 +164,7 @@ export default function ExecutionView({
       className="h-full flex flex-col"
     >
       {/* Main view area */}
-      <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-5 gap-3 p-3 min-h-0">
+      <div className="flex-1 overflow-hidden grid grid-cols-1 md:grid-cols-5 gap-3 p-3 min-h-0 relative">
         {/* Left: Code */}
         <div className="md:col-span-3 h-full min-h-0">
           <CodeHighlight
@@ -183,6 +184,36 @@ export default function ExecutionView({
             <StepDescription steps={steps} currentStep={currentStep} />
           </div>
         </div>
+
+        {/* Keyboard shortcuts hint - desktop only, dismissible */}
+        {showShortcuts && (
+          <div className="hidden md:flex absolute bottom-3 right-3 items-center gap-3 px-3 py-2 bg-code-surface/95 backdrop-blur rounded-lg shadow-md text-[11px] text-gallery-gray font-mono z-20">
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-code-bg text-code-text">Space</kbd>
+              播放
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-code-bg text-code-text">←</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-code-bg text-code-text">→</kbd>
+              步骤
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-code-bg text-code-text">Home</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-code-bg text-code-text">End</kbd>
+              首末
+            </span>
+            <button
+              onClick={() => setShowShortcuts(false)}
+              className="ml-1 text-gallery-gray hover:text-code-text transition-colors"
+              aria-label="关闭快捷键提示"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Player controls */}
