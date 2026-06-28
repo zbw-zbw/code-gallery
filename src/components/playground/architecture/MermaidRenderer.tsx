@@ -1,11 +1,55 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type Mermaid from "mermaid";
 
 interface MermaidRendererProps {
   code: string;
   id: string;
   className?: string;
+}
+
+// Module-level singleton: load and initialize mermaid only once
+let mermaidPromise: Promise<typeof Mermaid> | null = null;
+let mermaidInstance: typeof Mermaid | null = null;
+
+async function getMermaid(): Promise<typeof Mermaid> {
+  if (mermaidInstance) return mermaidInstance;
+  if (mermaidPromise) return mermaidPromise;
+
+  mermaidPromise = import("mermaid").then((mod) => {
+    const mermaid = mod.default;
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "base",
+      themeVariables: {
+        primaryColor: "#6366f1",
+        primaryTextColor: "#1a1a1a",
+        primaryBorderColor: "#818cf8",
+        lineColor: "#6b7280",
+        secondaryColor: "#38bdf8",
+        tertiaryColor: "#34d399",
+        background: "#ffffff",
+        mainBkg: "#f0f0ff",
+        nodeBorder: "#6366f1",
+        clusterBkg: "#f8f8ff",
+        fontSize: "14px",
+        fontFamily:
+          '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+      },
+      flowchart: {
+        curve: "basis",
+        padding: 20,
+        nodeSpacing: 50,
+        rankSpacing: 60,
+        htmlLabels: true,
+      },
+    });
+    mermaidInstance = mermaid;
+    return mermaid;
+  });
+
+  return mermaidPromise;
 }
 
 export default function MermaidRenderer({
@@ -28,36 +72,7 @@ export default function MermaidRenderer({
 
     const render = async () => {
       try {
-        const mermaidModule = await import("mermaid");
-        const mermaid = mermaidModule.default;
-
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: "base",
-          themeVariables: {
-            primaryColor: "#6366f1",
-            primaryTextColor: "#1a1a1a",
-            primaryBorderColor: "#818cf8",
-            lineColor: "#6b7280",
-            secondaryColor: "#38bdf8",
-            tertiaryColor: "#34d399",
-            background: "#ffffff",
-            mainBkg: "#f0f0ff",
-            nodeBorder: "#6366f1",
-            clusterBkg: "#f8f8ff",
-            fontSize: "14px",
-            fontFamily:
-              '-apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
-          },
-          flowchart: {
-            curve: "basis",
-            padding: 20,
-            nodeSpacing: 50,
-            rankSpacing: 60,
-            htmlLabels: true,
-          },
-        });
-
+        const mermaid = await getMermaid();
         const result = await mermaid.render(`mermaid-${id}`, code);
         if (!cancelled && mountedRef.current) {
           setSvg(result.svg);

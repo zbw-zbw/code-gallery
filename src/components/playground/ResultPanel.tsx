@@ -46,6 +46,12 @@ const DataFlowIcon = () => (
   </svg>
 );
 
+const TABS = [
+  { key: "execution" as const, label: "执行流程", Icon: ExecutionIcon },
+  { key: "architecture" as const, label: "架构图", Icon: ArchitectureIcon },
+  { key: "dataflow" as const, label: "数据流", Icon: DataFlowIcon },
+];
+
 export default function ResultPanel({
   result,
   isAnalyzing,
@@ -55,6 +61,7 @@ export default function ResultPanel({
   const [activeTab, setActiveTab] = useState<"execution" | "architecture" | "dataflow">("execution");
   const [stageIndex, setStageIndex] = useState(0);
   const visualRef = useRef<HTMLDivElement>(null);
+  const tablistRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isAnalyzing) {
@@ -66,6 +73,29 @@ export default function ResultPanel({
     }, 2000);
     return () => clearInterval(interval);
   }, [isAnalyzing]);
+
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const index = TABS.findIndex((t) => t.key === activeTab);
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = (index + 1) % TABS.length;
+      setActiveTab(TABS[next].key);
+      tablistRef.current?.querySelectorAll("button")[next]?.focus();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const prev = (index - 1 + TABS.length) % TABS.length;
+      setActiveTab(TABS[prev].key);
+      tablistRef.current?.querySelectorAll("button")[prev]?.focus();
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActiveTab(TABS[0].key);
+      tablistRef.current?.querySelectorAll("button")[0]?.focus();
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setActiveTab(TABS[TABS.length - 1].key);
+      tablistRef.current?.querySelectorAll("button")[TABS.length - 1]?.focus();
+    }
+  };
 
   // Error state
   if (error) {
@@ -132,32 +162,42 @@ export default function ResultPanel({
           </div>
 
           {/* Tabs */}
-          <div className="flex relative bg-gallery-bg/30 flex-shrink-0">
-            {[
-              { key: "execution" as const, label: "执行流程", Icon: ExecutionIcon },
-              { key: "architecture" as const, label: "架构图", Icon: ArchitectureIcon },
-              { key: "dataflow" as const, label: "数据流", Icon: DataFlowIcon },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors duration-200 relative ${
-                  activeTab === tab.key
-                    ? "text-code-purple"
-                    : "text-gallery-gray hover:text-gallery-black"
-                }`}
-              >
-                <tab.Icon />
-                <span>{tab.label}</span>
-                {activeTab === tab.key && (
-                  <motion.div
-                    layoutId="tabIndicator"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-code-purple"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
+          <div
+            ref={tablistRef}
+            role="tablist"
+            aria-label="分析结果视图"
+            className="flex relative bg-gallery-bg/30 flex-shrink-0"
+          >
+            {TABS.map((tab) => {
+              const selected = activeTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  role="tab"
+                  aria-selected={selected}
+                  aria-controls={`tabpanel-${tab.key}`}
+                  id={`tab-${tab.key}`}
+                  tabIndex={selected ? 0 : -1}
+                  onClick={() => setActiveTab(tab.key)}
+                  onKeyDown={handleTabKeyDown}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors duration-200 relative ${
+                    selected
+                      ? "text-code-purple"
+                      : "text-gallery-gray hover:text-gallery-black"
+                  }`}
+                >
+                  <tab.Icon />
+                  <span>{tab.label}</span>
+                  {selected && (
+                    <motion.div
+                      layoutId="tabIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-code-purple"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
           {/* Tab content */}
@@ -165,6 +205,9 @@ export default function ResultPanel({
             <motion.div
               key={activeTab}
               ref={visualRef}
+              role="tabpanel"
+              id={`tabpanel-${activeTab}`}
+              aria-labelledby={`tab-${activeTab}`}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

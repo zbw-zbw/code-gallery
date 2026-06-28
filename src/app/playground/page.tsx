@@ -69,8 +69,8 @@ function PlaygroundContent() {
   return (
     <PlaygroundLayout>
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
-        {/* Left: Code input - fills full height */}
-        <div className="flex-1 min-h-0 flex flex-col">
+        {/* Left: Code input - 60% on mobile, 50% on desktop */}
+        <div className="flex-[3] md:flex-1 min-h-0 flex flex-col">
           <CodeInputPanel
             code={code}
             language={language}
@@ -86,8 +86,8 @@ function PlaygroundContent() {
           />
         </div>
 
-        {/* Right: Result - fills full height */}
-        <div className="flex-1 min-h-0 flex flex-col">
+        {/* Right: Result - 40% on mobile, 50% on desktop */}
+        <div className="flex-[2] md:flex-1 min-h-0 flex flex-col">
           <ResultPanel
             result={result}
             isAnalyzing={isAnalyzing}
