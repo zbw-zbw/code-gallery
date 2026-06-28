@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/shared/Toast";
 import { generateMarkdown } from "@/lib/export";
 import { AnalysisResult } from "@/types";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface ShareButtonProps {
   result: AnalysisResult;
@@ -13,6 +14,20 @@ interface ShareButtonProps {
 export default function ShareButton({ result }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
   const { showToast } = useToast();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  useFocusTrap({ open, onClose: () => setOpen(false), containerRef: panelRef });
 
   const handleCopyLink = async () => {
     try {
@@ -42,7 +57,7 @@ export default function ShareButton({ result }: ShareButtonProps) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={wrapperRef}>
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
@@ -64,6 +79,9 @@ export default function ShareButton({ result }: ShareButtonProps) {
           <>
             <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
             <motion.div
+              ref={panelRef}
+              role="dialog"
+              aria-label="分享"
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}

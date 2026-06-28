@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Language } from "@/types";
 import { SUPPORTED_LANGUAGES } from "@/lib/constants";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface LanguageSelectorProps {
   value: Language;
@@ -15,7 +16,7 @@ export default function LanguageSelector({
 }: LanguageSelectorProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
+  const panelRef = useRef<HTMLDivElement>(null);
   const selected = SUPPORTED_LANGUAGES.find((l) => l.value === value);
 
   useEffect(() => {
@@ -28,6 +29,8 @@ export default function LanguageSelector({
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useFocusTrap({ open, onClose: () => setOpen(false), containerRef: panelRef });
+
   return (
     <div className="relative" ref={ref}>
       <button
@@ -35,6 +38,7 @@ export default function LanguageSelector({
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-code-surface hover:bg-gallery-border/20 transition-colors duration-200 text-sm text-code-text"
         aria-label={`选择语言，当前: ${selected?.label || value}`}
         aria-expanded={open}
+        aria-haspopup="listbox"
       >
         {selected && (
           <span
@@ -57,10 +61,17 @@ export default function LanguageSelector({
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-1.5 w-40 rounded-xl bg-code-bg shadow-xl overflow-hidden z-50">
+        <div
+          ref={panelRef}
+          role="listbox"
+          aria-label="选择语言"
+          className="absolute top-full left-0 mt-1.5 w-40 rounded-xl bg-code-bg shadow-xl overflow-hidden z-50"
+        >
           {SUPPORTED_LANGUAGES.map((lang) => (
             <button
               key={lang.value}
+              role="option"
+              aria-selected={lang.value === value}
               onClick={() => {
                 onChange(lang.value);
                 setOpen(false);

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/components/shared/Toast";
 import { exportAsPng, exportAsSvg, generateEmbedCode } from "@/lib/export";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface ExportPanelProps {
   targetRef: React.RefObject<HTMLDivElement | null>;
@@ -16,7 +17,20 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
   const [scale, setScale] = useState<1 | 2>(2);
   const [exporting, setExporting] = useState(false);
   const { showToast } = useToast();
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  useFocusTrap({ open, onClose: () => setOpen(false), containerRef: panelRef });
 
   const handleExport = async () => {
     if (!targetRef.current && format !== "embed") {
@@ -46,7 +60,7 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
   };
 
   return (
-    <div className="relative" ref={panelRef}>
+    <div className="relative" ref={wrapperRef}>
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
@@ -69,6 +83,9 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
               onClick={() => setOpen(false)}
             />
             <motion.div
+              ref={panelRef}
+              role="dialog"
+              aria-label="导出可视化"
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
