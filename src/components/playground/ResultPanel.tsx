@@ -7,6 +7,7 @@ import ArchitectureView from "./architecture/ArchitectureView";
 import DataFlowView from "./dataflow/DataFlowView";
 import ExportPanel from "./ExportPanel";
 import ShareButton from "./ShareButton";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ResultPanelProps {
@@ -170,15 +171,17 @@ export default function ResultPanel({
               transition={{ duration: 0.2 }}
               className="flex-1 overflow-hidden"
             >
-              {activeTab === "execution" && (
-                <ExecutionView code={result.codeInput.code} steps={result.executionSteps} fileName={result.codeInput.fileName} />
-              )}
-              {activeTab === "architecture" && (
-                <ArchitectureView nodes={result.architecture.nodes} edges={result.architecture.edges} mermaidCode={result.architecture.mermaidCode} />
-              )}
-              {activeTab === "dataflow" && (
-                <DataFlowView nodes={result.dataFlow.nodes} edges={result.dataFlow.edges} mermaidCode={result.dataFlow.mermaidCode} />
-              )}
+              <ErrorBoundary key={activeTab}>
+                {activeTab === "execution" && (
+                  <ExecutionView code={result.codeInput.code} steps={result.executionSteps} fileName={result.codeInput.fileName} />
+                )}
+                {activeTab === "architecture" && (
+                  <ArchitectureView nodes={result.architecture.nodes} edges={result.architecture.edges} mermaidCode={result.architecture.mermaidCode} />
+                )}
+                {activeTab === "dataflow" && (
+                  <DataFlowView nodes={result.dataFlow.nodes} edges={result.dataFlow.edges} mermaidCode={result.dataFlow.mermaidCode} />
+                )}
+              </ErrorBoundary>
             </motion.div>
           </AnimatePresence>
         </>
