@@ -9,19 +9,23 @@ interface VariableTrackerProps {
   currentStep: number;
 }
 
-function formatValue(value: string, type: string): string | React.ReactNode {
+function formatValue(value: string, type: string): React.ReactNode {
   if (type === "array" || type === "object") {
     try {
       const parsed = JSON.parse(value);
       if (Array.isArray(parsed)) {
         return <ArrayVisualizer value={parsed} />;
       }
-      return JSON.stringify(parsed, null, 1);
+      return (
+        <span className="text-sm font-mono text-code-text">
+          {JSON.stringify(parsed, null, 1)}
+        </span>
+      );
     } catch {
-      return value;
+      return <span className="text-sm font-mono text-code-text">{value}</span>;
     }
   }
-  return value;
+  return <span className="text-sm font-mono text-code-text">{value}</span>;
 }
 
 function ArrayVisualizer({ value }: { value: unknown[] }) {
@@ -31,7 +35,7 @@ function ArrayVisualizer({ value }: { value: unknown[] }) {
         const isNumber = typeof item === "number";
         return (
           <motion.div
-            key={i}
+            key={`${i}-${String(item)}`}
             layout
             className={`min-w-[32px] h-7 flex items-center justify-center rounded-md text-xs font-mono font-medium ${
               isNumber
@@ -83,47 +87,38 @@ export default function VariableTracker({
               {variables.map((variable) => {
                 const changed = variable.changed;
                 const prevValue = prevVariables.get(variable.name);
-                const isArray = variable.type === "array";
+                const isArray = variable.type === "array" || variable.type === "object";
 
                 return (
                   <motion.div
-                    key={variable.name}
+                    key={`${variable.name}-${currentStep}`}
                     layout
                     initial={changed ? { backgroundColor: "rgba(52, 211, 153, 0.2)" } : false}
                     animate={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.6 }}
                     className="flex items-start gap-3 px-3 py-2 rounded-lg"
                   >
                     {/* Variable name */}
-                    <div className="w-20 flex-shrink-0">
-                      <span className="text-sm font-mono text-flow-blue">
+                    <div className="w-20 flex-shrink-0 truncate">
+                      <span className="text-sm font-mono text-flow-blue truncate block">
                         {variable.name}
                       </span>
                     </div>
 
                     {/* Value */}
                     <div className="flex-1 min-w-0">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={`${variable.name}-${currentStep}`}
-                          initial={changed ? { opacity: 0, y: 5 } : false}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -5 }}
-                          transition={{ duration: 0.2 }}
-                          className={changed ? "text-data-green" : "text-code-text"}
-                        >
-                          {isArray ? (
-                            formatValue(variable.value, variable.type)
-                          ) : (
-                            <span className="text-sm font-mono break-all">
-                              {changed && prevValue !== undefined && prevValue !== variable.value && (
-                                <span className="text-xs text-gallery-gray line-through mr-1">{prevValue}</span>
-                              )}
-                              {variable.value}
-                            </span>
+                      {isArray ? (
+                        formatValue(variable.value, variable.type)
+                      ) : (
+                        <div className="text-sm font-mono break-all">
+                          {changed && prevValue !== undefined && prevValue !== variable.value && (
+                            <span className="text-xs text-gallery-gray line-through mr-1">{prevValue}</span>
                           )}
-                        </motion.div>
-                      </AnimatePresence>
+                          <span className={changed ? "text-data-green" : "text-code-text"}>
+                            {variable.value}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Type tag */}
                       <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-code-surface text-gallery-gray">

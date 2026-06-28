@@ -96,26 +96,8 @@ export interface AnalysisResult {
 }
 
 // Landing page types (kept from round 1)
-export interface Feature {
-  icon: string;
-  title: string;
-  description: string;
-}
-
-export interface PainPoint {
-  emoji: string;
-  title: string;
-  description: string;
-}
-
 export interface HowItWorksStep {
   number: number;
   title: string;
   description: string;
-}
-
-export interface BubbleSortBar {
-  value: number;
-  height: number;
-  color: string;
 }

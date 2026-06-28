@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { ExecutionStep } from "@/types";
 import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
@@ -22,17 +22,36 @@ const HIGHLIGHT_COLORS: Record<ExecutionStep["highlight"], string> = {
   return: "text-data-green",
 };
 
+function detectLang(fname?: string): string {
+  if (!fname) return "javascript";
+  if (fname.endsWith(".py")) return "python";
+  if (fname.endsWith(".tsx") || fname.endsWith(".ts")) return "typescript";
+  if (fname.endsWith(".jsx") || fname.endsWith(".js")) return "javascript";
+  if (fname.endsWith(".java")) return "java";
+  if (fname.endsWith(".go")) return "go";
+  if (fname.endsWith(".rs")) return "rust";
+  if (fname.endsWith(".cpp") || fname.endsWith(".cc")) return "cpp";
+  return "javascript";
+}
+
 export default function CodeHighlight({
   code,
   steps,
   currentStep,
   fileName,
 }: CodeHighlightProps) {
-  const lines = code.split("\n");
+  const lines = useMemo(() => code.split("\n"), [code]);
   const currentStepData = steps[currentStep];
   const activeLine = currentStepData?.lineNumber ?? 0;
   const highlight = currentStepData?.highlight ?? "normal";
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Memoize highlighted HTML to avoid re-highlighting on every step change
+  const language = useMemo(() => detectLang(fileName), [fileName]);
+  const highlightedLines = useMemo(() => {
+    const html = getHighlightedHtml(code, language);
+    return html.split("\n");
+  }, [code, language]);
 
   // Auto-scroll active line into view
   useEffect(() => {
@@ -43,22 +62,6 @@ export default function CodeHighlight({
       });
     }
   }, [activeLine]);
-
-  // Detect language from fileName or code
-  const detectLang = (fname?: string): string => {
-    if (!fname) return "javascript";
-    if (fname.endsWith(".py")) return "python";
-    if (fname.endsWith(".ts")) return "typescript";
-    if (fname.endsWith(".java")) return "java";
-    if (fname.endsWith(".go")) return "go";
-    if (fname.endsWith(".rs")) return "rust";
-    if (fname.endsWith(".cpp") || fname.endsWith(".cc")) return "cpp";
-    return "javascript";
-  };
-
-  const language = detectLang(fileName);
-  const highlightedHtml = getHighlightedHtml(code, language);
-  const highlightedLines = highlightedHtml.split("\n");
 
   return (
     <div className="flex flex-col h-full bg-code-bg rounded-xl overflow-hidden">

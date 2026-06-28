@@ -77,6 +77,10 @@ function PlaygroundContent() {
             onCodeChange={setCode}
             onLanguageChange={setLanguage}
             onAnalyze={handleAnalyze}
+            onClear={() => {
+              setResult(null);
+              setError(null);
+            }}
             isAnalyzing={isAnalyzing}
             extraToolbar={<ExampleDrawer onSelect={handleSelectExample} />}
           />

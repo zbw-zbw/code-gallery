@@ -50,6 +50,8 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
       <button
         onClick={() => setOpen(!open)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200"
+        aria-label="导出可视化"
+        aria-expanded={open}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -89,6 +91,8 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
                             ? "bg-code-purple text-white"
                             : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
                         }`}
+                        aria-label={`导出格式: ${f === "png" ? "PNG 图片" : f === "svg" ? "SVG" : "嵌入代码"}`}
+                        aria-pressed={format === f}
                       >
                         {f === "png" ? "PNG 图片" : f === "svg" ? "SVG" : "嵌入代码"}
                       </button>
@@ -110,6 +114,8 @@ export default function ExportPanel({ targetRef, svgContent }: ExportPanelProps)
                               ? "bg-code-purple text-white"
                               : "bg-gallery-bg text-gallery-gray hover:text-gallery-black"
                           }`}
+                          aria-label={`分辨率 ${s}x`}
+                          aria-pressed={scale === s}
                         >
                           {s}x
                         </button>

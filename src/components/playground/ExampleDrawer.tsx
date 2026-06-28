@@ -66,6 +66,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
       <button
         onClick={() => setOpen(true)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-code-surface hover:bg-gallery-border/20 transition-colors duration-200 text-sm text-code-text"
+        aria-label="打开示例库"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -101,6 +102,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                   <button
                     onClick={() => setOpen(false)}
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
+                    aria-label="关闭示例库"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <line x1="18" y1="6" x2="6" y2="18" />
@@ -171,6 +173,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                 <button
                   onClick={() => setOpen(false)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
+                  aria-label="关闭示例库"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18" />

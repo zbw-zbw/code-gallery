@@ -22,20 +22,17 @@ export default function ExecutionView({
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(1);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const totalSteps = steps.length;
 
-  // Cleanup interval on unmount
+  // Reset currentStep when steps change (new analysis result loaded)
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
+    setCurrentStep(0);
+    setIsPlaying(false);
+  }, [steps]);
 
-  // Auto-play logic
+  // Auto-play logic with proper cleanup
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
@@ -47,12 +44,14 @@ export default function ExecutionView({
           return prev + 1;
         });
       }, 1500 / playSpeed);
-    } else {
+    }
+
+    return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    }
+    };
   }, [isPlaying, playSpeed, totalSteps]);
 
   const goToFirst = useCallback(() => {
@@ -67,18 +66,18 @@ export default function ExecutionView({
 
   const goToNext = useCallback(() => {
     setIsPlaying(false);
-    setCurrentStep((prev) => Math.min(totalSteps - 1, prev + 1));
+    setCurrentStep((prev) => (totalSteps > 0 ? Math.min(totalSteps - 1, prev + 1) : 0));
   }, [totalSteps]);
 
   const goToLast = useCallback(() => {
     setIsPlaying(false);
-    setCurrentStep(totalSteps - 1);
+    setCurrentStep(totalSteps > 0 ? totalSteps - 1 : 0);
   }, [totalSteps]);
 
   const handleSeek = useCallback(
     (step: number) => {
       setIsPlaying(false);
-      setCurrentStep(Math.max(0, Math.min(totalSteps - 1, step)));
+      setCurrentStep(totalSteps > 0 ? Math.max(0, Math.min(totalSteps - 1, step)) : 0);
     },
     [totalSteps]
   );
@@ -100,7 +99,12 @@ export default function ExecutionView({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      if (
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLButtonElement
+      )
+        return;
 
       switch (e.code) {
         case "Space":
@@ -115,12 +119,20 @@ export default function ExecutionView({
           e.preventDefault();
           goToNext();
           break;
+        case "Home":
+          e.preventDefault();
+          goToFirst();
+          break;
+        case "End":
+          e.preventDefault();
+          goToLast();
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handlePlayPause, goToPrev, goToNext]);
+  }, [handlePlayPause, goToPrev, goToNext, goToFirst, goToLast]);
 
   // Empty state
   if (totalSteps === 0) {

@@ -69,14 +69,6 @@ export const BUBBLE_SORT_CODE = `function bubbleSort(arr) {
   return arr;
 }`;
 
-export const BUBBLE_SORT_ARRAY = [
-  { value: 5, height: 100 },
-  { value: 3, height: 60 },
-  { value: 8, height: 160 },
-  { value: 1, height: 20 },
-  { value: 4, height: 80 },
-];
-
 // === Playground constants ===
 
 export const SUPPORTED_LANGUAGES: { value: Language; label: string; color: string }[] = [
@@ -122,47 +114,4 @@ export function detectLanguage(code: string): Language {
   return "javascript";
 }
 
-export const EXAMPLE_CODES: { title: string; language: Language; code: string }[] = [
-  {
-    title: "冒泡排序",
-    language: "javascript",
-    code: `function bubbleSort(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      if (arr[j] > arr[j + 1]) {
-        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-      }
-    }
-  }
-  return arr;
-}
 
-bubbleSort([5, 3, 8, 1, 4]);`,
-  },
-  {
-    title: "斐波那契递归",
-    language: "python",
-    code: `def fibonacci(n):
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
-
-result = fibonacci(5)
-print(result)`,
-  },
-  {
-    title: "API 数据获取",
-    language: "typescript",
-    code: `async function fetchUserData(userId: string) {
-  const response = await fetch(\`/api/users/\${userId}\`);
-  const data = await response.json();
-  return {
-    name: data.name,
-    email: data.email,
-    age: data.age
-  };
-}
-
-fetchUserData("123");`,
-  },
-];

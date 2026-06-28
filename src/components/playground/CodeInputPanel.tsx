@@ -12,6 +12,7 @@ interface CodeInputPanelProps {
   onCodeChange: (code: string) => void;
   onLanguageChange: (lang: Language) => void;
   onAnalyze: () => void;
+  onClear?: () => void;
   isAnalyzing: boolean;
   extraToolbar?: ReactNode;
 }
@@ -22,6 +23,7 @@ export default function CodeInputPanel({
   onCodeChange,
   onLanguageChange,
   onAnalyze,
+  onClear,
   isAnalyzing,
   extraToolbar,
 }: CodeInputPanelProps) {
@@ -71,6 +73,7 @@ export default function CodeInputPanel({
 
   const handleClear = () => {
     onCodeChange("");
+    onClear?.();
     hasAutoDetected.current = false;
     textareaRef.current?.focus();
   };
