@@ -6,6 +6,8 @@ import { detectLanguage, SUPPORTED_LANGUAGES } from "@/lib/constants";
 import LanguageSelector from "./LanguageSelector";
 import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
 
+const MAX_CODE_LENGTH = 5000;
+
 interface CodeInputPanelProps {
   code: string;
   language: Language;
@@ -60,7 +62,7 @@ export default function CodeInputPanel({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
-      if (!isEmpty && !isAnalyzing) onAnalyze();
+      if (canAnalyze) onAnalyze();
       return;
     }
     if (e.key === "Tab") {
@@ -85,6 +87,9 @@ export default function CodeInputPanel({
 
   const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);
   const isEmpty = code.trim().length === 0;
+  const isOverLimit = code.length > MAX_CODE_LENGTH;
+  const isNearLimit = code.length > MAX_CODE_LENGTH * 0.9 && !isOverLimit;
+  const canAnalyze = !isEmpty && !isAnalyzing && !isOverLimit;
 
   // Syntax highlighted HTML for overlay (memoized for performance)
   const highlightedHtml = useMemo(() => getHighlightedHtml(code, language), [code, language]);
@@ -107,10 +112,10 @@ export default function CodeInputPanel({
           </button>
           <button
             onClick={onAnalyze}
-            disabled={isEmpty || isAnalyzing}
-            title="Ctrl+Enter"
+            disabled={!canAnalyze}
+            title={isOverLimit ? `代码超过 ${MAX_CODE_LENGTH} 字符限制` : "Ctrl+Enter"}
             className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-              isEmpty || isAnalyzing
+              !canAnalyze
                 ? "bg-gallery-border text-gallery-gray cursor-not-allowed"
                 : "bg-code-purple hover:bg-code-purple-light text-white"
             }`}
@@ -184,7 +189,18 @@ export default function CodeInputPanel({
           共 {lineCount} 行 · 语言:{" "}
           {SUPPORTED_LANGUAGES.find((l) => l.value === language)?.label}
         </span>
-        <span className="flex-shrink-0 ml-2">{code.length} 字符</span>
+        <span
+          className={`flex-shrink-0 ml-2 font-mono ${
+            isOverLimit
+              ? "text-red-400 font-medium"
+              : isNearLimit
+              ? "text-amber-400"
+              : ""
+          }`}
+        >
+          {code.length} / {MAX_CODE_LENGTH} 字符
+          {isOverLimit && " (超限)"}
+        </span>
       </div>
     </div>
   );
