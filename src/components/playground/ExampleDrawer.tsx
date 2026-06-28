@@ -73,7 +73,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
           <rect x="3" y="14" width="7" height="7" rx="1" />
           <rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
-        <span>示例库</span>
+        <span className="hidden sm:inline">示例库</span>
       </button>
 
       <AnimatePresence>

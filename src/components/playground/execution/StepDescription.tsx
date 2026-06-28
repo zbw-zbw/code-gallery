@@ -8,14 +8,14 @@ interface StepDescriptionProps {
   currentStep: number;
 }
 
-const BORDER_COLORS: Record<ExecutionStep["highlight"], string> = {
-  normal: "border-code-purple",
-  "branch-true": "border-data-green",
-  "branch-false": "border-gallery-gray",
-  "loop-start": "border-flow-blue",
-  "loop-end": "border-flow-blue",
-  "function-call": "border-code-purple-light",
-  return: "border-data-green",
+const DOT_COLORS: Record<ExecutionStep["highlight"], string> = {
+  normal: "bg-code-purple",
+  "branch-true": "bg-data-green",
+  "branch-false": "bg-gallery-gray",
+  "loop-start": "bg-flow-blue",
+  "loop-end": "bg-flow-blue",
+  "function-call": "bg-code-purple-light",
+  return: "bg-data-green",
 };
 
 export default function StepDescription({
@@ -35,15 +35,18 @@ export default function StepDescription({
           exit={{ opacity: 0, y: -5 }}
           transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <div className={`border-l-[3px] pl-4 ${BORDER_COLORS[step.highlight]}`}>
-            <p className="text-base font-medium text-code-text leading-relaxed">
-              {step.description}
-            </p>
-            {step.annotation && (
-              <p className="text-sm text-gallery-gray mt-2 leading-relaxed">
-                {step.annotation}
+          <div className="flex items-start gap-3">
+            <span className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${DOT_COLORS[step.highlight]}`} />
+            <div className="flex-1">
+              <p className="text-base font-medium text-code-text leading-relaxed">
+                {step.description}
               </p>
-            )}
+              {step.annotation && (
+                <p className="text-sm text-gallery-gray mt-2 leading-relaxed">
+                  {step.annotation}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Loop indicator */}

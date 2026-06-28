@@ -40,19 +40,21 @@ body {
 button,
 a,
 [role="button"],
+[onclick],
 input[type="button"],
 input[type="submit"],
 input[type="range"],
 select,
 label,
-textarea,
+summary,
 .cursor-pointer {
   cursor: pointer;
 }
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+textarea {
   cursor: text;
 }
 

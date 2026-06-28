@@ -7,18 +7,6 @@ export default function HeroSection() {
   return (
     <section className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24 text-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gallery-bg backdrop-blur-sm mb-8"
-        >
-          <span className="text-xs md:text-sm text-gallery-gray">
-            TRAE AI 创造力大赛 · 学习工作赛道
-          </span>
-        </motion.div>
-
         {/* Main Title */}
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
@@ -81,12 +69,12 @@ export default function HeroSection() {
           >
             开始体验
           </Link>
-          <a
-            href="#features"
+          <Link
+            href="/examples"
             className="px-8 py-3.5 bg-gallery-bg hover:bg-gallery-border/50 text-gallery-black font-medium rounded-xl transition-colors duration-200 text-base"
           >
-            了解更多
-          </a>
+            浏览示例
+          </Link>
         </motion.div>
 
         {/* Hero Animation */}
@@ -106,11 +94,11 @@ function HeroDecoration() {
         delay: 0.6,
         ease: [0.25, 0.1, 0.25, 1],
       }}
-      className="relative max-w-3xl mx-auto w-full h-[200px] rounded-2xl bg-code-bg shadow-sm overflow-hidden"
+      className="relative max-w-3xl mx-auto w-full h-[180px] md:h-[200px] rounded-2xl bg-code-bg shadow-sm overflow-hidden"
     >
-      <div className="absolute inset-0 flex items-center justify-center gap-8 md:gap-16 px-8">
+      <div className="absolute inset-0 flex items-center justify-center gap-4 sm:gap-8 md:gap-16 px-4 sm:px-8">
         {/* Left: Code blocks */}
-        <div className="flex flex-col gap-2 w-[120px] md:w-[160px]">
+        <div className="flex flex-col gap-2 w-[80px] sm:w-[120px] md:w-[160px] flex-shrink-0">
           <div className="h-3 rounded bg-code-purple/60 w-full" />
           <div className="h-3 rounded bg-flow-blue/60 w-3/4" />
           <div className="h-3 rounded bg-data-green/60 w-5/6" />
@@ -118,7 +106,7 @@ function HeroDecoration() {
         </div>
 
         {/* Middle: Flowing lines */}
-        <div className="relative w-[80px] md:w-[120px] h-[80px]">
+        <div className="relative w-[60px] sm:w-[80px] md:w-[120px] h-[60px] sm:h-[80px] md:h-[80px] flex-shrink-0">
           <svg
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 120 80"
@@ -170,7 +158,7 @@ function HeroDecoration() {
         </div>
 
         {/* Right: Visualization nodes */}
-        <div className="relative w-[100px] md:w-[140px] h-[100px]">
+        <div className="relative w-[70px] sm:w-[100px] md:w-[140px] h-[70px] sm:h-[100px] md:h-[100px] flex-shrink-0">
           {/* Nodes */}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-code-purple" />
           <div className="absolute top-1/2 left-2 -translate-y-1/2 w-4 h-4 rounded-full bg-flow-blue" />

@@ -706,7 +706,7 @@ preorder(root);`,
       "",
       "javascript",
       "dfs-tree",
-      "前序遍历二叉树：根节点 → 左子树 → 右子树",
+      "前序遍历二叉树：根节点 -> 左子树 -> 右子树",
       [
         { stepNumber: 1, lineNumber: 1, description: "调用 preorder(root)", variables: [{ name: "node", value: "root(1)", type: "object", changed: true }], highlight: "function-call" },
         { stepNumber: 2, lineNumber: 3, description: "输出节点值 1", variables: [{ name: "output", value: "1", type: "number", changed: true }], highlight: "normal" },

@@ -57,22 +57,22 @@ export default function FeaturesSection() {
 
 function FlowAnimationDiagram() {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       {[
         { label: "step1", color: "bg-code-purple" },
         { label: "step2", color: "bg-flow-blue" },
         { label: "step3", color: "bg-data-green" },
       ].map((step, i) => (
-        <div key={step.label} className="flex items-center gap-3">
+        <div key={step.label} className="flex items-center gap-2 sm:gap-3">
           <div
-            className={`w-16 h-12 ${step.color} rounded-lg flex items-center justify-center text-white text-xs font-mono`}
+            className={`w-12 sm:w-16 h-10 sm:h-12 ${step.color} rounded-lg flex items-center justify-center text-white text-[10px] sm:text-xs font-mono`}
           >
             {step.label}
           </div>
           {i < 2 && (
             <svg
-              width="20"
-              height="20"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="#6b7280"

@@ -84,23 +84,23 @@ export default function CodeInputPanel({
   return (
     <div className="flex flex-col h-full min-h-0 bg-code-bg">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-code-surface flex-shrink-0">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-3 bg-code-surface flex-shrink-0 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <LanguageSelector value={language} onChange={onLanguageChange} />
           {extraToolbar}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={handleClear}
-            className="px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-code-text hover:bg-gallery-border/20 transition-colors duration-200"
+            className="px-2 sm:px-3 py-1.5 rounded-lg text-sm text-gallery-gray hover:text-code-text hover:bg-gallery-border/20 transition-colors duration-200"
           >
             清空
           </button>
           <button
             onClick={onAnalyze}
             disabled={isEmpty || isAnalyzing}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
               isEmpty || isAnalyzing
                 ? "bg-gallery-border text-gallery-gray cursor-not-allowed"
                 : "bg-code-purple hover:bg-code-purple-light text-white"
@@ -170,12 +170,12 @@ export default function CodeInputPanel({
       </div>
 
       {/* Bottom info bar */}
-      <div className="px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between flex-shrink-0">
-        <span>
+      <div className="px-3 sm:px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between flex-shrink-0">
+        <span className="truncate">
           共 {lineCount} 行 · 语言:{" "}
           {SUPPORTED_LANGUAGES.find((l) => l.value === language)?.label}
         </span>
-        <span>{code.length} 字符</span>
+        <span className="flex-shrink-0 ml-2">{code.length} 字符</span>
       </div>
     </div>
   );

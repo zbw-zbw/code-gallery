@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "示例库 - 代码画廊",
-  description: "探索不同类型的代码可视化示例",
+  description: "查看不同类型的代码可视化示例",
 };
 
 export default function ExamplesPage() {
@@ -20,7 +20,7 @@ export default function ExamplesPage() {
                 示例库
               </h1>
               <p className="text-lg text-gallery-gray max-w-xl mx-auto">
-                探索不同类型的代码可视化
+                查看不同类型的代码可视化
               </p>
             </div>
           </section>
@@ -32,9 +32,12 @@ export default function ExamplesPage() {
           <div className="text-center pb-16">
             <Link
               href="/"
-              className="text-sm text-gallery-gray hover:text-code-purple transition-colors duration-200"
+              className="text-sm text-gallery-gray hover:text-code-purple transition-colors duration-200 inline-flex items-center gap-1"
             >
-              ← 返回首页
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              返回首页
             </Link>
           </div>
         </div>

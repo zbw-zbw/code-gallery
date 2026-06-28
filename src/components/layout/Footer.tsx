@@ -54,7 +54,7 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-8 pt-8 text-center">
           <p className="text-sm text-gallery-gray">
-            © 2026 代码画廊 · TRAE AI 创造力大赛
+            © 2026 代码画廊 · 让代码看得见
           </p>
         </div>
       </div>

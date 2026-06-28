@@ -60,7 +60,7 @@ export default function CTASection() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-10 text-sm text-white/60"
         >
-          代码画廊 · TRAE AI 创造力大赛 · 学习工作赛道
+          代码画廊 · 让代码看得见
         </motion.p>
       </div>
     </section>

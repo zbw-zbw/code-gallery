@@ -51,7 +51,10 @@ export default function PlayerControls({
             }`}
             title="首步"
           >
-            <span className="text-sm font-mono">|◁</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="19 20 9 12 19 4 19 20" fill="currentColor" />
+              <line x1="5" y1="19" x2="5" y2="5" />
+            </svg>
           </button>
 
           {/* Previous */}
@@ -65,7 +68,9 @@ export default function PlayerControls({
             }`}
             title="上一步"
           >
-            <span className="text-sm font-mono">◁</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15 6l-6 6 6 6V6z" />
+            </svg>
           </button>
         </div>
 
@@ -98,7 +103,9 @@ export default function PlayerControls({
                 : "text-gallery-black hover:bg-gallery-border/50"
             }`}
           >
-            <span className="text-sm font-mono">◁</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15 6l-6 6 6 6V6z" />
+            </svg>
           </button>
           <button
             onClick={onNext}
@@ -109,7 +116,9 @@ export default function PlayerControls({
                 : "text-gallery-black hover:bg-gallery-border/50"
             }`}
           >
-            <span className="text-sm font-mono">▷</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 6l6 6-6 6V6z" />
+            </svg>
           </button>
         </div>
 
@@ -125,7 +134,9 @@ export default function PlayerControls({
             }`}
             title="下一步"
           >
-            <span className="text-sm font-mono">▷</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 6l6 6-6 6V6z" />
+            </svg>
           </button>
 
           <button
@@ -138,12 +149,15 @@ export default function PlayerControls({
             }`}
             title="末步"
           >
-            <span className="text-sm font-mono">▷|</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" />
+              <line x1="19" y1="5" x2="19" y2="19" />
+            </svg>
           </button>
         </div>
 
         {/* Progress bar */}
-        <div className="flex-1 max-w-[200px] md:max-w-xs flex items-center gap-3">
+        <div className="flex-1 max-w-[120px] md:max-w-xs flex items-center gap-2 md:gap-3">
           <div className="flex-1 relative h-1.5 bg-gallery-border rounded-full overflow-hidden">
             <div
               className="absolute left-0 top-0 bottom-0 bg-code-purple rounded-full transition-all duration-200"
