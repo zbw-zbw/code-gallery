@@ -114,7 +114,7 @@ export default function CoreDemoSection() {
               </div>
 
               {/* Step label */}
-              <div className="h-6 flex items-center justify-center">
+              <div className="h-6 flex items-center justify-center relative">
                 <span className="text-sm text-gallery-gray animate-step-label">
                   比较 arr[0] 和 arr[1]...
                 </span>

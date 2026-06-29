@@ -11,7 +11,7 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
   return (
     <div className="h-screen flex flex-col bg-gallery-white">
       {/* Simplified top bar */}
-      <header className="h-14 flex items-center justify-between px-4 bg-gallery-white flex-shrink-0">
+      <header className="h-14 flex items-center px-4 bg-gallery-white flex-shrink-0">
         <Link
           href="/"
           className="flex items-center gap-2.5 group"
@@ -36,9 +36,9 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
           </span>
         </Link>
 
-        <h1 className="text-sm font-medium text-gallery-gray">Playground</h1>
+        <h1 className="flex-1 text-center text-sm font-medium text-gallery-gray">Playground</h1>
 
-        <div className="w-20" />
+        <div className="w-7" />
       </header>
 
       {/* Main content */}

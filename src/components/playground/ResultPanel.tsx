@@ -229,7 +229,7 @@ export default function ResultPanel({
           </AnimatePresence>
         </>
       ) : (
-        /* Empty state - rendered even during first analysis so overlay stacks on top */
+        /* Empty state */
         <div className="h-full flex flex-col items-center justify-center px-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 rounded-xl bg-code-bg flex items-center justify-center">
@@ -251,7 +251,17 @@ export default function ResultPanel({
             </div>
           </div>
           <p className="text-lg font-medium text-gallery-black mb-2">粘贴代码并点击「分析代码」</p>
-          <p className="text-sm text-gallery-gray text-center max-w-sm">AI 将为你生成执行动画、架构图和数据流图</p>
+          <p className="text-sm text-gallery-gray text-center max-w-sm mb-6">AI 将为你生成执行动画、架构图和数据流图</p>
+
+          <div className="flex flex-col items-center gap-3 text-xs text-gallery-gray">
+            <div className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-code-surface text-code-text font-mono">Ctrl</kbd>
+              <span>+</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-code-surface text-code-text font-mono">Enter</kbd>
+              <span className="ml-1">快捷分析</span>
+            </div>
+            <span>或点击左侧工具栏「示例库」查看预置代码</span>
+          </div>
         </div>
       )}
     </div>

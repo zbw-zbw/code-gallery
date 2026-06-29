@@ -14,6 +14,8 @@ interface CodeInputPanelProps {
   onCodeChange: (code: string) => void;
   onLanguageChange: (lang: Language) => void;
   onAnalyze: () => void;
+  onCancel?: () => void;
+  onShareUrl?: () => void;
   onClear?: () => void;
   isAnalyzing: boolean;
   extraToolbar?: ReactNode;
@@ -25,6 +27,8 @@ export default function CodeInputPanel({
   onCodeChange,
   onLanguageChange,
   onAnalyze,
+  onCancel,
+  onShareUrl,
   onClear,
   isAnalyzing,
   extraToolbar,
@@ -111,11 +115,13 @@ export default function CodeInputPanel({
             清空
           </button>
           <button
-            onClick={onAnalyze}
-            disabled={!canAnalyze}
-            title={isOverLimit ? `代码超过 ${MAX_CODE_LENGTH} 字符限制` : "Ctrl+Enter"}
+            onClick={isAnalyzing ? onCancel : onAnalyze}
+            disabled={!isAnalyzing && !canAnalyze}
+            title={isOverLimit ? `代码超过 ${MAX_CODE_LENGTH} 字符限制` : isAnalyzing ? "取消分析" : "Ctrl+Enter"}
             className={`px-3 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-              !canAnalyze
+              isAnalyzing
+                ? "bg-red-400 hover:bg-red-500 text-white"
+                : !canAnalyze
                 ? "bg-gallery-border text-gallery-gray cursor-not-allowed"
                 : "bg-code-purple hover:bg-code-purple-light text-white"
             }`}
@@ -126,7 +132,7 @@ export default function CodeInputPanel({
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                分析中...
+                取消
               </span>
             ) : (
               "分析代码"
