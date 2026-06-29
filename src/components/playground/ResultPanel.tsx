@@ -15,6 +15,7 @@ interface ResultPanelProps {
   isAnalyzing: boolean;
   error: string | null;
   onRetry: () => void;
+  onShareUrl?: () => void;
 }
 
 const LOADING_STAGES = [
@@ -57,6 +58,7 @@ export default function ResultPanel({
   isAnalyzing,
   error,
   onRetry,
+  onShareUrl,
 }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<"execution" | "architecture" | "dataflow">("execution");
   const [stageIndex, setStageIndex] = useState(0);
@@ -157,7 +159,7 @@ export default function ResultPanel({
                     : undefined
                 }
               />
-              <ShareButton result={result} />
+              <ShareButton result={result} onShareUrl={onShareUrl} />
             </div>
           </div>
 

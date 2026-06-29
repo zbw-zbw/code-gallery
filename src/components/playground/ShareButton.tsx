@@ -9,9 +9,10 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 interface ShareButtonProps {
   result: AnalysisResult;
+  onShareUrl?: () => void;
 }
 
-export default function ShareButton({ result }: ShareButtonProps) {
+export default function ShareButton({ result, onShareUrl }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
   const { showToast } = useToast();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -31,8 +32,13 @@ export default function ShareButton({ result }: ShareButtonProps) {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      showToast("链接已复制到剪贴板");
+      if (onShareUrl) {
+        onShareUrl();
+        showToast("分享链接已复制，含代码可直接打开");
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("链接已复制到剪贴板");
+      }
     } catch {
       showToast("复制失败");
     }
@@ -86,7 +92,7 @@ export default function ShareButton({ result }: ShareButtonProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl z-50 overflow-hidden"
+              className="absolute right-0 top-full mt-2 w-48 bg-gallery-white rounded-xl shadow-xl z-50 overflow-hidden"
             >
               <button
                 onClick={handleCopyLink}

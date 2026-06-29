@@ -39,7 +39,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
       <button
         key={example.id}
         onClick={() => handleSelect(example)}
-        className="w-full text-left p-4 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-white"
+        className="w-full text-left p-4 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-gallery-white"
       >
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <h4 className="text-sm font-medium text-gallery-black">
@@ -103,7 +103,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                 aria-modal="true"
                 aria-label="示例库"
               >
-                <div className="w-full max-w-2xl h-[70vh] bg-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto hidden md:flex overflow-hidden">
+                <div className="w-full max-w-2xl h-[70vh] bg-gallery-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto hidden md:flex overflow-hidden">
                   {/* Header */}
                   <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
                     <h3 className="text-base font-bold text-gallery-black">示例库</h3>
@@ -173,7 +173,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl flex flex-col md:hidden"
+                className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-gallery-white z-50 shadow-2xl flex flex-col md:hidden"
                 role="dialog"
                 aria-modal="true"
                 aria-label="示例库"

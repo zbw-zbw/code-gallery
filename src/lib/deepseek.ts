@@ -2,12 +2,14 @@ import OpenAI from "openai";
 import { AnalysisResult, ArchNode, CodeInput, ExecutionStep, FlowNode } from "@/types";
 import { ANALYSIS_SYSTEM_PROMPT, buildAnalysisPrompt } from "./prompts";
 
-const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: process.env.DEEPSEEK_BASE_URL
-    ? `${process.env.DEEPSEEK_BASE_URL.replace(/\/$/, "")}/v1`
-    : "https://api.deepseek.com/v1",
-});
+function getClient(): OpenAI {
+  return new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: process.env.DEEPSEEK_BASE_URL
+      ? `${process.env.DEEPSEEK_BASE_URL.replace(/\/$/, "")}/v1`
+      : "https://api.deepseek.com/v1",
+  });
+}
 
 const MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 
@@ -21,7 +23,7 @@ export async function analyzeCode(
   };
 
   try {
-    const response = await client.chat.completions.create(
+    const response = await getClient().chat.completions.create(
       {
         model: MODEL,
         messages: [

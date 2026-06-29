@@ -289,7 +289,7 @@ export default function MermaidCanvas({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="absolute top-4 right-4 z-10 bg-white rounded-xl shadow-lg p-4 max-w-[260px]"
+              className="absolute top-4 right-4 z-10 bg-gallery-white rounded-xl shadow-lg p-4 max-w-[260px]"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gallery-black">

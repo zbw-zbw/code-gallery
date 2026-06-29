@@ -7,8 +7,10 @@ import PlaygroundLayout from "@/components/playground/PlaygroundLayout";
 import CodeInputPanel from "@/components/playground/CodeInputPanel";
 import ResultPanel from "@/components/playground/ResultPanel";
 import ExampleDrawer from "@/components/playground/ExampleDrawer";
+import HistoryDrawer from "@/components/playground/HistoryDrawer";
 import { ToastProvider } from "@/components/shared/Toast";
 import { EXAMPLES } from "@/lib/examples";
+import { addHistory } from "@/lib/codeHistory";
 import type { Example } from "@/lib/examples";
 
 function encodeCodeForUrl(code: string, language: string): string {
@@ -100,6 +102,8 @@ function PlaygroundContent() {
         setError(data.error || "分析请求失败");
       } else {
         setResult(data);
+        // Save to history after successful analysis
+        addHistory(code, language, data.summary);
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
@@ -123,6 +127,7 @@ function PlaygroundContent() {
 
   const handleShareUrl = useCallback(() => {
     const encoded = encodeCodeForUrl(code, language);
+    if (!encoded) return;
     const url = `${window.location.origin}${window.location.pathname}?code=${encoded}`;
     router.replace(url, { scroll: false });
     navigator.clipboard.writeText(url);
@@ -134,6 +139,13 @@ function PlaygroundContent() {
     setResult(example.preAnalyzed);
     setError(null);
   };
+
+  const handleSelectHistory = useCallback((historyCode: string, historyLang: Language) => {
+    setCode(historyCode);
+    setLanguage(historyLang);
+    setResult(null);
+    setError(null);
+  }, []);
 
   return (
     <PlaygroundLayout>
@@ -153,7 +165,12 @@ function PlaygroundContent() {
               setError(null);
             }}
             isAnalyzing={isAnalyzing}
-            extraToolbar={<ExampleDrawer onSelect={handleSelectExample} />}
+            extraToolbar={
+              <div className="flex items-center gap-2">
+                <HistoryDrawer onSelect={handleSelectHistory} />
+                <ExampleDrawer onSelect={handleSelectExample} />
+              </div>
+            }
           />
         </div>
 
@@ -164,6 +181,7 @@ function PlaygroundContent() {
             isAnalyzing={isAnalyzing}
             error={error}
             onRetry={handleAnalyze}
+            onShareUrl={handleShareUrl}
           />
         </div>
       </div>
