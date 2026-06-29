@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
 
 interface CodeBlockProps {
   code: string;
@@ -8,37 +9,9 @@ interface CodeBlockProps {
 }
 
 export default function CodeBlock({ code, filename }: CodeBlockProps) {
-  // Simple manual syntax highlighting for bubble sort demo
-  const highlightCode = (code: string) => {
-    return code.split("\n").map((line, i) => {
-      // Highlight keywords
-      let highlighted = line
-        .replace(
-          /\b(function|for|let|if|return)\b/g,
-          '<span class="text-code-purple-light">$1</span>'
-        )
-        .replace(
-          /\b(bubbleSort|arr|length|j)\b/g,
-          '<span class="text-flow-blue-light">$1</span>'
-        )
-        .replace(
-          /\b(0|1)\b/g,
-          '<span class="text-data-green">$1</span>'
-        )
-        .replace(
-          /([=><!+-])/g,
-          '<span class="text-code-text">$1</span>'
-        );
-
-      return (
-        <div
-          key={i}
-          className="whitespace-pre"
-          dangerouslySetInnerHTML={{ __html: highlighted }}
-        />
-      );
-    });
-  };
+  // Use hljs for safe syntax highlighting (HTML-escaped by default)
+  const highlightedHtml = getHighlightedHtml(code, "javascript");
+  const highlightedLines = highlightedHtml.split("\n");
 
   return (
     <motion.div
@@ -62,7 +35,13 @@ export default function CodeBlock({ code, filename }: CodeBlockProps) {
       )}
       <div className="p-4 md:p-6 overflow-x-auto">
         <pre className="text-sm md:text-base leading-relaxed font-mono text-code-text">
-          {highlightCode(code)}
+          {highlightedLines.map((line, i) => (
+            <div
+              key={i}
+              className="whitespace-pre"
+              dangerouslySetInnerHTML={{ __html: line || " " }}
+            />
+          ))}
         </pre>
       </div>
     </motion.div>

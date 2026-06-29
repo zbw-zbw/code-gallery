@@ -25,7 +25,7 @@ export default function SectionTitle({
         {title}
       </h2>
       {subtitle && (
-        <p className="text-lg md:text-xl text-gallery-gray max-w-2xl mx-auto">
+        <p className={`text-lg md:text-xl text-gallery-gray max-w-2xl ${align === "center" ? "mx-auto" : ""}`}>
           {subtitle}
         </p>
       )}

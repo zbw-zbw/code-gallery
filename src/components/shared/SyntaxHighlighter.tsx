@@ -1,8 +1,21 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
+import python from "highlight.js/lib/languages/python";
+import java from "highlight.js/lib/languages/java";
+import go from "highlight.js/lib/languages/go";
+import rust from "highlight.js/lib/languages/rust";
+import cpp from "highlight.js/lib/languages/cpp";
 import "highlight.js/styles/atom-one-dark.css";
+
+// Register only the 7 languages we actually use (vs ~190 in the full bundle)
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("java", java);
+hljs.registerLanguage("go", go);
+hljs.registerLanguage("rust", rust);
+hljs.registerLanguage("cpp", cpp);
 
 const LANGUAGE_MAP: Record<string, string> = {
   javascript: "javascript",
@@ -14,38 +27,8 @@ const LANGUAGE_MAP: Record<string, string> = {
   cpp: "cpp",
 };
 
-interface SyntaxHighlighterProps {
-  code: string;
-  language?: string;
-  className?: string;
-}
-
-export default function SyntaxHighlighter({
-  code,
-  language = "javascript",
-  className = "",
-}: SyntaxHighlighterProps) {
-  const ref = useRef<HTMLPreElement>(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.removeAttribute("data-highlighted");
-      hljs.highlightElement(ref.current);
-    }
-  }, [code, language]);
-
-  const hljsLang = LANGUAGE_MAP[language] || "javascript";
-
-  return (
-    <pre className={`${className} m-0`} style={{ margin: 0, padding: 0, background: "transparent" }}>
-      <code ref={ref} className={`language-${hljsLang}`} style={{ background: "transparent", padding: 0 }}>
-        {code}
-      </code>
-    </pre>
-  );
-}
-
-// Utility to get highlighted HTML string for overlay approach
+// Utility to get highlighted HTML string for overlay approach.
+// highlight.js escapes HTML entities internally, so output is safe for dangerouslySetInnerHTML.
 export function getHighlightedHtml(code: string, language: string): string {
   const hljsLang = LANGUAGE_MAP[language] || "javascript";
   try {

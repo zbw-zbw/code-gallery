@@ -154,6 +154,7 @@ export default function CodeHighlight({
 
                 {/* Line number */}
                 <div
+                  aria-hidden="true"
                   className={`relative w-12 flex-shrink-0 text-right pr-3 py-0.5 text-sm font-mono select-none ${lineColor}`}
                 >
                   {isActive && (

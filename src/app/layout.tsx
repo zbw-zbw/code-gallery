@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { MotionConfig } from "framer-motion";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -30,7 +31,12 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={`${jetbrainsMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-gallery-white text-gallery-black">
-        {children}
+        <MotionConfig reducedMotion="user">
+          <a href="#main" className="skip-link">
+            跳到主内容
+          </a>
+          {children}
+        </MotionConfig>
       </body>
     </html>
   );

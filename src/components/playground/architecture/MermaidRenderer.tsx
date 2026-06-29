@@ -21,6 +21,7 @@ async function getMermaid(): Promise<typeof Mermaid> {
     const mermaid = mod.default;
     mermaid.initialize({
       startOnLoad: false,
+      securityLevel: "strict",
       theme: "base",
       themeVariables: {
         primaryColor: "#6366f1",
@@ -42,7 +43,7 @@ async function getMermaid(): Promise<typeof Mermaid> {
         padding: 20,
         nodeSpacing: 50,
         rankSpacing: 60,
-        htmlLabels: true,
+        htmlLabels: false,
       },
     });
     mermaidInstance = mermaid;
@@ -50,6 +51,27 @@ async function getMermaid(): Promise<typeof Mermaid> {
   });
 
   return mermaidPromise;
+}
+
+// Lazy-load DOMPurify only in browser (requires window)
+let dompurifyPromise: Promise<(dirty: string) => string> | null = null;
+
+async function getSanitizer(): Promise<(dirty: string) => string> {
+  if (dompurifyPromise) return dompurifyPromise;
+
+  dompurifyPromise = import("dompurify").then((mod) => {
+    const DOMPurify = mod.default;
+    const purify = typeof DOMPurify === "function" ? DOMPurify(window) : DOMPurify;
+    purify.setConfig({
+      USE_PROFILES: { svg: true, svgFilters: true },
+      ADD_TAGS: ["foreignObject"],
+      FORBID_TAGS: ["script", "iframe", "object", "embed"],
+      FORBID_ATTR: ["onload", "onclick", "onerror", "onmouseover"],
+    });
+    return (dirty: string) => purify.sanitize(dirty);
+  });
+
+  return dompurifyPromise;
 }
 
 export default function MermaidRenderer({
@@ -72,10 +94,15 @@ export default function MermaidRenderer({
 
     const render = async () => {
       try {
-        const mermaid = await getMermaid();
+        const [mermaid, sanitize] = await Promise.all([
+          getMermaid(),
+          getSanitizer(),
+        ]);
         const result = await mermaid.render(`mermaid-${id}`, code);
         if (!cancelled && mountedRef.current) {
-          setSvg(result.svg);
+          // Sanitize SVG to prevent XSS via injected scripts/event handlers
+          const cleanSvg = sanitize(result.svg);
+          setSvg(cleanSvg);
           setLoading(false);
         }
       } catch (e) {

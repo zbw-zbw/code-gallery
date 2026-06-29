@@ -140,6 +140,7 @@ export default function CodeInputPanel({
         {/* Line numbers */}
         <div
           ref={lineNumbersRef}
+          aria-hidden="true"
           className="w-12 flex-shrink-0 py-4 text-right pr-3 text-sm font-mono text-gallery-gray select-none overflow-hidden bg-code-bg z-10"
         >
           {lines.map((n) => (

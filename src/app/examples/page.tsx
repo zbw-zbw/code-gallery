@@ -12,7 +12,7 @@ export default function ExamplesPage() {
   return (
     <>
       <Header />
-      <main className="flex-1">
+      <main id="main" className="flex-1">
         <div className="min-h-screen bg-gallery-white">
           <section className="pt-24 pb-12 md:pt-32 md:pb-16">
             <div className="max-w-6xl mx-auto px-6 text-center">

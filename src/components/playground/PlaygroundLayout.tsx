@@ -42,7 +42,7 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
       </header>
 
       {/* Main content */}
-      <div className="flex-1 min-h-0 overflow-hidden flex flex-col">{children}</div>
+      <main id="main" className="flex-1 min-h-0 overflow-hidden flex flex-col">{children}</main>
     </div>
   );
 }

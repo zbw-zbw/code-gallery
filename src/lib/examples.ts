@@ -1,5 +1,3 @@
-"use client";
-
 import { Language, AnalysisResult } from "@/types";
 
 export interface Example {

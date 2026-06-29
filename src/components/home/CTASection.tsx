@@ -47,7 +47,7 @@ export default function CTASection() {
         >
           <Link
             href="/playground"
-            className="inline-block px-10 py-4 bg-white hover:bg-gallery-bg text-code-purple font-bold rounded-2xl transition-colors duration-200 text-lg"
+            className="inline-block px-10 py-4 bg-white hover:bg-gallery-bg text-code-purple font-bold rounded-xl transition-colors duration-200 text-lg"
           >
             立即体验
           </Link>
