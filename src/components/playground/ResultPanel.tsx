@@ -119,21 +119,21 @@ export default function ResultPanel({
 
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-gallery-white overflow-hidden relative">
-      {/* Loading indicator - small floating badge, does not cover content */}
+      {/* Loading overlay - covers entire panel, blocks all interaction */}
       <AnimatePresence>
         {isAnalyzing && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 bg-code-purple text-white rounded-full shadow-lg text-sm font-medium"
+            className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-gallery-white/80 backdrop-blur-sm"
           >
-            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <svg className="animate-spin w-8 h-8 text-code-purple mb-3" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <span>{LOADING_STAGES[stageIndex]}</span>
+            <span className="text-sm font-medium text-code-purple">{LOADING_STAGES[stageIndex]}</span>
           </motion.div>
         )}
       </AnimatePresence>

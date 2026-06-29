@@ -150,7 +150,7 @@ export default function CodeInputPanel({
           className="w-12 flex-shrink-0 py-4 text-right pr-3 text-sm font-mono text-gallery-gray select-none overflow-hidden bg-code-bg z-10"
         >
           {lines.map((n) => (
-            <div key={n} className="leading-6">{n}</div>
+            <div key={n} className="leading-6 min-h-6">{n}</div>
           ))}
         </div>
 
@@ -171,7 +171,7 @@ export default function CodeInputPanel({
             />
           </div>
 
-          {/* Textarea on top */}
+          {/* Textarea on top - fills entire area */}
           <textarea
             ref={textareaRef}
             value={code}
@@ -180,7 +180,7 @@ export default function CodeInputPanel({
             onKeyDown={handleKeyDown}
             placeholder="粘贴你的代码到这里...（或点击右上角示例库）"
             spellCheck={false}
-            className="absolute inset-0 py-4 pl-2 pr-4 bg-transparent text-code-text text-sm font-mono leading-6 resize-none outline-none border-none placeholder:text-gallery-gray/50"
+            className="absolute inset-0 py-4 pl-2 pr-4 w-full h-full bg-transparent text-code-text text-sm font-mono leading-6 resize-none outline-none border-none placeholder:text-gallery-gray/50"
             style={{
               color: "transparent",
               caretColor: "#f8f8f2",
