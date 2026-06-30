@@ -16,6 +16,7 @@ interface ResultPanelProps {
   error: string | null;
   onRetry: () => void;
   onShareUrl?: () => void;
+  analysisDuration?: number | null;
 }
 
 const LOADING_STAGES = [
@@ -48,9 +49,9 @@ const DataFlowIcon = () => (
 );
 
 const TABS = [
-  { key: "execution" as const, label: "执行流程", Icon: ExecutionIcon },
-  { key: "architecture" as const, label: "架构图", Icon: ArchitectureIcon },
-  { key: "dataflow" as const, label: "数据流", Icon: DataFlowIcon },
+  { key: "execution" as const, label: "执行流程", Icon: ExecutionIcon, shortcut: "1" },
+  { key: "architecture" as const, label: "架构图", Icon: ArchitectureIcon, shortcut: "2" },
+  { key: "dataflow" as const, label: "数据流", Icon: DataFlowIcon, shortcut: "3" },
 ];
 
 export default function ResultPanel({
@@ -59,6 +60,7 @@ export default function ResultPanel({
   error,
   onRetry,
   onShareUrl,
+  analysisDuration,
 }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<"execution" | "architecture" | "dataflow">("execution");
   const [stageIndex, setStageIndex] = useState(0);
@@ -75,6 +77,22 @@ export default function ResultPanel({
     }, 2000);
     return () => clearInterval(interval);
   }, [isAnalyzing]);
+
+  // Keyboard shortcuts: 1/2/3 to switch tabs
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLInputElement
+      )
+        return;
+      if (e.key === "1") setActiveTab("execution");
+      else if (e.key === "2") setActiveTab("architecture");
+      else if (e.key === "3") setActiveTab("dataflow");
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     const index = TABS.findIndex((t) => t.key === activeTab);
@@ -188,6 +206,18 @@ export default function ResultPanel({
                   label={`${result.codeInput.code.split("\n").length} 行`}
                   color="gallery-gray"
                 />
+                {typeof analysisDuration === "number" && (
+                  <StatBadge
+                    icon={
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                    }
+                    label={analysisDuration === 0 ? "缓存" : `${(analysisDuration / 1000).toFixed(1)}s`}
+                    color={analysisDuration === 0 ? "data-green" : "code-purple"}
+                  />
+                )}
               </div>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
@@ -232,6 +262,7 @@ export default function ResultPanel({
                 >
                   <tab.Icon />
                   <span>{tab.label}</span>
+                  <kbd className="hidden lg:inline-flex w-4 h-4 items-center justify-center rounded text-[9px] font-mono bg-gallery-bg text-gallery-gray">{tab.shortcut}</kbd>
                   {selected && (
                     <motion.div
                       layoutId="tabIndicator"

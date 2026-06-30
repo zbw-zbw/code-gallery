@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import KeyboardShortcuts from "./KeyboardShortcuts";
 
 interface PlaygroundLayoutProps {
   children: ReactNode;
@@ -131,6 +132,9 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
 
       {/* Main content */}
       <main id="main" className="flex-1 min-h-0 overflow-auto md:overflow-hidden flex flex-col">{children}</main>
+
+      {/* Global keyboard shortcuts panel */}
+      <KeyboardShortcuts />
     </div>
   );
 }

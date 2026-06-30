@@ -42,6 +42,7 @@ function PlaygroundContent() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [analysisDuration, setAnalysisDuration] = useState<number | null>(null);
 
   // Load example from URL param (runs once on mount)
   const initializedRef = useRef(false);
@@ -86,6 +87,7 @@ function PlaygroundContent() {
     if (cached) {
       setResult(cached);
       setError(null);
+      setAnalysisDuration(0); // Cached = instant
       return;
     }
 
@@ -96,6 +98,7 @@ function PlaygroundContent() {
 
     setIsAnalyzing(true);
     setError(null);
+    const startTime = Date.now();
 
     try {
       const response = await fetch("/api/analyze", {
@@ -111,6 +114,7 @@ function PlaygroundContent() {
         setError(data.error || "分析请求失败");
       } else {
         setResult(data);
+        setAnalysisDuration(Date.now() - startTime);
         // Cache the result for future same-code analyses
         setCache(code, language, data);
         // Save to history after successful analysis
@@ -144,7 +148,11 @@ function PlaygroundContent() {
     navigator.clipboard.writeText(url);
   }, [code, language, router]);
 
+  // Skip clearing result on initial load and example selection
+  const skipClearRef = useRef(false);
+
   const handleSelectExample = (example: Example) => {
+    skipClearRef.current = true;
     setCode(example.code);
     setLanguage(example.language);
     setResult(example.preAnalyzed);
@@ -152,17 +160,33 @@ function PlaygroundContent() {
   };
 
   const handleSelectHistory = useCallback((historyCode: string, historyLang: Language) => {
+    skipClearRef.current = true;
     setCode(historyCode);
     setLanguage(historyLang);
     setResult(null);
     setError(null);
   }, []);
 
+  // Clear result when code changes (user edits code after seeing a result)
+  const codeChangedRef = useRef(false);
+  useEffect(() => {
+    if (skipClearRef.current) {
+      skipClearRef.current = false;
+      return;
+    }
+    // Don't clear on initial load from URL/example
+    if (codeChangedRef.current) {
+      setResult(null);
+      setError(null);
+    }
+    codeChangedRef.current = true;
+  }, [code]);
+
   return (
     <PlaygroundLayout>
       <div className="flex-1 min-h-0 flex flex-col md:flex-row overflow-hidden">
-        {/* Left: Code input - 60% on mobile, 50% on desktop */}
-        <div className="flex-[3] md:flex-1 min-h-0 flex flex-col">
+        {/* Left: Code input - 50% on both mobile and desktop */}
+        <div className="flex-1 md:flex-1 min-h-0 flex flex-col">
           <CodeInputPanel
             code={code}
             language={language}
@@ -185,14 +209,15 @@ function PlaygroundContent() {
           />
         </div>
 
-        {/* Right: Result - 40% on mobile, 50% on desktop */}
-        <div className="flex-[2] md:flex-1 min-h-0 flex flex-col">
+        {/* Right: Result - 50% on both mobile and desktop */}
+        <div className="flex-1 md:flex-1 min-h-0 flex flex-col">
           <ResultPanel
             result={result}
             isAnalyzing={isAnalyzing}
             error={error}
             onRetry={handleAnalyze}
             onShareUrl={handleShareUrl}
+            analysisDuration={analysisDuration}
           />
         </div>
       </div>
