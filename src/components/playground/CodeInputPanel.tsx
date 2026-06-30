@@ -1,12 +1,40 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo, ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Language } from "@/types";
 import { detectLanguage, SUPPORTED_LANGUAGES } from "@/lib/constants";
 import LanguageSelector from "./LanguageSelector";
 import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
 
 const MAX_CODE_LENGTH = 5000;
+
+const SUPPORTED_EXTENSIONS: Record<string, Language> = {
+  ".js": "javascript",
+  ".jsx": "javascript",
+  ".ts": "typescript",
+  ".tsx": "typescript",
+  ".py": "python",
+  ".java": "java",
+  ".go": "go",
+  ".rs": "rust",
+  ".cpp": "cpp",
+  ".cc": "cpp",
+  ".c": "cpp",
+  ".h": "cpp",
+};
+
+const ALLOWED_EXTENSIONS = new Set(Object.keys(SUPPORTED_EXTENSIONS));
+
+function detectLanguageFromFilename(filename: string): Language | null {
+  const lowerName = filename.toLowerCase();
+  for (const ext of Object.keys(SUPPORTED_EXTENSIONS)) {
+    if (lowerName.endsWith(ext)) {
+      return SUPPORTED_EXTENSIONS[ext];
+    }
+  }
+  return null;
+}
 
 interface CodeInputPanelProps {
   code: string;
@@ -37,6 +65,8 @@ export default function CodeInputPanel({
   const highlightRef = useRef<HTMLDivElement>(null);
   const lineNumbersRef = useRef<HTMLDivElement>(null);
   const [lineCount, setLineCount] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
 
   // Auto-detect language on first meaningful code paste only
   const hasAutoDetected = useRef(false);
@@ -86,8 +116,69 @@ export default function CodeInputPanel({
     onCodeChange("");
     onClear?.();
     hasAutoDetected.current = false;
+    setIsDragging(false);
+    dragCounter.current = 0;
     textareaRef.current?.focus();
   };
+
+  // Drag-and-drop file upload handlers
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current += 1;
+    if (dragCounter.current === 1) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current -= 1;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      dragCounter.current = 0;
+
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+
+      const lowerName = file.name.toLowerCase();
+      const hasValidExtension = [...ALLOWED_EXTENSIONS].some((ext) =>
+        lowerName.endsWith(ext)
+      );
+      if (!hasValidExtension) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target?.result;
+        if (typeof text !== "string") return;
+
+        const trimmed = text.length > MAX_CODE_LENGTH ? text.substring(0, MAX_CODE_LENGTH) : text;
+        onCodeChange(trimmed);
+
+        const detectedLang = detectLanguageFromFilename(file.name);
+        if (detectedLang) {
+          onLanguageChange(detectedLang);
+          hasAutoDetected.current = true;
+        }
+      };
+      reader.readAsText(file);
+    },
+    [onCodeChange, onLanguageChange]
+  );
 
   const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);
   const isEmpty = code.trim().length === 0;
@@ -142,7 +233,13 @@ export default function CodeInputPanel({
       </div>
 
       {/* Code editor with syntax highlighting overlay */}
-      <div className="flex-1 min-h-0 flex overflow-hidden relative">
+      <div
+        className="flex-1 min-h-0 flex overflow-hidden relative"
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         {/* Line numbers */}
         <div
           ref={lineNumbersRef}
@@ -188,6 +285,37 @@ export default function CodeInputPanel({
             }}
           />
         </div>
+
+        {/* Drag-and-drop overlay */}
+        <AnimatePresence>
+          {isDragging && (
+            <motion.div
+              key="drop-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-code-bg/80 backdrop-blur-sm border-2 border-dashed border-code-purple rounded-lg"
+            >
+              <svg
+                className="w-12 h-12 text-code-purple mb-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                />
+              </svg>
+              <span className="text-sm text-code-text/80 font-medium">
+                拖放文件到此处
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Bottom info bar */}

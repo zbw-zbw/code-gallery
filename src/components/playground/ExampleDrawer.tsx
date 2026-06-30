@@ -15,6 +15,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
+  const [search, setSearch] = useState("");
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap({ open, onClose: () => setOpen(false), containerRef: drawerRef });
@@ -22,10 +23,14 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
   const categories = Object.keys(CATEGORY_LABELS);
   const difficulties = Object.keys(DIFFICULTY_LABELS);
 
+  const searchLower = search.toLowerCase().trim();
   const filtered = EXAMPLES.filter((e) => {
     const matchCategory = category === "all" || e.category === category;
     const matchDifficulty = difficulty === "all" || e.difficulty === difficulty;
-    return matchCategory && matchDifficulty;
+    const matchSearch = !searchLower ||
+      e.title.toLowerCase().includes(searchLower) ||
+      e.description.toLowerCase().includes(searchLower);
+    return matchCategory && matchDifficulty && matchSearch;
   });
 
   const handleSelect = (example: Example) => {
@@ -68,7 +73,7 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => { setOpen(true); setSearch(""); }}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-code-surface hover:bg-gallery-border/20 transition-colors duration-200 text-sm text-code-text"
         aria-label="打开示例库"
       >
@@ -105,18 +110,28 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
               >
                 <div className="w-full max-w-2xl h-[70vh] bg-gallery-white rounded-2xl shadow-2xl flex flex-col pointer-events-auto hidden md:flex overflow-hidden">
                   {/* Header */}
-                  <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-                    <h3 className="text-base font-bold text-gallery-black">示例库</h3>
-                    <button
-                      onClick={() => setOpen(false)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
-                      aria-label="关闭示例库"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                      </svg>
-                    </button>
+                  <div className="px-6 py-4 flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-bold text-gallery-black">示例库</h3>
+                      <button
+                        onClick={() => setOpen(false)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
+                        aria-label="关闭示例库"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="搜索示例..."
+                      autoFocus
+                      className="w-full mt-3 px-3 py-2 rounded-lg bg-gallery-bg text-sm text-gallery-black placeholder:text-gallery-gray outline-none focus:ring-2 focus:ring-code-purple/30 transition-all duration-200"
+                    />
                   </div>
 
                   {/* Filters */}
@@ -179,18 +194,27 @@ export default function ExampleDrawer({ onSelect }: ExampleDrawerProps) {
                 aria-label="示例库"
               >
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 flex-shrink-0">
-                  <h3 className="text-base font-bold text-gallery-black">示例库</h3>
-                  <button
-                    onClick={() => setOpen(false)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
-                    aria-label="关闭示例库"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
+                <div className="px-5 py-4 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-gallery-black">示例库</h3>
+                    <button
+                      onClick={() => setOpen(false)}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
+                      aria-label="关闭示例库"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="搜索示例..."
+                    className="w-full mt-3 px-3 py-2 rounded-lg bg-gallery-bg text-sm text-gallery-black placeholder:text-gallery-gray outline-none focus:ring-2 focus:ring-code-purple/30 transition-all duration-200"
+                  />
                 </div>
 
                 {/* Filters */}

@@ -142,11 +142,53 @@ export default function ResultPanel({
 
       {result ? (
         <>
-          {/* Summary */}
+          {/* Summary + Stats */}
           <div className="px-5 py-3 bg-gallery-bg/50 flex items-start justify-between gap-4 flex-shrink-0">
             <div className="min-w-0">
               <p className="text-sm text-gallery-gray mb-0.5">代码概述</p>
               <p className="text-base font-medium text-gallery-black truncate">{result.summary}</p>
+              {/* Quick stats badges */}
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                <StatBadge
+                  icon={
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  }
+                  label={`${result.executionSteps.length} 步`}
+                  color="code-purple"
+                />
+                <StatBadge
+                  icon={
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <rect x="3" y="3" width="7" height="7" rx="1" />
+                      <rect x="14" y="3" width="7" height="7" rx="1" />
+                    </svg>
+                  }
+                  label={`${result.architecture.nodes.length} 模块`}
+                  color="flow-blue"
+                />
+                <StatBadge
+                  icon={
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  }
+                  label={`${result.dataFlow.nodes.length} 节点`}
+                  color="data-green"
+                />
+                <StatBadge
+                  icon={
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z" />
+                      <polyline points="13 2 13 9 20 9" />
+                    </svg>
+                  }
+                  label={`${result.codeInput.code.split("\n").length} 行`}
+                  color="gallery-gray"
+                />
+              </div>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <ExportPanel
@@ -269,3 +311,28 @@ export default function ResultPanel({
     </div>
   );
 }
+
+function StatBadge({
+  icon,
+  label,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+}) {
+  const colorMap: Record<string, string> = {
+    "code-purple": "bg-code-purple/10 text-code-purple",
+    "flow-blue": "bg-flow-blue/10 text-flow-blue",
+    "data-green": "bg-data-green/10 text-data-green",
+    "gallery-gray": "bg-gallery-bg text-gallery-gray",
+  };
+  const classes = colorMap[color] || colorMap["gallery-gray"];
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${classes}`}>
+      {icon}
+      {label}
+    </span>
+  );
+}
+

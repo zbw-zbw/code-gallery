@@ -11,6 +11,7 @@ import HistoryDrawer from "@/components/playground/HistoryDrawer";
 import { ToastProvider } from "@/components/shared/Toast";
 import { EXAMPLES } from "@/lib/examples";
 import { addHistory } from "@/lib/codeHistory";
+import { getCached, setCache } from "@/lib/analysisCache";
 import type { Example } from "@/lib/examples";
 
 function encodeCodeForUrl(code: string, language: string): string {
@@ -80,6 +81,14 @@ function PlaygroundContent() {
   const handleAnalyze = useCallback(async () => {
     if (!code.trim()) return;
 
+    // Check cache first — skip API call if cached
+    const cached = getCached(code, language);
+    if (cached) {
+      setResult(cached);
+      setError(null);
+      return;
+    }
+
     // Cancel any in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -102,6 +111,8 @@ function PlaygroundContent() {
         setError(data.error || "分析请求失败");
       } else {
         setResult(data);
+        // Cache the result for future same-code analyses
+        setCache(code, language, data);
         // Save to history after successful analysis
         addHistory(code, language, data.summary);
       }
