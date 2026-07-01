@@ -203,6 +203,56 @@ textarea {
   animation: stepLabel 6s ease-in-out infinite;
 }
 
+/* Focus-visible: accessible focus indicator for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-code-purple);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove default outline only when focus-visible is supported */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Code editor textarea: custom focus indicator */
+textarea:focus-visible,
+input[type="text"]:focus-visible {
+  outline: none;
+}
+
+/* Custom scrollbar for dark code areas */
+.code-scroll-dark::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.code-scroll-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+.code-scroll-dark::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.code-scroll-dark::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Custom scrollbar for light areas */
+.code-scroll-light::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.code-scroll-light::-webkit-scrollbar-track {
+  background: transparent;
+}
+.code-scroll-light::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+}
+.code-scroll-light::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 /* Skip link for keyboard accessibility */
 .skip-link {
   position: absolute;

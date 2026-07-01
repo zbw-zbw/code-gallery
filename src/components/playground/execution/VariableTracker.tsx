@@ -76,7 +76,7 @@ export default function VariableTracker({
       </div>
 
       {/* Variable list */}
-      <div className="flex-1 overflow-auto p-3">
+      <div className="flex-1 overflow-auto p-3 code-scroll-dark">
         {variables.length === 0 ? (
           <div className="h-full flex items-center justify-center text-sm text-gallery-gray">
             暂无变量
@@ -99,7 +99,7 @@ export default function VariableTracker({
                     className="flex items-start gap-3 px-3 py-2 rounded-lg"
                   >
                     {/* Variable name */}
-                    <div className="w-20 flex-shrink-0 truncate">
+                    <div className="w-20 flex-shrink-0 truncate" title={variable.name}>
                       <span className="text-sm font-mono text-flow-blue truncate block">
                         {variable.name}
                       </span>

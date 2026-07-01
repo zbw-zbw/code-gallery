@@ -6,6 +6,8 @@ import { Language } from "@/types";
 import { detectLanguage, SUPPORTED_LANGUAGES } from "@/lib/constants";
 import LanguageSelector from "./LanguageSelector";
 import { getHighlightedHtml } from "@/components/shared/SyntaxHighlighter";
+import { useToast } from "@/components/shared/Toast";
+import CodeTemplates from "./CodeTemplates";
 
 const MAX_CODE_LENGTH = 5000;
 
@@ -67,6 +69,7 @@ export default function CodeInputPanel({
   const [lineCount, setLineCount] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0);
+  const { showToast } = useToast();
 
   // Auto-detect language on first meaningful code paste only
   const hasAutoDetected = useRef(false);
@@ -159,12 +162,19 @@ export default function CodeInputPanel({
       const hasValidExtension = [...ALLOWED_EXTENSIONS].some((ext) =>
         lowerName.endsWith(ext)
       );
-      if (!hasValidExtension) return;
+      if (!hasValidExtension) {
+        showToast("不支持的文件类型，请上传 .js/.ts/.py/.java 等代码文件");
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = (event) => {
         const text = event.target?.result;
         if (typeof text !== "string") return;
+
+        if (text.length > MAX_CODE_LENGTH) {
+          showToast(`文件已截断至 ${MAX_CODE_LENGTH} 字符（原文 ${text.length} 字符）`);
+        }
 
         const trimmed = text.length > MAX_CODE_LENGTH ? text.substring(0, MAX_CODE_LENGTH) : text;
         onCodeChange(trimmed);
@@ -177,7 +187,7 @@ export default function CodeInputPanel({
       };
       reader.readAsText(file);
     },
-    [onCodeChange, onLanguageChange]
+    [onCodeChange, onLanguageChange, showToast]
   );
 
   const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);
@@ -317,6 +327,16 @@ export default function CodeInputPanel({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Quick code templates - shown when editor is empty */}
+      <CodeTemplates
+        visible={isEmpty}
+        onSelect={(templateCode, templateLang) => {
+          onCodeChange(templateCode);
+          onLanguageChange(templateLang);
+          hasAutoDetected.current = true;
+        }}
+      />
 
       {/* Bottom info bar */}
       <div className="px-3 sm:px-4 py-2 bg-code-surface text-xs text-gallery-gray flex items-center justify-between flex-shrink-0">

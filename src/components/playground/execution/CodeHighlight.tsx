@@ -52,8 +52,8 @@ export default function CodeHighlight({
   // Memoize highlighted HTML to avoid re-highlighting on every step change
   const language = useMemo(() => detectLang(fileName), [fileName]);
   const highlightedLines = useMemo(() => {
-    const html = getHighlightedHtml(code, language);
-    return html.split("\n");
+    const codeLines = code.split("\n");
+    return codeLines.map(line => getHighlightedHtml(line, language));
   }, [code, language]);
 
   // Auto-scroll active line into view
@@ -109,7 +109,7 @@ export default function CodeHighlight({
       </div>
 
       {/* Code area */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto code-scroll-dark">
         <div className="py-2">
           {lines.map((line, index) => {
             const lineNum = index + 1;

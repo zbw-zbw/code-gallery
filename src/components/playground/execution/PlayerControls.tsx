@@ -167,7 +167,7 @@ export default function PlayerControls({
         <div className="flex-1 max-w-[120px] md:max-w-xs flex items-center gap-2 md:gap-3">
           <div className="flex-1 relative h-1.5 bg-gallery-border rounded-full overflow-hidden">
             <div
-              className="absolute left-0 top-0 bottom-0 bg-code-purple rounded-full transition-all duration-200"
+              className="absolute left-0 top-0 bottom-0 bg-code-purple rounded-full"
               style={{ width: `${progress}%` }}
             />
             <input
@@ -186,7 +186,7 @@ export default function PlayerControls({
         </div>
 
         {/* Speed controls */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           {speeds.map((speed) => (
             <button
               key={speed}
