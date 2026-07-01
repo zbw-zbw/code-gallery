@@ -9,6 +9,7 @@ import ResultPanel from "@/components/playground/ResultPanel";
 import ExampleDrawer from "@/components/playground/ExampleDrawer";
 import HistoryDrawer from "@/components/playground/HistoryDrawer";
 import { ToastProvider } from "@/components/shared/Toast";
+import LoadingFallback from "@/components/shared/LoadingFallback";
 import { EXAMPLES } from "@/lib/examples";
 import { addHistory } from "@/lib/codeHistory";
 import { getCached, setCache } from "@/lib/analysisCache";
@@ -16,7 +17,11 @@ import type { Example } from "@/lib/examples";
 
 function encodeCodeForUrl(code: string, language: string): string {
   try {
-    return btoa(unescape(encodeURIComponent(`${language}||${code}`)));
+    // Use TextEncoder for proper UTF-8 handling (emoji, CJK, etc.)
+    // Replace the deprecated unescape() API
+    const bytes = new TextEncoder().encode(`${language}||${code}`);
+    const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join("");
+    return btoa(binary);
   } catch {
     return "";
   }
@@ -24,7 +29,12 @@ function encodeCodeForUrl(code: string, language: string): string {
 
 function decodeCodeFromUrl(encoded: string): { code: string; language: Language } | null {
   try {
-    const decoded = decodeURIComponent(escape(atob(encoded)));
+    const binary = atob(encoded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const decoded = new TextDecoder().decode(bytes);
     const [lang, ...codeParts] = decoded.split("||");
     if (lang && codeParts.length > 0) {
       return { code: codeParts.join("||"), language: lang as Language };
@@ -228,11 +238,7 @@ function PlaygroundContent() {
 export default function PlaygroundPage() {
   return (
     <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center text-gallery-gray">
-          加载中...
-        </div>
-      }
+      fallback={<LoadingFallback message="正在准备 Playground..." />}
     >
       <ToastProvider>
         <PlaygroundContent />

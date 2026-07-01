@@ -230,6 +230,7 @@ export default function ResultPanel({
                     ? result.dataFlow.mermaidCode
                     : undefined
                 }
+                analysis={result}
               />
               <ShareButton result={result} onShareUrl={onShareUrl} />
             </div>

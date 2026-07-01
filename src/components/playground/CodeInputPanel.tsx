@@ -172,12 +172,28 @@ export default function CodeInputPanel({
         const text = event.target?.result;
         if (typeof text !== "string") return;
 
+        let trimmed = text;
+        let wasTruncated = false;
         if (text.length > MAX_CODE_LENGTH) {
-          showToast(`文件已截断至 ${MAX_CODE_LENGTH} 字符（原文 ${text.length} 字符）`);
+          wasTruncated = true;
+          // Append a language-appropriate truncation marker so the user can see
+          // the code was cut and where the cut happened.
+          const marker =
+            language === "python"
+              ? `\n# ... 已截断 (原文 ${text.length} 字符，仅保留前 ${MAX_CODE_LENGTH} 字符)`
+              : `// ... 已截断 (原文 ${text.length} 字符，仅保留前 ${MAX_CODE_LENGTH} 字符)`;
+          trimmed = text.substring(0, MAX_CODE_LENGTH) + marker;
         }
-
-        const trimmed = text.length > MAX_CODE_LENGTH ? text.substring(0, MAX_CODE_LENGTH) : text;
         onCodeChange(trimmed);
+
+        if (wasTruncated) {
+          showToast(
+            `文件超过 ${MAX_CODE_LENGTH} 字符，已在编辑器中标记截断位置`,
+            "warning"
+          );
+        } else {
+          showToast(`已加载 ${file.name}`, "success");
+        }
 
         const detectedLang = detectLanguageFromFilename(file.name);
         if (detectedLang) {
@@ -187,7 +203,7 @@ export default function CodeInputPanel({
       };
       reader.readAsText(file);
     },
-    [onCodeChange, onLanguageChange, showToast]
+    [onCodeChange, onLanguageChange, showToast, language]
   );
 
   const lines = useMemo(() => Array.from({ length: lineCount }, (_, i) => i + 1), [lineCount]);

@@ -51,9 +51,11 @@ export default function CodeHighlight({
 
   // Memoize highlighted HTML to avoid re-highlighting on every step change
   const language = useMemo(() => detectLang(fileName), [fileName]);
+  // Highlight the whole code at once (preserves cross-line context) then split
+  // This is both more accurate AND faster than per-line highlighting
   const highlightedLines = useMemo(() => {
-    const codeLines = code.split("\n");
-    return codeLines.map(line => getHighlightedHtml(line, language));
+    const fullHtml = getHighlightedHtml(code, language);
+    return fullHtml.split("\n");
   }, [code, language]);
 
   // Auto-scroll active line into view

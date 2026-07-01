@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { MotionConfig } from "framer-motion";
@@ -8,6 +8,15 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "代码画廊 - AI 把代码变成可交互的视觉故事",
