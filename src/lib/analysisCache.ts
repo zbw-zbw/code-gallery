@@ -6,6 +6,7 @@ const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
 interface CacheEntry {
   key: string;
+  codeLength: number;
   result: AnalysisResult;
   timestamp: number;
 }
@@ -29,7 +30,10 @@ export function getCached(code: string, language: string): AnalysisResult | null
     const entries: CacheEntry[] = JSON.parse(raw);
     const key = makeKey(code, language);
     const entry = entries.find(
-      (e) => e.key === key && Date.now() - e.timestamp < CACHE_TTL
+      (e) =>
+        e.key === key &&
+        Date.now() - e.timestamp < CACHE_TTL &&
+        e.codeLength === code.length // Collision guard: verify code length matches
     );
     return entry?.result ?? null;
   } catch {
@@ -45,7 +49,7 @@ export function setCache(code: string, language: string, result: AnalysisResult)
     const key = makeKey(code, language);
     // Remove existing entry for same key
     const filtered = entries.filter((e) => e.key !== key);
-    const newEntry: CacheEntry = { key, result, timestamp: Date.now() };
+    const newEntry: CacheEntry = { key, codeLength: code.length, result, timestamp: Date.now() };
     const updated = [newEntry, ...filtered]
       .slice(0, MAX_CACHE_SIZE)
       .filter((e) => Date.now() - e.timestamp < CACHE_TTL);

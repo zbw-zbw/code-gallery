@@ -98,6 +98,7 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
           <div
             className="fixed inset-0 z-50 bg-black/30 md:hidden"
             onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
           />
           <div
             ref={menuRef}

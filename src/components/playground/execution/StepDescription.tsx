@@ -50,8 +50,8 @@ export default function StepDescription({
         </span>
       </div>
 
-      {/* Step detail */}
-      <div className="flex-1 overflow-auto p-4">
+      {/* Step detail — aria-live notifies screen readers on step change */}
+      <div className="flex-1 overflow-auto p-4" aria-live="polite" aria-atomic="true">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

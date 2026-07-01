@@ -148,6 +148,7 @@ export default function ExportPanel({
             <div
               className="fixed inset-0 z-40"
               onClick={() => setOpen(false)}
+              aria-hidden="true"
             />
             <motion.div
               ref={panelRef}

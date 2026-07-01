@@ -32,6 +32,7 @@ export function useFocusTrap({ open, onClose, containerRef }: UseFocusTrapOption
       'select:not([disabled])',
       'textarea:not([disabled])',
       '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]',
     ].join(", ");
 
     const focusable = Array.from(container.querySelectorAll<HTMLElement>(focusableSelectors));
