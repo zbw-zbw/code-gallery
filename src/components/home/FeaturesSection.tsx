@@ -64,11 +64,18 @@ function FlowAnimationDiagram() {
         { label: "step3", color: "bg-data-green" },
       ].map((step, i) => (
         <div key={step.label} className="flex items-center gap-2 sm:gap-3">
-          <div
+          <motion.div
             className={`w-12 sm:w-16 h-10 sm:h-12 ${step.color} rounded-lg flex items-center justify-center text-white text-[10px] sm:text-xs font-mono`}
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: i * 0.5,
+              ease: "easeInOut",
+            }}
           >
             {step.label}
-          </div>
+          </motion.div>
           {i < 2 && (
             <svg
               width="16"
@@ -77,6 +84,8 @@ function FlowAnimationDiagram() {
               fill="none"
               stroke="#6b7280"
               strokeWidth="2"
+              aria-hidden="true"
+              className="animate-flow-line"
             >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
@@ -91,75 +100,58 @@ function ArchitectureDiagram() {
   return (
     <div className="relative w-[180px] h-[140px]">
       {/* Root node */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-code-purple flex items-center justify-center">
+      <motion.div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-code-purple flex items-center justify-center"
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
         <div className="w-3 h-3 rounded-full bg-white" />
-      </div>
+      </motion.div>
 
       {/* Level 2 nodes */}
-      <div className="absolute top-16 left-2 w-8 h-8 rounded-full bg-flow-blue flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-white" />
-      </div>
-      <div className="absolute top-16 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-flow-blue flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-white" />
-      </div>
-      <div className="absolute top-16 right-2 w-8 h-8 rounded-full bg-flow-blue flex items-center justify-center">
-        <div className="w-2 h-2 rounded-full bg-white" />
-      </div>
+      {[
+        { className: "absolute top-16 left-2", delay: 0.2 },
+        { className: "absolute top-16 left-1/2 -translate-x-1/2", delay: 0.4 },
+        { className: "absolute top-16 right-2", delay: 0.6 },
+      ].map((node, i) => (
+        <motion.div
+          key={i}
+          className={`${node.className} w-8 h-8 rounded-full bg-flow-blue flex items-center justify-center`}
+          animate={{ scale: [1, 1.15, 1] }}
+          transition={{ duration: 2, repeat: Infinity, delay: node.delay, ease: "easeInOut" }}
+        >
+          <div className="w-2 h-2 rounded-full bg-white" />
+        </motion.div>
+      ))}
 
-      {/* Level 3 node */}
-      <div className="absolute bottom-0 left-8 w-6 h-6 rounded-full bg-data-green flex items-center justify-center">
+      {/* Level 3 nodes */}
+      <motion.div
+        className="absolute bottom-0 left-8 w-6 h-6 rounded-full bg-data-green flex items-center justify-center"
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.8, ease: "easeInOut" }}
+      >
         <div className="w-1.5 h-1.5 rounded-full bg-white" />
-      </div>
-      <div className="absolute bottom-0 right-8 w-6 h-6 rounded-full bg-data-green flex items-center justify-center">
+      </motion.div>
+      <motion.div
+        className="absolute bottom-0 right-8 w-6 h-6 rounded-full bg-data-green flex items-center justify-center"
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1, ease: "easeInOut" }}
+      >
         <div className="w-1.5 h-1.5 rounded-full bg-white" />
-      </div>
+      </motion.div>
 
       {/* Lines */}
       <svg
         className="absolute inset-0 w-full h-full"
         viewBox="0 0 180 140"
         fill="none"
+        aria-hidden="true"
       >
-        <line
-          x1="90"
-          y1="10"
-          x2="30"
-          y2="60"
-          stroke="#e5e7eb"
-          strokeWidth="2"
-        />
-        <line
-          x1="90"
-          y1="10"
-          x2="90"
-          y2="60"
-          stroke="#e5e7eb"
-          strokeWidth="2"
-        />
-        <line
-          x1="90"
-          y1="10"
-          x2="150"
-          y2="60"
-          stroke="#e5e7eb"
-          strokeWidth="2"
-        />
-        <line
-          x1="30"
-          y1="68"
-          x2="40"
-          y2="130"
-          stroke="#e5e7eb"
-          strokeWidth="2"
-        />
-        <line
-          x1="150"
-          y1="68"
-          x2="140"
-          y2="130"
-          stroke="#e5e7eb"
-          strokeWidth="2"
-        />
+        <line x1="90" y1="10" x2="30" y2="60" stroke="#e5e7eb" strokeWidth="2" />
+        <line x1="90" y1="10" x2="90" y2="60" stroke="#e5e7eb" strokeWidth="2" />
+        <line x1="90" y1="10" x2="150" y2="60" stroke="#e5e7eb" strokeWidth="2" />
+        <line x1="30" y1="68" x2="40" y2="130" stroke="#e5e7eb" strokeWidth="2" />
+        <line x1="150" y1="68" x2="140" y2="130" stroke="#e5e7eb" strokeWidth="2" />
       </svg>
     </div>
   );
@@ -168,7 +160,7 @@ function ArchitectureDiagram() {
 function EmbedDiagram() {
   return (
     <div className="w-[200px] h-[120px] rounded-xl bg-gallery-bg flex flex-col items-center justify-center gap-2">
-      <svg
+      <motion.svg
         width="32"
         height="32"
         viewBox="0 0 24 24"
@@ -177,10 +169,13 @@ function EmbedDiagram() {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+        aria-hidden="true"
+        animate={{ opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       >
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
-      </svg>
+      </motion.svg>
       <span className="text-xs text-gallery-gray font-mono">&lt;/&gt; embed</span>
     </div>
   );

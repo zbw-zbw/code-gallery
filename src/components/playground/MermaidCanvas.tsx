@@ -55,6 +55,18 @@ export default function MermaidCanvas({
   const [hoveredNode, setHoveredNode] = useState<CanvasNode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Refs for non-passive event handlers (wheel, touch)
+  const scaleRef = useRef(scale);
+  const positionRef = useRef(position);
+  const isDraggingRef = useRef(isDragging);
+  const dragStartRef = useRef(dragStart);
+
+  // Keep refs in sync with state
+  useEffect(() => { scaleRef.current = scale; }, [scale]);
+  useEffect(() => { positionRef.current = position; }, [position]);
+  useEffect(() => { isDraggingRef.current = isDragging; }, [isDragging]);
+  useEffect(() => { dragStartRef.current = dragStart; }, [dragStart]);
+
   const zoomIn = useCallback(() => {
     setScale((prev) => Math.min(3, +(prev + 0.2).toFixed(1)));
   }, []);
@@ -68,10 +80,87 @@ export default function MermaidCanvas({
     setPosition({ x: 0, y: 0 });
   }, []);
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setScale((prev) => Math.min(3, Math.max(0.5, +(prev + delta).toFixed(1))));
+  // Non-passive wheel handler (fixes passive listener issue)
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setScale((prev) => Math.min(3, Math.max(0.5, +(prev + delta).toFixed(1))));
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, []);
+
+  // Non-passive touch handler with pinch-to-zoom support
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+
+    const getTouchDist = (touches: TouchList) => {
+      if (touches.length !== 2) return 0;
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        // Start pinch-to-zoom
+        pinchStartDist = getTouchDist(e.touches);
+        pinchStartScale = scaleRef.current;
+        setIsDragging(false);
+      } else if (e.touches.length === 1) {
+        // Start single-finger pan
+        setIsDragging(true);
+        setDragStart({
+          x: e.touches[0].clientX - positionRef.current.x,
+          y: e.touches[0].clientY - positionRef.current.y,
+        });
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchStartDist > 0) {
+        // Pinch-to-zoom
+        e.preventDefault();
+        const dist = getTouchDist(e.touches);
+        const ratio = dist / pinchStartDist;
+        const newScale = Math.min(3, Math.max(0.5, +(pinchStartScale * ratio).toFixed(1)));
+        setScale(newScale);
+      } else if (e.touches.length === 1 && isDraggingRef.current) {
+        // Single-finger pan
+        e.preventDefault();
+        setPosition({
+          x: e.touches[0].clientX - dragStartRef.current.x,
+          y: e.touches[0].clientY - dragStartRef.current.y,
+        });
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        pinchStartDist = 0;
+      }
+      if (e.touches.length === 0) {
+        setIsDragging(false);
+      }
+    };
+
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd, { passive: false });
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
+    };
   }, []);
 
   const handleMouseDown = useCallback(
@@ -95,34 +184,6 @@ export default function MermaidCanvas({
   );
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      setIsDragging(true);
-      setDragStart({
-        x: e.touches[0].clientX - position.x,
-        y: e.touches[0].clientY - position.y,
-      });
-    },
-    [position]
-  );
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!isDragging || e.touches.length !== 1) return;
-      e.preventDefault();
-      setPosition({
-        x: e.touches[0].clientX - dragStart.x,
-        y: e.touches[0].clientY - dragStart.y,
-      });
-    },
-    [isDragging, dragStart]
-  );
-
-  const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
   }, []);
 
@@ -237,9 +298,9 @@ export default function MermaidCanvas({
             title="缩小"
             aria-label="缩小"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
-          <span className="text-xs font-mono text-gallery-gray w-8 text-center">
+          <span className="text-xs font-mono text-gallery-gray w-8 text-center" aria-live="polite">
             {Math.round(scale * 100)}%
           </span>
           <button
@@ -248,7 +309,7 @@ export default function MermaidCanvas({
             title="放大"
             aria-label="放大"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
           <button
             onClick={resetView}
@@ -256,7 +317,7 @@ export default function MermaidCanvas({
             title="重置"
             aria-label="重置视图"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
         </div>
       </div>
@@ -272,15 +333,13 @@ export default function MermaidCanvas({
           `,
           backgroundSize: "24px 24px",
           cursor: isDragging ? "grabbing" : "grab",
+          // touch-action: none prevents browser default touch behaviors
+          touchAction: "none",
         }}
-        onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Node info panel */}
         <AnimatePresence>
@@ -289,7 +348,7 @@ export default function MermaidCanvas({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="absolute top-4 right-4 z-10 bg-gallery-white rounded-xl shadow-lg p-4 max-w-[260px]"
+              className="absolute top-4 right-4 z-10 bg-gallery-white rounded-xl shadow-lg p-4 max-w-[260px] pointer-events-none"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gallery-black">
@@ -298,10 +357,10 @@ export default function MermaidCanvas({
                 {selectedNode && (
                   <button
                     onClick={() => setSelectedNode(null)}
-                    className="text-gallery-gray hover:text-gallery-black"
+                    className="text-gallery-gray hover:text-gallery-black pointer-events-auto"
                     aria-label="关闭节点详情"
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </button>
                 )}
               </div>
@@ -375,7 +434,7 @@ export default function MermaidCanvas({
 function LegendItem({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5">
-      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
+      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} aria-hidden="true" />
       <span className="text-xs text-gallery-gray">{label}</span>
     </div>
   );

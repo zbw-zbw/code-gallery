@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type Mermaid from "mermaid";
+import { useToast } from "@/components/shared/Toast";
 
 interface MermaidRendererProps {
   code: string;
@@ -82,7 +83,9 @@ export default function MermaidRenderer({
   const [svg, setSvg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retryKey, setRetryKey] = useState(0);
   const mountedRef = useRef(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     mountedRef.current = true;
@@ -98,9 +101,10 @@ export default function MermaidRenderer({
           getMermaid(),
           getSanitizer(),
         ]);
-        const result = await mermaid.render(`mermaid-${id}`, code);
+        // Use unique id with retryKey to avoid collisions
+        const renderId = `mermaid-${id}-${retryKey}`;
+        const result = await mermaid.render(renderId, code);
         if (!cancelled && mountedRef.current) {
-          // Sanitize SVG to prevent XSS via injected scripts/event handlers
           const cleanSvg = sanitize(result.svg);
           setSvg(cleanSvg);
           setLoading(false);
@@ -120,7 +124,20 @@ export default function MermaidRenderer({
       cancelled = true;
       mountedRef.current = false;
     };
-  }, [code, id]);
+  }, [code, id, retryKey]);
+
+  const handleRetry = useCallback(() => {
+    setRetryKey((prev) => prev + 1);
+  }, []);
+
+  const handleCopyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      showToast("Mermaid 代码已复制");
+    } catch {
+      showToast("复制失败");
+    }
+  }, [code, showToast]);
 
   if (loading) {
     return (
@@ -132,6 +149,7 @@ export default function MermaidRenderer({
             className="animate-spin w-6 h-6 text-code-purple"
             viewBox="0 0 24 24"
             fill="none"
+            aria-hidden="true"
           >
             <circle
               className="opacity-25"
@@ -156,12 +174,41 @@ export default function MermaidRenderer({
   if (error) {
     return (
       <div
-        className={`flex flex-col items-center justify-center h-48 bg-gallery-bg rounded-xl p-6 ${className}`}
+        className={`flex flex-col items-center justify-center min-h-[200px] bg-gallery-bg rounded-xl p-6 ${className}`}
       >
-        <p className="text-sm text-red-500 mb-3">图表渲染失败</p>
-        <p className="text-xs text-gallery-gray text-center mb-3 max-w-md">
+        <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center mb-3">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <p className="text-sm font-medium text-gallery-black mb-1">图表渲染失败</p>
+        <p className="text-xs text-gallery-gray text-center mb-4 max-w-md">
           {error}
         </p>
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={handleRetry}
+            className="px-3 py-1.5 rounded-lg bg-code-purple hover:bg-code-purple-light text-white text-xs font-medium transition-colors duration-200 flex items-center gap-1.5"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
+            </svg>
+            重试
+          </button>
+          <button
+            onClick={handleCopyCode}
+            className="px-3 py-1.5 rounded-lg bg-gallery-white border border-gallery-border/50 text-gallery-gray hover:text-gallery-black text-xs font-medium transition-colors duration-200 flex items-center gap-1.5"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            复制代码
+          </button>
+        </div>
         <details className="w-full">
           <summary className="text-xs text-code-purple cursor-pointer text-center">
             查看 Mermaid 原始代码

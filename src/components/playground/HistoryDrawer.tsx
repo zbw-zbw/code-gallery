@@ -172,10 +172,18 @@ function HistoryContent({
             {history.map((entry) => {
               const lang = SUPPORTED_LANGUAGES.find((l) => l.value === entry.language);
               return (
-                <button
+                <div
                   key={entry.id}
                   onClick={() => onSelect(entry)}
-                  className="w-full text-left p-3.5 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-gallery-border/30 group"
+                  className="w-full text-left p-3.5 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-gallery-border/30 group cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelect(entry);
+                    }
+                  }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
@@ -195,20 +203,19 @@ function HistoryContent({
                         <span>{formatTimeAgo(entry.timestamp)}</span>
                       </div>
                     </div>
-                    {/* Delete button */}
-                    <div
+                    {/* Delete button — now a real button, not nested */}
+                    <button
                       onClick={(e) => onRemove(e, entry.id)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray opacity-0 group-hover:opacity-100 hover:text-red-400 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
-                      role="button"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-400 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
                       aria-label="删除此记录"
                     >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
                       </svg>
-                    </div>
+                    </button>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

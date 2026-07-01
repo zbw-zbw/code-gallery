@@ -33,14 +33,14 @@ export default function ShareButton({ result, onShareUrl }: ShareButtonProps) {
   const handleCopyLink = async () => {
     try {
       if (onShareUrl) {
-        onShareUrl();
+        await Promise.resolve(onShareUrl());
         showToast("分享链接已复制，含代码可直接打开");
       } else {
         await navigator.clipboard.writeText(window.location.href);
         showToast("链接已复制到剪贴板");
       }
     } catch {
-      showToast("复制失败");
+      showToast("复制失败，请手动复制地址栏链接");
     }
     setOpen(false);
   };
@@ -83,7 +83,7 @@ export default function ShareButton({ result, onShareUrl }: ShareButtonProps) {
       <AnimatePresence>
         {open && (
           <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-hidden="true" />
             <motion.div
               ref={panelRef}
               role="dialog"

@@ -65,15 +65,6 @@ textarea {
   }
 }
 
-@keyframes pulseBar {
-  0%, 100% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 /* Bubble sort visualization animations */
 @keyframes bubbleStep1 {
   0% {
