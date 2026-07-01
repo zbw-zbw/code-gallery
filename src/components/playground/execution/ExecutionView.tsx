@@ -154,7 +154,7 @@ export default function ExecutionView({
   // Empty state
   if (totalSteps === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-gallery-gray">
+      <div className="h-full flex flex-col items-center justify-center text-gallery-gray px-6">
         <svg
           width="48"
           height="48"
@@ -167,7 +167,10 @@ export default function ExecutionView({
           <polyline points="16 18 22 12 16 6" />
           <polyline points="8 6 2 12 8 18" />
         </svg>
-        <p className="text-sm">AI 没有返回执行步骤数据</p>
+        <p className="text-sm font-medium text-gallery-black mb-2">AI 没有返回执行步骤数据</p>
+        <p className="text-xs text-gallery-gray text-center max-w-xs">
+          可能是代码过于简单或 AI 分析失败。请尝试修改代码后重新分析，或切换到"架构图"或"数据流"视图查看其他可视化结果。
+        </p>
       </div>
     );
   }
@@ -180,7 +183,11 @@ export default function ExecutionView({
       className="h-full flex flex-col"
     >
       {/* Mobile tab bar — visible only on small screens */}
-      <div className="md:hidden flex items-center bg-code-surface flex-shrink-0 border-b border-code-bg/30">
+      <div
+        className="md:hidden flex items-center bg-code-surface flex-shrink-0 border-b border-code-bg/30"
+        role="tablist"
+        aria-label="执行视图切换"
+      >
         {MOBILE_TABS.map((tab) => {
           const isActive = mobileTab === tab.key;
           const badgeCount =
@@ -191,6 +198,20 @@ export default function ExecutionView({
             <button
               key={tab.key}
               onClick={() => setMobileTab(tab.key)}
+              onKeyDown={(e) => {
+                const index = MOBILE_TABS.findIndex((t) => t.key === tab.key);
+                if (e.key === "ArrowRight") {
+                  e.preventDefault();
+                  const next = (index + 1) % MOBILE_TABS.length;
+                  setMobileTab(MOBILE_TABS[next].key);
+                  (e.currentTarget.parentElement?.children[next] as HTMLElement)?.focus();
+                } else if (e.key === "ArrowLeft") {
+                  e.preventDefault();
+                  const prev = (index - 1 + MOBILE_TABS.length) % MOBILE_TABS.length;
+                  setMobileTab(MOBILE_TABS[prev].key);
+                  (e.currentTarget.parentElement?.children[prev] as HTMLElement)?.focus();
+                }
+              }}
               className={`flex-1 relative flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors duration-200 ${
                 isActive
                   ? "text-code-purple-light"

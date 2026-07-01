@@ -226,6 +226,7 @@ function PlaygroundContent() {
             isAnalyzing={isAnalyzing}
             error={error}
             onRetry={handleAnalyze}
+            onCancel={handleCancel}
             onShareUrl={handleShareUrl}
             analysisDuration={analysisDuration}
           />

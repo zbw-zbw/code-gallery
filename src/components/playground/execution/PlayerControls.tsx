@@ -177,7 +177,11 @@ export default function PlayerControls({
               value={currentStep}
               onChange={(e) => onSeek(Number(e.target.value))}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              aria-label="进度条"
+              aria-label="执行步骤进度"
+              aria-valuenow={currentStep + 1}
+              aria-valuemin={1}
+              aria-valuemax={totalSteps}
+              aria-valuetext={`第 ${currentStep + 1} 步，共 ${totalSteps} 步`}
             />
           </div>
           <span className="text-xs font-mono text-gallery-gray flex-shrink-0">

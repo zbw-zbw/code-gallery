@@ -109,9 +109,10 @@ export default function CodeInputPanel({
       const end = target.selectionEnd;
       const newValue = code.substring(0, start) + "  " + code.substring(end);
       onCodeChange(newValue);
-      requestAnimationFrame(() => {
+      // Use setTimeout to ensure React has updated the DOM before setting cursor
+      setTimeout(() => {
         target.selectionStart = target.selectionEnd = start + 2;
-      });
+      }, 0);
     }
   };
 
@@ -163,7 +164,14 @@ export default function CodeInputPanel({
         lowerName.endsWith(ext)
       );
       if (!hasValidExtension) {
-        showToast("不支持的文件类型，请上传 .js/.ts/.py/.java 等代码文件");
+        showToast("不支持的文件类型，请上传 .js/.ts/.py/.java 等代码文件", "error");
+        return;
+      }
+
+      // Pre-check file size before reading into memory (1MB limit)
+      const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+      if (file.size > MAX_FILE_SIZE) {
+        showToast(`文件过大 (${(file.size / 1024 / 1024).toFixed(1)}MB)，请上传小于 1MB 的文件`, "error");
         return;
       }
 
@@ -302,6 +310,7 @@ export default function CodeInputPanel({
             onScroll={handleScroll}
             onKeyDown={handleKeyDown}
             placeholder="粘贴你的代码到这里...（或点击右上角示例库）"
+            aria-label="代码输入框"
             spellCheck={false}
             className="absolute inset-0 py-4 pl-2 pr-4 w-full h-full bg-transparent text-code-text text-sm font-mono leading-6 resize-none outline-none border-none placeholder:text-gallery-gray/50"
             style={{

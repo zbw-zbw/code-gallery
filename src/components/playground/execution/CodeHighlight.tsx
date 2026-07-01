@@ -58,6 +58,11 @@ export default function CodeHighlight({
     return fullHtml.split("\n");
   }, [code, language]);
 
+  // Truncate lineRefs when code changes to prevent stale references
+  useEffect(() => {
+    lineRefs.current.length = lines.length;
+  }, [lines.length]);
+
   // Auto-scroll active line into view
   useEffect(() => {
     if (activeLine > 0 && lineRefs.current[activeLine - 1]) {

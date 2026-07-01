@@ -7,6 +7,7 @@ import ArchitectureView from "./architecture/ArchitectureView";
 import DataFlowView from "./dataflow/DataFlowView";
 import ExportPanel from "./ExportPanel";
 import ShareButton from "./ShareButton";
+import AnalysisStats from "./AnalysisStats";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,6 +16,7 @@ interface ResultPanelProps {
   isAnalyzing: boolean;
   error: string | null;
   onRetry: () => void;
+  onCancel?: () => void;
   onShareUrl?: () => void;
   analysisDuration?: number | null;
 }
@@ -59,6 +61,7 @@ export default function ResultPanel({
   isAnalyzing,
   error,
   onRetry,
+  onCancel,
   onShareUrl,
   analysisDuration,
 }: ResultPanelProps) {
@@ -81,9 +84,13 @@ export default function ResultPanel({
   // Keyboard shortcuts: 1/2/3 to switch tabs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Exclude all interactive elements to prevent conflicts
       if (
         e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLInputElement
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLButtonElement ||
+        e.target instanceof HTMLSelectElement ||
+        (e.target as HTMLElement)?.isContentEditable
       )
         return;
       if (e.key === "1") setActiveTab("execution");
@@ -153,7 +160,13 @@ export default function ResultPanel({
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <span className="text-sm font-medium text-code-purple">{LOADING_STAGES[stageIndex]}</span>
+            <span className="text-sm font-medium text-code-purple mb-4">{LOADING_STAGES[stageIndex]}</span>
+            <button
+              onClick={onCancel}
+              className="px-4 py-1.5 text-xs font-medium text-gallery-gray hover:text-gallery-black bg-gallery-bg/80 hover:bg-gallery-border/50 rounded-lg transition-colors duration-200"
+            >
+              取消分析
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -235,6 +248,9 @@ export default function ResultPanel({
               <ShareButton result={result} onShareUrl={onShareUrl} />
             </div>
           </div>
+
+          {/* Detailed Analysis Stats */}
+          <AnalysisStats result={result} />
 
           {/* Tabs */}
           <div

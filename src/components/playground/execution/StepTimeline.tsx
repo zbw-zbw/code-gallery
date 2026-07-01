@@ -51,7 +51,15 @@ export default function StepTimeline({ steps, currentStep, onSeek }: StepTimelin
     <div className="flex-shrink-0 px-3 pb-2">
       <div className="bg-code-surface/50 rounded-lg p-2.5">
         {/* Timeline bar */}
-        <div className="flex items-center gap-0.5 h-6 mb-1.5">
+        <div
+          className="flex items-center gap-0.5 h-6 mb-1.5"
+          role="slider"
+          aria-label="执行步骤进度"
+          aria-valuenow={currentStep + 1}
+          aria-valuemin={1}
+          aria-valuemax={steps.length}
+          aria-valuetext={`第 ${currentStep + 1} 步，共 ${steps.length} 步`}
+        >
           {steps.map((step, i) => {
             const isActive = i === currentStep;
             const color = STEP_COLORS[step.highlight] || STEP_COLORS.normal;
@@ -59,6 +67,26 @@ export default function StepTimeline({ steps, currentStep, onSeek }: StepTimelin
               <button
                 key={i}
                 onClick={() => onSeek(i)}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowLeft" && i > 0) {
+                    e.preventDefault();
+                    onSeek(i - 1);
+                    (e.currentTarget.parentElement?.children[i - 1] as HTMLElement)?.focus();
+                  } else if (e.key === "ArrowRight" && i < steps.length - 1) {
+                    e.preventDefault();
+                    onSeek(i + 1);
+                    (e.currentTarget.parentElement?.children[i + 1] as HTMLElement)?.focus();
+                  } else if (e.key === "Home") {
+                    e.preventDefault();
+                    onSeek(0);
+                    (e.currentTarget.parentElement?.children[0] as HTMLElement)?.focus();
+                  } else if (e.key === "End") {
+                    e.preventDefault();
+                    onSeek(steps.length - 1);
+                    (e.currentTarget.parentElement?.children[steps.length - 1] as HTMLElement)?.focus();
+                  }
+                }}
+                tabIndex={isActive ? 0 : -1}
                 className="group relative flex-1 h-full min-w-[6px] flex items-end"
                 title={`第 ${i + 1} 步: ${step.description.slice(0, 50)}${step.description.length > 50 ? "..." : ""}`}
                 aria-label={`跳到第 ${i + 1} 步`}
