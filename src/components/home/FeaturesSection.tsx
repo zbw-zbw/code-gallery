@@ -57,7 +57,7 @@ export default function FeaturesSection() {
 
 function FlowAnimationDiagram() {
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
+    <div className="flex items-center gap-2 sm:gap-3" aria-hidden="true">
       {[
         { label: "step1", color: "bg-code-purple" },
         { label: "step2", color: "bg-flow-blue" },
@@ -98,7 +98,7 @@ function FlowAnimationDiagram() {
 
 function ArchitectureDiagram() {
   return (
-    <div className="relative w-[180px] h-[140px]">
+    <div className="relative w-[180px] h-[140px]" aria-hidden="true">
       {/* Root node */}
       <motion.div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-code-purple flex items-center justify-center"

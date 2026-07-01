@@ -190,6 +190,38 @@ textarea {
   animation-delay: 2s;
 }
 
+@keyframes bubbleStep5 {
+  0% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+  20% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateX(-52px);
+    opacity: 1;
+  }
+  60% {
+    transform: translateX(-52px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 0.6;
+  }
+}
+
+.animate-bubble-5 {
+  animation: bubbleStep5 6s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
 .animate-step-label {
   animation: stepLabel 6s ease-in-out infinite;
 }

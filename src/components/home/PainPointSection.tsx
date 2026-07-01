@@ -26,7 +26,7 @@ export default function PainPointSection() {
                 delay: index * 0.1,
                 ease: [0.25, 0.1, 0.25, 1],
               }}
-              className="group bg-gallery-bg rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              className="group bg-gallery-bg rounded-2xl p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:scale-[0.98]"
             >
               <div className="text-code-purple mb-5">
                 <Icon name={point.icon} size={40} />

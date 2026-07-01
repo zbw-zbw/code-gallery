@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, Suspense } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Language, AnalysisResult } from "@/types";
 import PlaygroundLayout from "@/components/playground/PlaygroundLayout";
@@ -10,6 +10,7 @@ import ExampleDrawer from "@/components/playground/ExampleDrawer";
 import HistoryDrawer from "@/components/playground/HistoryDrawer";
 import { ToastProvider } from "@/components/shared/Toast";
 import LoadingFallback from "@/components/shared/LoadingFallback";
+import CommandPalette, { useCommandPalette, type CommandItem } from "@/components/shared/CommandPalette";
 import { EXAMPLES } from "@/lib/examples";
 import { addHistory } from "@/lib/codeHistory";
 import { getCached, setCache } from "@/lib/analysisCache";
@@ -150,6 +151,37 @@ function PlaygroundContent() {
     setIsAnalyzing(false);
   }, []);
 
+  // Command palette (Ctrl/Cmd+K)
+  const commandItems: CommandItem[] = useMemo(
+    () => [
+      {
+        id: "analyze",
+        label: "分析代码",
+        description: "开始分析当前代码",
+        shortcut: "Ctrl+Enter",
+        group: "操作",
+        action: handleAnalyze,
+      },
+      {
+        id: "cancel",
+        label: "取消分析",
+        description: "停止当前分析",
+        group: "操作",
+        action: handleCancel,
+      },
+      {
+        id: "clear",
+        label: "清空代码",
+        description: "重置编辑器",
+        group: "操作",
+        action: () => { setCode(""); setResult(null); setError(null); },
+      },
+    ],
+    [handleAnalyze, handleCancel]
+  );
+
+  const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette(commandItems);
+
   const handleShareUrl = useCallback(() => {
     const encoded = encodeCodeForUrl(code, language);
     if (!encoded) return;
@@ -232,6 +264,11 @@ function PlaygroundContent() {
           />
         </div>
       </div>
+      <CommandPalette
+        items={commandItems}
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+      />
     </PlaygroundLayout>
   );
 }

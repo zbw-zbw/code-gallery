@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HistoryEntry, getHistory, removeHistory, clearHistory, getPreview, formatTimeAgo } from "@/lib/codeHistory";
 import { Language } from "@/types";
@@ -42,18 +42,32 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
   };
 
   const [confirmingClear, setConfirmingClear] = useState(false);
+  const confirmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up the confirmation timer on unmount
+  useEffect(() => {
+    return () => {
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+    };
+  }, []);
 
   const handleClearAll = () => {
-    if (!confirmingClear) {
-      setConfirmingClear(true);
-      // Auto-cancel confirmation after 4 seconds
-      setTimeout(() => setConfirmingClear(false), 4000);
+    if (confirmingClear) {
+      // User confirmed — clear the timer first
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = null;
+      clearHistory();
+      setHistory([]);
+      setConfirmingClear(false);
+      showToast("历史记录已清空", "success");
       return;
     }
-    clearHistory();
-    setHistory([]);
-    setConfirmingClear(false);
-    showToast("历史记录已清空", "success");
+    setConfirmingClear(true);
+    // Auto-cancel confirmation after 4 seconds
+    confirmTimerRef.current = setTimeout(() => {
+      setConfirmingClear(false);
+      confirmTimerRef.current = null;
+    }, 4000);
   };
 
   const handleClose = useCallback(() => {
