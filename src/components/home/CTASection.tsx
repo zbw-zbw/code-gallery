@@ -34,7 +34,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          className="text-xl md:text-2xl text-white/80 mb-10"
+          className="text-xl md:text-2xl text-white/90 mb-10"
         >
           不只是被阅读
         </motion.p>
@@ -58,7 +58,7 @@ export default function CTASection() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-10 text-sm text-white/60"
+          className="mt-10 text-sm text-white/80"
         >
           代码画廊 · 让代码看得见
         </motion.p>

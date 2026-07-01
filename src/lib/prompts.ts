@@ -1,10 +1,11 @@
 export function buildAnalysisPrompt(code: string, language: string): string {
+  // Use 4-backtick fence to avoid breakage if user code contains triple backticks
   return `请分析以下 ${language} 代码，返回严格的 JSON 格式分析结果。
 
 代码：
-\`\`\`${language}
+\`\`\`\`${language}
 ${code}
-\`\`\`
+\`\`\`\`
 
 要求返回的 JSON 结构如下，所有字段必须存在：
 

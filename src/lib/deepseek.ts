@@ -2,13 +2,18 @@ import OpenAI from "openai";
 import { AnalysisResult, ArchNode, CodeInput, ExecutionStep, FlowNode } from "@/types";
 import { ANALYSIS_SYSTEM_PROMPT, buildAnalysisPrompt } from "./prompts";
 
+// Module-level singleton — reuse the HTTP client connection pool across calls
+let clientInstance: OpenAI | null = null;
+
 function getClient(): OpenAI {
-  return new OpenAI({
+  if (clientInstance) return clientInstance;
+  clientInstance = new OpenAI({
     apiKey: process.env.DEEPSEEK_API_KEY,
     baseURL: process.env.DEEPSEEK_BASE_URL
       ? `${process.env.DEEPSEEK_BASE_URL.replace(/\/$/, "")}/v1`
       : "https://api.deepseek.com/v1",
   });
+  return clientInstance;
 }
 
 const MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
@@ -63,14 +68,14 @@ export async function analyzeCode(
             return {
               stepNumber: Number(step.stepNumber) || i + 1,
               lineNumber: Number(step.lineNumber) || 1,
-              description: String(step.description || ""),
+              description: String(step.description ?? ""),
               variables: Array.isArray(step.variables)
                 ? step.variables.map((v: unknown) => {
                     const varState = v as Record<string, unknown>;
                     return {
-                      name: String(varState.name || ""),
-                      value: String(varState.value || ""),
-                      type: String(varState.type || "unknown"),
+                      name: String(varState.name ?? ""),
+                      value: String(varState.value ?? ""),
+                      type: String(varState.type ?? "unknown"),
                       changed: Boolean(varState.changed),
                     };
                   })

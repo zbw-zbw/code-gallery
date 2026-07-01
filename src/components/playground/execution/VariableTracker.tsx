@@ -9,11 +9,24 @@ interface VariableTrackerProps {
   currentStep: number;
 }
 
+// Maximum array elements to render individually — beyond this, show JSON summary
+const MAX_ARRAY_VISUALIZE = 50;
+
 function formatValue(value: string, type: string): React.ReactNode {
   if (type === "array" || type === "object") {
     try {
       const parsed = JSON.parse(value);
       if (Array.isArray(parsed)) {
+        if (parsed.length > MAX_ARRAY_VISUALIZE) {
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-mono text-gallery-gray">
+                [{parsed.length} 个元素] (仅显示前 {MAX_ARRAY_VISUALIZE} 个)
+              </span>
+              <ArrayVisualizer value={parsed.slice(0, MAX_ARRAY_VISUALIZE)} />
+            </div>
+          );
+        }
         return <ArrayVisualizer value={parsed} />;
       }
       return (
@@ -91,7 +104,7 @@ export default function VariableTracker({
 
                 return (
                   <motion.div
-                    key={`${variable.name}-${currentStep}`}
+                    key={variable.name}
                     layout
                     initial={changed ? { backgroundColor: "rgba(52, 211, 153, 0.2)" } : false}
                     animate={{ backgroundColor: "rgba(0, 0, 0, 0)" }}

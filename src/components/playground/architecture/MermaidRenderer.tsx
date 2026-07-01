@@ -89,9 +89,10 @@ export default function MermaidRenderer({
 
   useEffect(() => {
     mountedRef.current = true;
+    // Don't clear SVG on re-render — keep the previous one visible until the new one is ready
+    // This prevents flicker when code changes incrementally
     setLoading(true);
     setError(null);
-    setSvg(null);
 
     let cancelled = false;
 
@@ -138,6 +139,18 @@ export default function MermaidRenderer({
       showToast("复制失败");
     }
   }, [code, showToast]);
+
+  // If we have a previous SVG and are re-rendering, show it instead of the loading state
+  if (loading && svg) {
+    return (
+      <div
+        className={`flex items-center justify-center ${className}`}
+        dangerouslySetInnerHTML={{ __html: svg }}
+        role="img"
+        aria-label="架构图（正在更新...）"
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -225,6 +238,8 @@ export default function MermaidRenderer({
     <div
       className={`flex items-center justify-center ${className}`}
       dangerouslySetInnerHTML={{ __html: svg || "" }}
+      role="img"
+      aria-label={`图表: ${code.split("\n")[0].replace(/^(graph|flowchart)\s+/, "").slice(0, 60)}`}
     />
   );
 }

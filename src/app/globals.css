@@ -206,10 +206,11 @@ textarea {
   outline: none;
 }
 
-/* Code editor textarea: custom focus indicator */
+/* Code editor textarea: custom focus indicator (caret color + ring) */
 textarea:focus-visible,
 input[type="text"]:focus-visible {
-  outline: none;
+  outline: 2px solid var(--color-code-purple);
+  outline-offset: -2px;
 }
 
 /* Custom scrollbar for dark code areas */

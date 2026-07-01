@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, ReactNode } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MermaidRenderer from "./architecture/MermaidRenderer";
 
@@ -86,9 +86,11 @@ export default function MermaidCanvas({
     if (!container) return;
 
     const handleWheel = (e: WheelEvent) => {
+      // Only intercept wheel when Ctrl/Cmd is held — otherwise let the page scroll
+      if (!(e.ctrlKey || e.metaKey)) return;
       e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setScale((prev) => Math.min(3, Math.max(0.5, +(prev + delta).toFixed(1))));
+      const delta = e.deltaY > 0 ? -0.15 : 0.15;
+      setScale((prev) => Math.min(3, Math.max(0.5, +(prev + delta).toFixed(2))));
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
@@ -147,6 +149,14 @@ export default function MermaidCanvas({
     const handleTouchEnd = (e: TouchEvent) => {
       if (e.touches.length < 2) {
         pinchStartDist = 0;
+      }
+      // If one finger remains after pinch, resume panning with that finger
+      if (e.touches.length === 1) {
+        setIsDragging(true);
+        setDragStart({
+          x: e.touches[0].clientX - positionRef.current.x,
+          y: e.touches[0].clientY - positionRef.current.y,
+        });
       }
       if (e.touches.length === 0) {
         setIsDragging(false);
@@ -275,11 +285,14 @@ export default function MermaidCanvas({
     };
   }, [nodes]);
 
-  const nodeConnections = nodes.map((node) => {
-    const outgoing = edges.filter((e) => e.from === node.id);
-    const incoming = edges.filter((e) => e.to === node.id);
-    return { ...node, outgoing, incoming };
-  });
+  const nodeConnections = useMemo(
+    () => nodes.map((node) => {
+      const outgoing = edges.filter((e) => e.from === node.id);
+      const incoming = edges.filter((e) => e.to === node.id);
+      return { ...node, outgoing, incoming };
+    }),
+    [nodes, edges]
+  );
 
   const activeNode = selectedNode || hoveredNode;
   const activeNodeData = activeNode
@@ -314,11 +327,14 @@ export default function MermaidCanvas({
           <button
             onClick={resetView}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-xs text-gallery-gray hover:text-gallery-black hover:bg-gallery-border/50 transition-colors duration-200 ml-1"
-            title="重置"
+            title="重置 (0)"
             aria-label="重置视图"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           </button>
+          <span className="text-[10px] text-gallery-gray/60 ml-1 hidden sm:inline" aria-hidden="true">
+            Ctrl+滚轮缩放
+          </span>
         </div>
       </div>
 
@@ -340,6 +356,43 @@ export default function MermaidCanvas({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        tabIndex={0}
+        role="application"
+        aria-label={`${title} — 可交互图表，使用方向键平移，+/- 缩放`}
+        onKeyDown={(e) => {
+          const step = 30;
+          switch (e.key) {
+            case "ArrowUp":
+              e.preventDefault();
+              setPosition((p) => ({ ...p, y: p.y + step }));
+              break;
+            case "ArrowDown":
+              e.preventDefault();
+              setPosition((p) => ({ ...p, y: p.y - step }));
+              break;
+            case "ArrowLeft":
+              e.preventDefault();
+              setPosition((p) => ({ ...p, x: p.x + step }));
+              break;
+            case "ArrowRight":
+              e.preventDefault();
+              setPosition((p) => ({ ...p, x: p.x - step }));
+              break;
+            case "+":
+            case "=":
+              e.preventDefault();
+              zoomIn();
+              break;
+            case "-":
+              e.preventDefault();
+              zoomOut();
+              break;
+            case "0":
+              e.preventDefault();
+              resetView();
+              break;
+          }
+        }}
       >
         {/* Node info panel */}
         <AnimatePresence>

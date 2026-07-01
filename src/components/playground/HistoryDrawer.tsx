@@ -41,11 +41,25 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
     showToast("已删除");
   };
 
+  const [confirmingClear, setConfirmingClear] = useState(false);
+
   const handleClearAll = () => {
+    if (!confirmingClear) {
+      setConfirmingClear(true);
+      // Auto-cancel confirmation after 4 seconds
+      setTimeout(() => setConfirmingClear(false), 4000);
+      return;
+    }
     clearHistory();
     setHistory([]);
-    showToast("历史记录已清空");
+    setConfirmingClear(false);
+    showToast("历史记录已清空", "success");
   };
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    setConfirmingClear(false);
+  }, []);
 
   return (
     <>
@@ -90,6 +104,8 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
                     onSelect={handleSelect}
                     onRemove={handleRemove}
                     onClearAll={handleClearAll}
+                    onClose={handleClose}
+                    confirmingClear={confirmingClear}
                   />
                 </div>
               </motion.div>
@@ -110,6 +126,8 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
                   onSelect={handleSelect}
                   onRemove={handleRemove}
                   onClearAll={handleClearAll}
+                  onClose={handleClose}
+                  confirmingClear={confirmingClear}
                 />
               </motion.div>
             </div>
@@ -125,11 +143,15 @@ function HistoryContent({
   onSelect,
   onRemove,
   onClearAll,
+  onClose,
+  confirmingClear,
 }: {
   history: HistoryEntry[];
   onSelect: (entry: HistoryEntry) => void;
   onRemove: (e: React.MouseEvent, id: string) => void;
   onClearAll: () => void;
+  onClose: () => void;
+  confirmingClear: boolean;
 }) {
   return (
     <>
@@ -140,11 +162,25 @@ function HistoryContent({
           {history.length > 0 && (
             <button
               onClick={onClearAll}
-              className="text-xs text-gallery-gray hover:text-red-400 transition-colors duration-200"
+              className={`text-xs transition-colors duration-200 ${
+                confirmingClear
+                  ? "text-red-500 font-medium"
+                  : "text-gallery-gray hover:text-red-400"
+              }`}
             >
-              清空全部
+              {confirmingClear ? "确认清空？" : "清空全部"}
             </button>
           )}
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors duration-200"
+            aria-label="关闭历史记录"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -206,7 +242,7 @@ function HistoryContent({
                     {/* Delete button — now a real button, not nested */}
                     <button
                       onClick={(e) => onRemove(e, entry.id)}
-                      className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-400 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 hover:text-red-400 hover:bg-red-50 transition-all duration-200 flex-shrink-0"
                       aria-label="删除此记录"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">

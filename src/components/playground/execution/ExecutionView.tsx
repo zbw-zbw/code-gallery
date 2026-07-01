@@ -7,6 +7,7 @@ import CodeHighlight from "./CodeHighlight";
 import VariableTracker from "./VariableTracker";
 import StepDescription from "./StepDescription";
 import PlayerControls from "./PlayerControls";
+import StepTimeline from "./StepTimeline";
 
 interface ExecutionViewProps {
   code: string;
@@ -33,29 +34,33 @@ export default function ExecutionView({
   const [showShortcuts, setShowShortcuts] = useState(true);
   const [mobileTab, setMobileTab] = useState<MobileTab>("code");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
+  // Track step count (primitive) instead of array reference to avoid spurious resets
   const totalSteps = steps.length;
+  const stepsKey = steps.length > 0 ? `${steps[0].stepNumber}-${steps.length}` : "empty";
 
-  // Reset currentStep when steps change (new analysis result loaded)
+  // Reset currentStep when a NEW analysis result is loaded (detected by content key, not reference)
   useEffect(() => {
     setCurrentStep(0);
     setIsPlaying(false);
     setMobileTab("code");
-  }, [steps]);
+  }, [stepsKey]);
 
   // Auto-play logic with proper cleanup
   useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setCurrentStep((prev) => {
-          if (prev >= totalSteps - 1) {
-            setIsPlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 1500 / playSpeed);
-    }
+    if (!isPlaying) return;
+
+    // Use a ref-like pattern: read currentStep from state via a closure variable
+    // that we update inside the interval callback itself
+    let step = currentStep;
+    intervalRef.current = setInterval(() => {
+      if (step >= totalSteps - 1) {
+        step = totalSteps - 1;
+        setIsPlaying(false);
+        return;
+      }
+      step += 1;
+      setCurrentStep(step);
+    }, 1500 / playSpeed);
 
     return () => {
       if (intervalRef.current) {
@@ -63,6 +68,7 @@ export default function ExecutionView({
         intervalRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, playSpeed, totalSteps]);
 
   const goToFirst = useCallback(() => {
@@ -332,6 +338,9 @@ export default function ExecutionView({
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Step timeline — visual overview of all steps with type color coding */}
+      <StepTimeline steps={steps} currentStep={currentStep} onSeek={handleSeek} />
 
       {/* Player controls */}
       <PlayerControls

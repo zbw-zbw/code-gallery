@@ -9,14 +9,6 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (menuOpen) {
@@ -28,6 +20,33 @@ export default function Header() {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
+  // Close mobile menu when resizing to desktop (prevents body scroll lock)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 640 && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [menuOpen]);
+
+  // Passive scroll listener with throttling
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useFocusTrap({ open: menuOpen, onClose: () => setMenuOpen(false), containerRef: menuRef });
 
@@ -107,11 +126,20 @@ export default function Header() {
 
       {/* Mobile dropdown menu */}
       {menuOpen && (
-        <div
-          ref={menuRef}
-          id="mobile-menu"
-          className="sm:hidden bg-gallery-white px-4 py-3 space-y-1"
-        >
+        <>
+          <div
+            className="sm:hidden fixed inset-0 top-16 bg-black/20 z-40"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            ref={menuRef}
+            id="mobile-menu"
+            className="sm:hidden bg-gallery-white px-4 py-3 space-y-1 relative z-50 border-t border-gallery-border/30"
+            role="dialog"
+            aria-modal="true"
+            aria-label="导航菜单"
+          >
           <Link
             href="/#features"
             onClick={() => setMenuOpen(false)}
@@ -133,7 +161,8 @@ export default function Header() {
           >
             Playground
           </Link>
-        </div>
+          </div>
+        </>
       )}
     </header>
   );

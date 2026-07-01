@@ -9,7 +9,7 @@ export default function HeroSection() {
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-24 text-center">
         {/* Main Title */}
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
             duration: 0.6,
@@ -111,6 +111,7 @@ function HeroDecoration() {
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 120 80"
             fill="none"
+            aria-hidden="true"
           >
             {/* Top flow line */}
             <path
@@ -170,6 +171,7 @@ function HeroDecoration() {
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 140 100"
             fill="none"
+            aria-hidden="true"
           >
             <line
               x1="70"
