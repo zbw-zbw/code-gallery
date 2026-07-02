@@ -357,8 +357,8 @@ export default function MermaidCanvas({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         tabIndex={0}
-        role="application"
-        aria-label={`${title} — 可交互图表，使用方向键平移，+/- 缩放`}
+        role="img"
+        aria-label={`${title} — 可交互图表，方向键平移，+/− 缩放，0 重置`}
         onKeyDown={(e) => {
           const step = 30;
           switch (e.key) {

@@ -27,8 +27,9 @@ export default function CodeTemplates({ onSelect, visible }: CodeTemplatesProps)
                 <button
                   key={template.id}
                   onClick={() => onSelect(template.code, template.language)}
-                  className="group flex items-start gap-2 p-2.5 rounded-lg bg-code-bg/60 hover:bg-code-bg border border-transparent hover:border-code-purple/30 transition-all duration-200 text-left"
+                  className="group flex items-start gap-2 p-2.5 rounded-lg bg-code-bg/60 hover:bg-code-bg border border-transparent hover:border-code-purple/30 focus-visible:ring-2 focus-visible:ring-code-purple/40 focus-visible:outline-none transition-all duration-200 text-left"
                   title={template.description}
+                  aria-label={`加载模板: ${template.title}`}
                 >
                   <span className="text-base flex-shrink-0 leading-none mt-0.5">{template.icon}</span>
                   <div className="min-w-0">

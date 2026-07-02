@@ -151,6 +151,14 @@ function PlaygroundContent() {
     setIsAnalyzing(false);
   }, []);
 
+  const handleShareUrl = useCallback(() => {
+    const encoded = encodeCodeForUrl(code, language);
+    if (!encoded) return;
+    const url = `${window.location.origin}${window.location.pathname}?code=${encoded}`;
+    router.replace(url, { scroll: false });
+    navigator.clipboard.writeText(url);
+  }, [code, language, router]);
+
   // Command palette (Ctrl/Cmd+K)
   const commandItems: CommandItem[] = useMemo(
     () => [
@@ -176,19 +184,27 @@ function PlaygroundContent() {
         group: "操作",
         action: () => { setCode(""); setResult(null); setError(null); },
       },
+      {
+        id: "share",
+        label: "分享链接",
+        description: "复制含代码的分享链接",
+        group: "操作",
+        action: () => handleShareUrl(),
+      },
+      {
+        id: "copy-code",
+        label: "复制代码",
+        description: "将当前代码复制到剪贴板",
+        group: "操作",
+        action: () => {
+          navigator.clipboard.writeText(code).catch(() => {});
+        },
+      },
     ],
-    [handleAnalyze, handleCancel]
+    [handleAnalyze, handleCancel, handleShareUrl, code]
   );
 
   const { open: paletteOpen, setOpen: setPaletteOpen } = useCommandPalette(commandItems);
-
-  const handleShareUrl = useCallback(() => {
-    const encoded = encodeCodeForUrl(code, language);
-    if (!encoded) return;
-    const url = `${window.location.origin}${window.location.pathname}?code=${encoded}`;
-    router.replace(url, { scroll: false });
-    navigator.clipboard.writeText(url);
-  }, [code, language, router]);
 
   // Skip clearing result on initial load and example selection
   const skipClearRef = useRef(false);

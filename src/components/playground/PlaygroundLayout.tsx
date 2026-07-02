@@ -3,6 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import KeyboardShortcuts from "./KeyboardShortcuts";
 
@@ -93,18 +94,27 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
       </header>
 
       {/* Mobile menu overlay */}
-      {menuOpen && (
+      <AnimatePresence>
+        {menuOpen && (
         <>
-          <div
+          <motion.div
             className="fixed inset-0 z-50 bg-black/30 md:hidden"
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
           />
-          <div
+          <motion.div
             ref={menuRef}
             className="fixed top-14 left-0 right-0 z-50 bg-gallery-white shadow-lg md:hidden"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
           >
-            <nav className="px-4 py-3 space-y-1">
+            <nav className="px-4 py-3 space-y-1" aria-label="移动端导航">
               <Link
                 href="/"
                 onClick={() => setMenuOpen(false)}
@@ -127,9 +137,10 @@ export default function PlaygroundLayout({ children }: PlaygroundLayoutProps) {
                 示例
               </Link>
             </nav>
-          </div>
+          </motion.div>
         </>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Main content */}
       <main id="main" className="flex-1 min-h-0 overflow-auto md:overflow-hidden flex flex-col">{children}</main>

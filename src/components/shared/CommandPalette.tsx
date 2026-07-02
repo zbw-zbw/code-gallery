@@ -80,6 +80,11 @@ export default function CommandPalette({ items, open, onClose }: CommandPaletteP
     setSelectedIndex(0);
   }, [query]);
 
+  // Also reset when items change
+  useEffect(() => {
+    setSelectedIndex((prev) => Math.min(prev, Math.max(filteredItems.length - 1, 0)));
+  }, [filteredItems]);
+
   // Focus input when opened
   useEffect(() => {
     if (open) {
@@ -98,7 +103,7 @@ export default function CommandPalette({ items, open, onClose }: CommandPaletteP
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex((prev) => Math.min(prev + 1, filteredItems.length - 1));
+          setSelectedIndex((prev) => Math.min(prev + 1, Math.max(filteredItems.length - 1, 0)));
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -106,7 +111,7 @@ export default function CommandPalette({ items, open, onClose }: CommandPaletteP
           break;
         case "Enter":
           e.preventDefault();
-          if (filteredItems[selectedIndex]) {
+          if (filteredItems[selectedIndex] && selectedIndex >= 0) {
             filteredItems[selectedIndex].action();
             onClose();
           }

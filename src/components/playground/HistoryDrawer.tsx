@@ -7,6 +7,7 @@ import { Language } from "@/types";
 import { SUPPORTED_LANGUAGES } from "@/lib/constants";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useToast } from "@/components/shared/Toast";
+import DiffView from "@/components/shared/DiffView";
 
 interface HistoryDrawerProps {
   onSelect: (code: string, language: Language) => void;
@@ -15,6 +16,8 @@ interface HistoryDrawerProps {
 export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [compareTarget, setCompareTarget] = useState<HistoryEntry | null>(null);
+  const [diffModal, setDiffModal] = useState<{ old: HistoryEntry; new: HistoryEntry } | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
 
@@ -73,7 +76,45 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
   const handleClose = useCallback(() => {
     setOpen(false);
     setConfirmingClear(false);
+    if (confirmTimerRef.current) {
+      clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = null;
+    }
   }, []);
+
+  // Body scroll lock when drawer is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  // Compare logic: first click selects a target, second click opens diff
+  const handleCompare = useCallback(
+    (entry: HistoryEntry) => {
+      if (!compareTarget) {
+        setCompareTarget(entry);
+        showToast("已选择对比基准，请选择另一条记录", "info");
+        return;
+      }
+      if (compareTarget.id === entry.id) {
+        setCompareTarget(null);
+        showToast("已取消对比选择", "info");
+        return;
+      }
+      // Open diff modal — newer entry on the right
+      const oldEntry = compareTarget.timestamp < entry.timestamp ? compareTarget : entry;
+      const newEntry = compareTarget.timestamp < entry.timestamp ? entry : compareTarget;
+      setDiffModal({ old: oldEntry, new: newEntry });
+      setCompareTarget(null);
+    },
+    [compareTarget, showToast]
+  );
 
   return (
     <>
@@ -120,6 +161,8 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
                     onClearAll={handleClearAll}
                     onClose={handleClose}
                     confirmingClear={confirmingClear}
+                    onCompare={handleCompare}
+                    compareTargetId={compareTarget?.id}
                   />
                 </div>
               </motion.div>
@@ -142,10 +185,61 @@ export default function HistoryDrawer({ onSelect }: HistoryDrawerProps) {
                   onClearAll={handleClearAll}
                   onClose={handleClose}
                   confirmingClear={confirmingClear}
+                  onCompare={handleCompare}
+                  compareTargetId={compareTarget?.id}
                 />
               </motion.div>
             </div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* Diff comparison modal */}
+      <AnimatePresence>
+        {diffModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setDiffModal(null)}
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-4xl h-[80vh] bg-gallery-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              role="dialog"
+              aria-modal="true"
+              aria-label="代码对比"
+            >
+              <div className="flex items-center justify-between px-5 py-3 border-b border-gallery-border/30 flex-shrink-0">
+                <h3 className="text-sm font-bold text-gallery-black">代码对比</h3>
+                <button
+                  onClick={() => setDiffModal(null)}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-gallery-gray hover:text-gallery-black hover:bg-gallery-bg transition-colors"
+                  aria-label="关闭对比"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 p-4">
+                <DiffView
+                  oldCode={diffModal.old.code}
+                  newCode={diffModal.new.code}
+                  oldLanguage={diffModal.old.language}
+                  newLanguage={diffModal.new.language}
+                  oldLabel={formatTimeAgo(diffModal.old.timestamp)}
+                  newLabel={formatTimeAgo(diffModal.new.timestamp)}
+                />
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>
@@ -159,6 +253,8 @@ function HistoryContent({
   onClearAll,
   onClose,
   confirmingClear,
+  onCompare,
+  compareTargetId,
 }: {
   history: HistoryEntry[];
   onSelect: (entry: HistoryEntry) => void;
@@ -166,6 +262,8 @@ function HistoryContent({
   onClearAll: () => void;
   onClose: () => void;
   confirmingClear: boolean;
+  onCompare: (entry: HistoryEntry) => void;
+  compareTargetId?: string;
 }) {
   return (
     <>
@@ -224,8 +322,16 @@ function HistoryContent({
               return (
                 <div
                   key={entry.id}
-                  onClick={() => onSelect(entry)}
-                  className="w-full text-left p-3.5 rounded-xl hover:shadow-md transition-all duration-200 bg-gallery-bg/50 hover:bg-gallery-border/30 group cursor-pointer"
+                  onClick={() => {
+                    if (compareTargetId) {
+                      onCompare(entry);
+                    } else {
+                      onSelect(entry);
+                    }
+                  }}
+                  className={`w-full text-left p-3.5 rounded-xl transition-all duration-200 bg-gallery-bg/50 hover:bg-gallery-border/30 group cursor-pointer ${
+                    compareTargetId === entry.id ? "ring-2 ring-code-purple" : "hover:shadow-md"
+                  }`}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
@@ -253,6 +359,26 @@ function HistoryContent({
                         <span>{formatTimeAgo(entry.timestamp)}</span>
                       </div>
                     </div>
+                    {/* Compare button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCompare(entry);
+                      }}
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                        compareTargetId === entry.id
+                          ? "text-code-purple bg-code-purple/10"
+                          : "text-gallery-gray opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 hover:text-code-purple hover:bg-code-purple/10"
+                      }`}
+                      aria-label={compareTargetId === entry.id ? "取消对比" : "对比此记录"}
+                      title="对比"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+                        <path d="M21 12H7" />
+                        <path d="M21 12l-4-4v8l4-4z" />
+                        <path d="M3 6v12" />
+                      </svg>
+                    </button>
                     {/* Delete button — now a real button, not nested */}
                     <button
                       onClick={(e) => onRemove(e, entry.id)}
