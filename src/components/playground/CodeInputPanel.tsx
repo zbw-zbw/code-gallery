@@ -268,7 +268,7 @@ export default function CodeInputPanel({
 
       {/* Code editor with syntax highlighting overlay */}
       <div
-        className="flex-1 min-h-0 flex overflow-hidden relative"
+        className="flex-1 min-h-0 flex overflow-hidden relative bg-code-bg"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -292,6 +292,7 @@ export default function CodeInputPanel({
             ref={highlightRef}
             className="absolute inset-0 py-4 pl-2 pr-4 text-sm font-mono leading-6 overflow-hidden pointer-events-none whitespace-pre bg-code-bg"
             aria-hidden="true"
+            style={{ contain: "strict" }}
           >
             <div
               dangerouslySetInnerHTML={{
